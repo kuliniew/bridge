@@ -1,4 +1,4 @@
-module Card (Suit, suits, Rank, ranks, Card, deck) where
+module Card (Suit (..), suits, Rank (..), ranks, Card, deck) where
 
 {-| This module describes a standard deck of playing cards.
 -}
