@@ -1,12 +1,12 @@
 module Game (Model, init, view, update) where
 
 import Card exposing (Card)
-import Seat exposing (Seat)
+import Seat
+import View
 
 import Array
 import Effects exposing (Effects)
 import Html exposing (Html)
-import Html.Attributes as Attr
 import Random
 import Random.Array
 import Signal
@@ -63,56 +63,4 @@ view address model =
 
 viewState : GameState -> Html
 viewState state =
-  Html.div [] (List.map (\seat -> viewHand seat (Seat.lookup seat state.hands)) [Seat.West, Seat.North, Seat.East, Seat.South])
-
-
-viewHand : Seat -> List Card -> Html
-viewHand seat hand =
-  Html.div []
-    [ Html.text (toString seat)
-    , Html.ul [Attr.class "suits"] (List.map (viewSuit hand) [Card.Spades, Card.Hearts, Card.Diamonds, Card.Clubs])
-    ]
-
-
-viewSuit : List Card -> Card.Suit -> Html
-viewSuit hand suit =
-  let
-    cards = List.filter (\card -> card.suit == suit) hand
-    contents = List.map viewRank cards
-  in
-    Html.li [suitClass suit] [ Html.ul [Attr.class "ranks"] contents ]
-
-
-viewRank : Card -> Html
-viewRank card =
-  let
-    value =
-      case card.rank of
-        Card.Ace -> "A"
-        Card.King -> "K"
-        Card.Queen -> "Q"
-        Card.Jack -> "J"
-        Card.Ten -> "10"
-        Card.Nine -> "9"
-        Card.Eight -> "8"
-        Card.Seven -> "7"
-        Card.Six -> "6"
-        Card.Five -> "5"
-        Card.Four -> "4"
-        Card.Three -> "3"
-        Card.Two -> "2"
-  in
-    Html.li [] [Html.text value]
-
-
-suitClass : Card.Suit -> Html.Attribute
-suitClass suit =
-  let
-    class =
-      case suit of
-        Card.Clubs -> "clubs"
-        Card.Diamonds -> "diamonds"
-        Card.Hearts -> "hearts"
-        Card.Spades -> "spades"
-  in
-    Attr.class class
+  Html.div [] (List.map (\seat -> View.viewHand seat (Seat.lookup seat state.hands)) [Seat.West, Seat.North, Seat.East, Seat.South])
