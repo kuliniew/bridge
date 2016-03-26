@@ -1,3 +1,52 @@
-body {
-  background-color: yellow;
+ul.suits {
+  list-style-type: none;
+}
+
+/*
+ul.suits > li::before {
+  content: "SUIT";
+  display: inline;
+}
+*/
+
+li.clubs {
+  color: black;
+}
+
+li.clubs::before {
+  content: '\2663';
+}
+
+li.diamonds {
+  color: red;
+}
+
+li.diamonds::before {
+  content: '\2666';
+}
+
+li.hearts {
+  color: red;
+}
+
+li.hearts::before {
+  content: '\2665';
+}
+
+li.spades {
+  color: black;
+}
+
+li.spades::before {
+  content: '\2660';
+}
+
+ul.ranks {
+  display: inline;
+  padding-left: 0;
+}
+
+ul.ranks li {
+  display: inline;
+  margin-left: 0.2em;
 }

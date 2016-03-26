@@ -6,7 +6,7 @@ import Seat exposing (Seat)
 import Array
 import Effects exposing (Effects)
 import Html exposing (Html)
-import Html.Events
+import Html.Attributes as Attr
 import Random
 import Random.Array
 import Signal
@@ -70,7 +70,7 @@ viewHand : Seat -> List Card -> Html
 viewHand seat hand =
   Html.div []
     [ Html.text (toString seat)
-    , Html.ul [] (List.map (viewSuit hand) [Card.Spades, Card.Hearts, Card.Diamonds, Card.Clubs])
+    , Html.ul [Attr.class "suits"] (List.map (viewSuit hand) [Card.Spades, Card.Hearts, Card.Diamonds, Card.Clubs])
     ]
 
 
@@ -78,10 +78,9 @@ viewSuit : List Card -> Card.Suit -> Html
 viewSuit hand suit =
   let
     cards = List.filter (\card -> card.suit == suit) hand
-    prefix = Html.text (toString suit)
     contents = List.map viewRank cards
   in
-    Html.li [] (prefix :: contents)
+    Html.li [suitClass suit] [ Html.ul [Attr.class "ranks"] contents ]
 
 
 viewRank : Card -> Html
@@ -103,4 +102,17 @@ viewRank card =
         Card.Three -> "3"
         Card.Two -> "2"
   in
-    Html.text value
+    Html.li [] [Html.text value]
+
+
+suitClass : Card.Suit -> Html.Attribute
+suitClass suit =
+  let
+    class =
+      case suit of
+        Card.Clubs -> "clubs"
+        Card.Diamonds -> "diamonds"
+        Card.Hearts -> "hearts"
+        Card.Spades -> "spades"
+  in
+    Attr.class class
