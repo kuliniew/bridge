@@ -21,7 +21,10 @@ viewSuit hand suit =
     cards =
       List.filter (\card -> card.suit == suit) hand
       |> List.sortWith Card.rankDescending
-    contents = List.map viewRank cards
+    contents =
+      if List.isEmpty cards
+        then [Html.li [] [Html.text "—"]]
+        else List.map viewRank cards
   in
     Html.li [suitClass suit] [ Html.ul [Attr.class "ranks"] contents ]
 
