@@ -18,7 +18,9 @@ viewHand seat hand =
 viewSuit : List Card -> Card.Suit -> Html
 viewSuit hand suit =
   let
-    cards = List.filter (\card -> card.suit == suit) hand
+    cards =
+      List.filter (\card -> card.suit == suit) hand
+      |> List.sortWith Card.rankDescending
     contents = List.map viewRank cards
   in
     Html.li [suitClass suit] [ Html.ul [Attr.class "ranks"] contents ]

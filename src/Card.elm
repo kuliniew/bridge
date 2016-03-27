@@ -1,4 +1,4 @@
-module Card (Suit (..), suits, Rank (..), ranks, Card, deck) where
+module Card (Suit (..), suits, Rank (..), ranks, Card, deck, rankDescending) where
 
 {-| This module describes a standard deck of playing cards.
 -}
@@ -40,6 +40,26 @@ type Rank
   | Two
 
 
+{-| Numerical equivalent of a rank.
+-}
+numericalRank : Rank -> Int
+numericalRank rank =
+  case rank of
+    Ace -> 14
+    King -> 13
+    Queen -> 12
+    Jack -> 11
+    Ten -> 10
+    Nine -> 9
+    Eight -> 8
+    Seven -> 7
+    Six -> 6
+    Five -> 5
+    Four -> 4
+    Three -> 3
+    Two -> 2
+
+
 {-| Array of all ranks.
 -}
 ranks : Array Rank
@@ -70,3 +90,9 @@ deck =
     Array.toList suits
       |> List.concatMap addRanks
       |> Array.fromList
+
+
+{-| Comparitor to sort cards in descending order by rank.
+-}
+rankDescending : Card -> Card -> Order
+rankDescending card1 card2 = (numericalRank card2.rank) `compare` (numericalRank card1.rank)
