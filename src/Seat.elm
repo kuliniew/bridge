@@ -1,4 +1,6 @@
-module Seat (Seat (..), Each, lookup) where
+module Seat (Seat (..), seats, next, Each, lookup) where
+
+import Array exposing (Array)
 
 
 type Seat
@@ -6,6 +8,24 @@ type Seat
   | North
   | East
   | South
+
+
+{-| Array of all seats.
+-}
+seats : Array Seat
+seats =
+  Array.fromList [West, North, East, South]
+
+
+{-| Return the next seat to act after this one.
+-}
+next : Seat -> Seat
+next seat =
+  case seat of
+    West -> North
+    North -> East
+    East -> South
+    South -> West
 
 
 type alias Each a =

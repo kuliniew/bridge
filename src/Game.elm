@@ -1,7 +1,8 @@
 module Game (Model, init, view, update) where
 
+import Auction
 import Card exposing (Card)
-import Seat
+import Seat exposing (Seat)
 import View
 
 import Array
@@ -19,6 +20,8 @@ type alias Model = Maybe GameState
 
 type alias GameState =
   { hands : Seat.Each (List Card)
+  , dealer : Seat
+  , auction : List Auction.Bid
   , seed : Random.Seed
   }
 
@@ -39,12 +42,12 @@ update action model =
     (Reseed time, _) ->
       let
         seed = Random.initialSeed (round time)
-        state = deal seed
+        state = deal Seat.South seed
       in
         (Just state, Effects.none)
     (NewDeal, Just oldState) ->
       let
-        newState = deal oldState.seed
+        newState = deal (Seat.next oldState.dealer) oldState.seed
       in
         (Just newState, Effects.none)
     (_, Nothing) ->
@@ -52,8 +55,8 @@ update action model =
       (Nothing, Effects.none)
 
 
-deal : Random.Seed -> GameState
-deal seed =
+deal : Seat -> Random.Seed -> GameState
+deal dealer seed =
   let
     (shuffled, seed') = Random.generate (Random.Array.shuffle Card.deck) seed
     cardsPerHand = Array.length shuffled // 4
@@ -66,6 +69,8 @@ deal seed =
       }
     state =
       { hands = hands
+      , dealer = dealer
+      , auction = []
       , seed = seed'
       }
   in
