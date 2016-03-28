@@ -1,13 +1,7 @@
 ul.suits {
   list-style-type: none;
+  padding-left: 0;
 }
-
-/*
-ul.suits > li::before {
-  content: "SUIT";
-  display: inline;
-}
-*/
 
 li.clubs {
   color: black;

@@ -63,4 +63,12 @@ view address model =
 
 viewState : GameState -> Html
 viewState state =
-  Html.div [] (List.map (\seat -> View.viewHand seat (Seat.lookup seat state.hands)) [Seat.West, Seat.North, Seat.East, Seat.South])
+  let
+    emptyCell = Html.td [] []
+    seatCell seat = Html.td [] [View.viewHand seat (Seat.lookup seat state.hands)]
+  in
+    Html.table []
+      [ Html.tr [] [ emptyCell, seatCell Seat.North, emptyCell ]
+      , Html.tr [] [ seatCell Seat.West, emptyCell, seatCell Seat.East ]
+      , Html.tr [] [ emptyCell, seatCell Seat.South, emptyCell ]
+      ]
