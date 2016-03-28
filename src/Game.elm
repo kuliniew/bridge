@@ -96,5 +96,6 @@ viewState address state =
           , Html.tr [] [ seatCell Seat.West, emptyCell, seatCell Seat.East ]
           , Html.tr [] [ emptyCell, seatCell Seat.South, emptyCell ]
           ]
+      , View.viewAuction state.dealer state.auction
       , Html.button [ Events.onClick address NewDeal ] [ Html.text "Rage Quit" ]
       ]

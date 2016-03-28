@@ -1,5 +1,10 @@
-module View (viewHand, viewSuit) where
+module View
+  ( viewHand
+  , viewSuit
+  , viewAuction
+  ) where
 
+import Auction
 import Card exposing (Card)
 import Seat exposing (Seat)
 
@@ -49,6 +54,20 @@ viewRank card =
         Card.Two -> "2"
   in
     Html.li [] [Html.text value]
+
+
+viewAuction : Seat -> List Auction.Bid -> Html
+viewAuction dealer auction =
+  let
+    headerCell name = Html.td [] [Html.text name]
+  in
+    Html.table []
+      [ Html.thead []
+          [ Html.tr [] (List.map headerCell ["West", "North", "East", "South"])
+          ]
+      , Html.tbody []
+          []
+      ]
 
 
 suitClass : Card.Suit -> Html.Attribute
