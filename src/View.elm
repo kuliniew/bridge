@@ -59,15 +59,47 @@ viewRank card =
 viewAuction : Seat -> List Auction.Bid -> Html
 viewAuction dealer auction =
   let
-    headerCell name = Html.td [] [Html.text name]
+    headerCell name =
+      Html.td [] [Html.text name]
+    bidCell bid =
+      Html.td [] (viewBid bid)
+    blankCell =
+      Html.td [] []
+    nullCell =
+      Html.td [] [Html.text "—"]
+    nullCells =
+      case dealer of
+        Seat.West -> []
+        Seat.North -> [nullCell]
+        Seat.East -> [nullCell, nullCell]
+        Seat.South -> [nullCell, nullCell, nullCell]
+    makeBidCells =
+      if Auction.isOpen auction
+        then [makeBidCell auction]
+        else []
+    allCells = nullCells ++ List.reverse (List.map bidCell auction) ++ makeBidCells
+    row cells =
+      Html.tr [] cells
   in
     Html.table []
       [ Html.thead []
           [ Html.tr [] (List.map headerCell ["West", "North", "East", "South"])
           ]
-      , Html.tbody []
-          []
+      , Html.tbody [] (List.map row <| cluster blankCell 4 allCells)
       ]
+
+
+makeBidCell : List Auction.Bid -> Html
+makeBidCell auction =
+  let
+    header =
+      Html.option [] [Html.text "Make a bid..."]
+    toChoice bid =
+      Html.option [] (viewBid bid)
+    choices =
+      List.map toChoice (Auction.legalBids auction)
+  in
+    Html.select [] (header :: choices)
 
 
 suitClass : Card.Suit -> Html.Attribute
@@ -81,3 +113,35 @@ suitClass suit =
         Card.Spades -> "spades"
   in
     Attr.class class
+
+
+viewBid : Auction.Bid -> List Html
+viewBid bid =
+  let
+    suitText suit =
+      case suit of
+        Card.Clubs -> "♣"
+        Card.Diamonds -> "♦"
+        Card.Hearts -> "♥"
+        Card.Spades -> "♠"
+    viewTrump trump =
+      case trump of
+        Just suit -> Html.span [suitClass suit] [Html.text <| suitText suit]
+        Nothing -> Html.text "NT"
+  in
+    case bid of
+      Auction.Pass -> [Html.text "Pass"]
+      Auction.Double -> [Html.text "Double"]
+      Auction.Redouble -> [Html.text "Redouble"]
+      Auction.Bid level trump -> [Html.text (toString level), viewTrump trump]
+
+
+cluster : a -> Int -> List a -> List (List a)
+cluster filler count elems =
+  let
+    pad chunk =
+      chunk ++ List.repeat (count - List.length chunk) filler
+  in
+    case List.take count elems of
+      [] -> []
+      chunk -> pad chunk :: cluster filler count (List.drop count elems)
