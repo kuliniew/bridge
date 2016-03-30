@@ -4,12 +4,17 @@ module View
   , viewAuction
   ) where
 
+import Action exposing (Action)
 import Auction
 import Card exposing (Card)
 import Seat exposing (Seat)
 
+import Debug
 import Html exposing (Html)
 import Html.Attributes as Attr
+import Html.Events as Events
+import Json.Decode
+import List.Extra
 
 
 viewHand : Seat -> List Card -> Html
@@ -56,8 +61,8 @@ viewRank card =
     Html.li [] [Html.text value]
 
 
-viewAuction : Seat -> List Auction.Bid -> Html
-viewAuction dealer auction =
+viewAuction : Signal.Address Action -> Seat -> List Auction.Bid -> Html
+viewAuction address dealer auction =
   let
     headerCell name =
       Html.td [] [Html.text name]
@@ -75,7 +80,7 @@ viewAuction dealer auction =
         Seat.South -> [nullCell, nullCell, nullCell]
     makeBidCells =
       if Auction.isOpen auction
-        then [makeBidCell auction]
+        then [makeBidCell address auction]
         else []
     allCells = nullCells ++ List.reverse (List.map bidCell auction) ++ makeBidCells
     row cells =
@@ -89,17 +94,27 @@ viewAuction dealer auction =
       ]
 
 
-makeBidCell : List Auction.Bid -> Html
-makeBidCell auction =
+makeBidCell : Signal.Address Action -> List Auction.Bid -> Html
+makeBidCell address auction =
   let
+    legalBids =
+      Auction.legalBids auction
+    lookupLegalBid index =
+      case List.Extra.getAt legalBids (index - 1) of
+        Just bid -> bid
+        Nothing -> Debug.crash "failed to lookup the selected bid"
+    getSelectedIndex =
+      Json.Decode.at ["target", "selectedIndex"] Json.Decode.int
+    onSelect =
+      Events.on "change" getSelectedIndex (Signal.message address << Action.Bid << lookupLegalBid)
     header =
       Html.option [] [Html.text "Make a bid..."]
     toChoice bid =
-      Html.option [] (viewBid bid)
+      Html.option [Events.onClick address (Action.Bid bid)] (viewBid bid)
     choices =
-      List.map toChoice (Auction.legalBids auction)
+      List.map toChoice legalBids
   in
-    Html.select [] (header :: choices)
+    Html.td [] [Html.select [onSelect] (header :: choices)]
 
 
 suitClass : Card.Suit -> Html.Attribute

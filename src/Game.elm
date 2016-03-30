@@ -1,5 +1,6 @@
 module Game (Model, init, view, update) where
 
+import Action exposing (Action)
 import Auction
 import Card exposing (Card)
 import Seat exposing (Seat)
@@ -12,7 +13,6 @@ import Html.Events as Events
 import Random
 import Random.Array
 import Signal
-import Time exposing (Time)
 
 
 type alias Model = Maybe GameState
@@ -26,28 +26,28 @@ type alias GameState =
   }
 
 
-type Action
-  = Reseed Time
-  | NewDeal
-
-
 init : (Model, Effects Action)
 init =
-  ( Nothing, Effects.tick Reseed )
+  ( Nothing, Effects.tick Action.Reseed )
 
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
   case (action, model) of
-    (Reseed time, _) ->
+    (Action.Reseed time, _) ->
       let
         seed = Random.initialSeed (round time)
         state = deal Seat.South seed
       in
         (Just state, Effects.none)
-    (NewDeal, Just oldState) ->
+    (Action.NewDeal, Just oldState) ->
       let
         newState = deal (Seat.next oldState.dealer) oldState.seed
+      in
+        (Just newState, Effects.none)
+    (Action.Bid bid, Just oldState) ->
+      let
+        newState = { oldState | auction = bid :: oldState.auction }
       in
         (Just newState, Effects.none)
     (_, Nothing) ->
@@ -96,6 +96,6 @@ viewState address state =
           , Html.tr [] [ seatCell Seat.West, emptyCell, seatCell Seat.East ]
           , Html.tr [] [ emptyCell, seatCell Seat.South, emptyCell ]
           ]
-      , View.viewAuction state.dealer state.auction
-      , Html.button [ Events.onClick address NewDeal ] [ Html.text "Rage Quit" ]
+      , View.viewAuction address state.dealer state.auction
+      , Html.button [ Events.onClick address Action.NewDeal ] [ Html.text "Rage Quit" ]
       ]
