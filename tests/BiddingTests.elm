@@ -2,6 +2,7 @@ module BiddingTests (all) where
 
 import Auction
 import Bidding
+import Card
 
 import ElmTest
 import Random
@@ -12,6 +13,7 @@ all =
   ElmTest.suite "Bidding"
     [ annotateSuite
     , chooseSuite
+    , roleSuite
     ]
 
 
@@ -52,6 +54,169 @@ chooseSuite =
     ]
 
 
+roleSuite : ElmTest.Test
+roleSuite =
+  ElmTest.suite "role'"
+    [ ElmTest.test "first bid at first seat is openable" <|
+        let
+          history = []
+        in
+          ElmTest.assertEqual Bidding.Openable (Bidding.role' history)
+
+    , ElmTest.test "first bid at second seat is openable if first seat passed" <|
+        let
+          history = [Auction.Pass]
+        in
+          ElmTest.assertEqual Bidding.Openable (Bidding.role' history)
+
+    , ElmTest.test "first bid at third seat is openable if first two seats passed" <|
+        let
+          history = [Auction.Pass, Auction.Pass]
+        in
+          ElmTest.assertEqual Bidding.Openable (Bidding.role' history)
+
+    , ElmTest.test "first bid at fourth seat is openable if first three seats passed" <|
+        let
+          history = [Auction.Pass, Auction.Pass, Auction.Pass]
+        in
+          ElmTest.assertEqual Bidding.Openable (Bidding.role' history)
+
+    , ElmTest.test "is opener if previously made the first non-Pass bid (first seat)" <|
+        let
+          history =
+            [ Auction.Pass, Auction.Bid 1 (Just Card.Diamonds), Auction.Pass, Auction.Bid 1 (Just Card.Spades)
+            ]
+        in
+          ElmTest.assertEqual Bidding.Opener (Bidding.role' history)
+
+    , ElmTest.test "is opener if previously made the first non-Pass bid (second seat)" <|
+        let
+          history =
+            [ Auction.Pass, Auction.Bid 1 (Just Card.Diamonds), Auction.Pass, Auction.Bid 1 (Just Card.Spades)
+            , Auction.Pass
+            ]
+        in
+          ElmTest.assertEqual Bidding.Opener (Bidding.role' history)
+
+    , ElmTest.test "is opener if previously made the first non-Pass bid (third seat)" <|
+        let
+          history =
+            [ Auction.Pass, Auction.Bid 1 (Just Card.Diamonds), Auction.Pass, Auction.Bid 1 (Just Card.Spades)
+            , Auction.Pass, Auction.Pass
+            ]
+        in
+          ElmTest.assertEqual Bidding.Opener (Bidding.role' history)
+
+    , ElmTest.test "is opener if previously made the first non-Pass bid (fourth seat)" <|
+        let
+          history =
+            [ Auction.Pass, Auction.Bid 1 (Just Card.Diamonds), Auction.Pass, Auction.Bid 1 (Just Card.Spades)
+            , Auction.Pass, Auction.Pass, Auction.Pass
+            ]
+        in
+          ElmTest.assertEqual Bidding.Opener (Bidding.role' history)
+
+    , ElmTest.test "is responder if partner opened in first seat" <|
+        let
+          history =
+            [ Auction.Pass, Auction.Bid 1 (Just Card.Diamonds)
+            ]
+        in
+          ElmTest.assertEqual Bidding.Responder (Bidding.role' history)
+
+    , ElmTest.test "is responder if partner opened in second seat" <|
+        let
+          history =
+            [ Auction.Pass, Auction.Bid 1 (Just Card.Diamonds), Auction.Pass
+            ]
+        in
+          ElmTest.assertEqual Bidding.Responder (Bidding.role' history)
+
+    , ElmTest.test "is responder if partner opened in third seat" <|
+        let
+          history =
+            [ Auction.Pass, Auction.Bid 1 (Just Card.Diamonds), Auction.Pass, Auction.Pass
+            ]
+        in
+          ElmTest.assertEqual Bidding.Responder (Bidding.role' history)
+
+    , ElmTest.test "is responder if partner opened in fourth seat" <|
+        let
+          history =
+            [ Auction.Pass, Auction.Bid 1 (Just Card.Diamonds), Auction.Pass, Auction.Pass
+            , Auction.Pass
+            ]
+        in
+          ElmTest.assertEqual Bidding.Responder (Bidding.role' history)
+
+    , ElmTest.test "is defender if right-hand opponent is opener in first seat" <|
+        let
+          history =
+            [ Auction.Bid 1 (Just Card.Clubs)
+            ]
+        in
+          ElmTest.assertEqual Bidding.Defender (Bidding.role' history)
+
+    , ElmTest.test "is defender if right-hand opponent is opener in second seat" <|
+        let
+          history =
+            [ Auction.Bid 1 (Just Card.Clubs), Auction.Pass
+            ]
+        in
+          ElmTest.assertEqual Bidding.Defender (Bidding.role' history)
+
+    , ElmTest.test "is defender if right-hand opponent is opener in third seat" <|
+        let
+          history =
+            [ Auction.Bid 1 (Just Card.Clubs), Auction.Pass, Auction.Pass
+            ]
+        in
+          ElmTest.assertEqual Bidding.Defender (Bidding.role' history)
+
+    , ElmTest.test "is defender if right-hand opponent is opener in fourth seat" <|
+        let
+          history =
+            [ Auction.Bid 1 (Just Card.Clubs), Auction.Pass, Auction.Pass, Auction.Pass
+            ]
+        in
+          ElmTest.assertEqual Bidding.Defender (Bidding.role' history)
+
+    , ElmTest.test "is defender if left-hand opponent is opener in first seat" <|
+        let
+          history =
+            [ Auction.Pass, Auction.Pass, Auction.Bid 1 (Just Card.Clubs)
+            ]
+        in
+          ElmTest.assertEqual Bidding.Defender (Bidding.role' history)
+
+    , ElmTest.test "is defender if left-hand opponent is opener in second seat" <|
+        let
+          history =
+            [ Auction.Pass, Auction.Pass, Auction.Bid 1 (Just Card.Clubs), Auction.Pass
+            ]
+        in
+          ElmTest.assertEqual Bidding.Defender (Bidding.role' history)
+
+    , ElmTest.test "is defender if left-hand opponent is opener in third seat" <|
+        let
+          history =
+            [ Auction.Pass, Auction.Pass, Auction.Bid 1 (Just Card.Clubs), Auction.Pass
+            , Auction.Pass
+            ]
+        in
+          ElmTest.assertEqual Bidding.Defender (Bidding.role' history)
+
+    , ElmTest.test "is defender if left-hand opponent is opener in fourth seat" <|
+        let
+          history =
+            [ Auction.Pass, Auction.Pass, Auction.Bid 1 (Just Card.Clubs), Auction.Pass
+            , Auction.Pass, Auction.Pass
+            ]
+        in
+          ElmTest.assertEqual Bidding.Defender (Bidding.role' history)
+    ]
+
+
 testSystem : Bidding.System
 testSystem =
   { name = "Test System"
@@ -61,9 +226,9 @@ testSystem =
 
 oneNoTrump : Bidding.AnnotatedBid
 oneNoTrump =
-  { bid = Auction.Bid 1 Nothing, meaning = [Bidding.HighCardPoints 15 17] }
+  { bid = Auction.Bid 1 Nothing, meaning = [] }
 
 
 twoNoTrump : Bidding.AnnotatedBid
 twoNoTrump =
-  { bid = Auction.Bid 2 Nothing, meaning = [Bidding.HighCardPoints 20 22] }
+  { bid = Auction.Bid 2 Nothing, meaning = [] }
