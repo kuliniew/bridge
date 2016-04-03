@@ -6,6 +6,7 @@ module View
 
 import Action exposing (Action)
 import Auction
+import Bidding
 import Card exposing (Card)
 import Seat exposing (Seat)
 
@@ -61,9 +62,11 @@ viewRank card =
     Html.li [] [Html.text value]
 
 
-viewAuction : Signal.Address Action -> Seat -> List Auction.Bid -> Html
-viewAuction address dealer auction =
+viewAuction : Signal.Address Action -> Seat -> List Bidding.AnnotatedBid -> Html
+viewAuction address dealer annotatedAuction =
   let
+    auction =
+      List.map .bid annotatedAuction
     headerCell name =
       Html.td [] [Html.text name]
     bidCell bid =

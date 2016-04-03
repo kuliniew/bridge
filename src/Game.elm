@@ -2,6 +2,8 @@ module Game (Model, init, view, update) where
 
 import Action exposing (Action)
 import Auction
+import Bidding
+import Bidding.StandardAmerican
 import Card exposing (Card)
 import Seat exposing (Seat)
 import View
@@ -21,7 +23,7 @@ type alias Model = Maybe GameState
 type alias GameState =
   { hands : Seat.Each (List Card)
   , dealer : Seat
-  , auction : List Auction.Bid
+  , auction : List Bidding.AnnotatedBid
   , seed : Random.Seed
   }
 
@@ -42,12 +44,13 @@ update action model =
         (Just state, Effects.none)
     (Action.NewDeal, Just oldState) ->
       let
-        newState = deal (Seat.next oldState.dealer) oldState.seed
+        newState = bidForBots <| deal (Seat.next oldState.dealer) oldState.seed
       in
         (Just newState, Effects.none)
     (Action.Bid bid, Just oldState) ->
       let
-        newState = { oldState | auction = bid :: oldState.auction }
+        annotated = Bidding.annotate Bidding.StandardAmerican.system oldState.auction bid
+        newState = bidForBots { oldState | auction = annotated :: oldState.auction }
       in
         (Just newState, Effects.none)
     (_, Nothing) ->
@@ -75,6 +78,22 @@ deal dealer seed =
       }
   in
     state
+
+
+bidForBots : GameState -> GameState
+bidForBots oldState =
+  let
+    nextBidder = List.foldl (<|) oldState.dealer (List.repeat (List.length oldState.auction) Seat.next)
+  in
+    if nextBidder /= Seat.South && Auction.isOpen (List.map .bid oldState.auction)
+      then
+        let
+          (newBid, newSeed) =
+            Bidding.choose Bidding.StandardAmerican.system oldState.auction (Seat.lookup nextBidder oldState.hands) oldState.seed
+          newAuction = newBid :: oldState.auction
+        in
+          bidForBots { oldState | auction = newAuction, seed = newSeed }
+      else oldState
 
 
 view : Signal.Address Action -> Model -> Html
