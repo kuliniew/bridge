@@ -1,4 +1,14 @@
-module Card (Suit (..), suits, Rank (..), ranks, Card, deck, rankDescending) where
+module Card
+  ( Suit (..)
+  , suits
+  , Rank (..)
+  , ranks
+  , Card
+  , deck
+  , rankDescending
+  , SampleHand
+  , fromSuits
+  ) where
 
 {-| This module describes a standard deck of playing cards.
 -}
@@ -96,3 +106,34 @@ deck =
 -}
 rankDescending : Card -> Card -> Order
 rankDescending card1 card2 = (numericalRank card2.rank) `compare` (numericalRank card1.rank)
+
+
+{-| Record used when writing test cases.
+-}
+type alias SampleHand =
+  { spades: List Rank
+  , hearts: List Rank
+  , diamonds: List Rank
+  , clubs: List Rank
+  }
+
+
+{-| Expand a sample hand into a full list of cards.
+-}
+fromSuits : SampleHand -> List Card
+fromSuits sample =
+  let
+    addSuit suit rank =
+      { suit = suit, rank = rank }
+    cards =
+      List.concat
+        [ List.map (addSuit Spades) sample.spades
+        , List.map (addSuit Hearts) sample.hearts
+        , List.map (addSuit Diamonds) sample.diamonds
+        , List.map (addSuit Clubs) sample.clubs
+        ]
+    length = List.length cards
+  in
+    if length == 13
+      then cards
+      else Debug.crash ("sanity check: sample hand has " ++ toString length ++ " cards, not 13")
