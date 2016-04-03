@@ -35,7 +35,7 @@ chooseSuite =
   ElmTest.suite "choose"
     [ ElmTest.test "picks one of the bids suggested by the system" <|
         let
-          (choice, _) = Bidding.choose testSystem [] (Random.initialSeed 0)
+          (choice, _) = Bidding.choose testSystem [] [] (Random.initialSeed 0)
         in
           ElmTest.assert (choice == oneNoTrump || choice == twoNoTrump)
 
@@ -46,7 +46,7 @@ chooseSuite =
           expected =
             { bid = Auction.Pass, meaning = [Bidding.OutOfSystem] }
           (choice, _) =
-            Bidding.choose nullSystem [] (Random.initialSeed 0)
+            Bidding.choose nullSystem [] [] (Random.initialSeed 0)
         in
           ElmTest.assertEqual expected choice
     ]

@@ -62,8 +62,8 @@ lookup bid =
 suggestions is chosen at random.  If the system makes no suggestion, the
 result will be Pass for reason of being OutOfSystem.
 -}
-choose : System -> List AnnotatedBid -> Random.Seed -> (AnnotatedBid, Random.Seed)
-choose system history =
+choose : System -> List AnnotatedBid -> List Card -> Random.Seed -> (AnnotatedBid, Random.Seed)
+choose system history hand =
   let
     fallback = { bid = Auction.Pass, meaning = [OutOfSystem] }
   in
