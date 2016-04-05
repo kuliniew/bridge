@@ -19,49 +19,82 @@ all =
 openingSuite : ElmTest.Test
 openingSuite =
   ElmTest.suite "opening"
-    [ ElmTest.test "must bid 1NT (1NT example 1)" <|
+    [ ElmTest.test "1NT allowed for 5-3-3-2 distribution and 15 HCP" <|
         let
           hand =
-            { spades = [ Card.Ace, Card.Eight, Card.Seven, Card.Three ]
-            , hearts = [ Card.Ace, Card.Jack, Card.Four, Card.Two ]
-            , diamonds = [ Card.Ace, Card.Jack, Card.Two ]
-            , clubs = [ Card.King, Card.Ten ]
-          }
-        in
-          mustBid (Auction.Bid 1 Nothing) [] hand
-
-    , ElmTest.test "may bid 1NT (1NT example 2)" <|
-        let
-          hand =
-            { spades = [ Card.King, Card.Nine, Card.Seven ]
-            , hearts = [ Card.Ten, Card.Two ]
-            , diamonds = [ Card.King, Card.Eight, Card.Seven ]
-            , clubs = [ Card.Ace, Card.King, Card.Queen, Card.Four, Card.Three ]
-          }
+            { spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Eight, Card.Two ]
+            , hearts = [ Card.King, Card.Queen, Card.Seven ]
+            , diamonds = [ Card.Queen, Card.Jack, Card.Four ]
+            , clubs = [ Card.Jack, Card.Eight ]
+            }
         in
           mayBid (Auction.Bid 1 Nothing) [] hand
 
-    , ElmTest.test "must bid 1NT (1NT example 3)" <|
+    , ElmTest.test "1NT required for 4-3-3-3 distribution and 15 HCP" <|
         let
           hand =
-            { spades = [ Card.Ace, Card.Jack ]
-            , hearts = [ Card.Eight, Card.Seven, Card.Six ]
-            , diamonds = [ Card.Ace, Card.King, Card.Nine, Card.Eight ]
-            , clubs = [ Card.King, Card.Ten, Card.Three, Card.Two ]
-          }
+            { spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Eight ]
+            , hearts = [ Card.King, Card.Queen, Card.Seven ]
+            , diamonds = [ Card.Queen, Card.Jack, Card.Four ]
+            , clubs = [ Card.Jack, Card.Eight, Card.Six ]
+            }
         in
           mustBid (Auction.Bid 1 Nothing) [] hand
 
-    , ElmTest.test "must bid 1NT (1NT example 4)" <|
+    , ElmTest.test "1NT required for 4-3-3-3 distribution and 17 HCP" <|
         let
           hand =
-            { spades = [ Card.Ace, Card.King, Card.Queen ]
-            , hearts = [ Card.King, Card.Queen, Card.Jack, Card.Two ]
-            , diamonds = [ Card.Jack, Card.Six, Card.Five ]
-            , clubs = [ Card.Nine, Card.Seven, Card.Three ]
-          }
+            { spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Eight ]
+            , hearts = [ Card.King, Card.Queen, Card.Seven ]
+            , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
+            , clubs = [ Card.Jack, Card.Eight, Card.Six ]
+            }
         in
           mustBid (Auction.Bid 1 Nothing) [] hand
+
+    , ElmTest.test "2NT required for 4-3-3-3 distribution and 20 HCP" <|
+        let
+          hand =
+            { spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
+            , hearts = [ Card.King, Card.Queen, Card.Seven ]
+            , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
+            , clubs = [ Card.Jack, Card.Eight, Card.Six ]
+            }
+        in
+          mustBid (Auction.Bid 2 Nothing) [] hand
+
+    , ElmTest.test "2NT required for 4-3-3-3 distribution and 21 HCP" <|
+        let
+          hand =
+            { spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
+            , hearts = [ Card.King, Card.Queen, Card.Seven ]
+            , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
+            , clubs = [ Card.Queen, Card.Eight, Card.Six ]
+            }
+        in
+          mustBid (Auction.Bid 2 Nothing) [] hand
+
+    , ElmTest.test "3NT required for 4-3-3-3 distribution and 25 HCP" <|
+        let
+          hand =
+            { spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
+            , hearts = [ Card.King, Card.Queen, Card.Seven ]
+            , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
+            , clubs = [ Card.Ace, Card.Queen, Card.Six ]
+            }
+        in
+          mustBid (Auction.Bid 3 Nothing) [] hand
+
+    , ElmTest.test "3NT required for 4-3-3-3 distribution and 27 HCP" <|
+        let
+          hand =
+            { spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
+            , hearts = [ Card.King, Card.Queen, Card.Seven ]
+            , diamonds = [ Card.Ace, Card.King, Card.Four ]
+            , clubs = [ Card.Ace, Card.Queen, Card.Six ]
+            }
+        in
+          mustBid (Auction.Bid 3 Nothing) [] hand
     ]
 
 

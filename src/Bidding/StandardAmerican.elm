@@ -29,10 +29,16 @@ suggest history =
 -}
 openingBids : List Bidding.AnnotatedBid
 openingBids =
-  [ { bid = Auction.Bid 1 Nothing
-    , meaning =
-        [ Bidding.HighCardPoints 15 17
-        , Bidding.Balanced
-        ]
-    }
-  ]
+  let
+    noTrump level lo hi =
+      { bid = Auction.Bid level Nothing
+      , meaning =
+          [ Bidding.HighCardPoints lo hi
+          , Bidding.Balanced
+          ]
+      }
+  in
+    [ noTrump 1 15 17
+    , noTrump 2 20 21
+    , noTrump 3 25 27
+    ]
