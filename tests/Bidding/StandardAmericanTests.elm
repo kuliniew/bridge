@@ -6,6 +6,7 @@ import Bidding.StandardAmerican
 import Card exposing (Card)
 
 import ElmTest
+import List.Extra
 import Random
 
 
@@ -16,114 +17,110 @@ all =
     ]
 
 
+type alias BidTest =
+  { name : String
+  , expected : List Auction.Bid
+  , history : List Auction.Bid
+  , hand : Card.SampleHand
+  }
+
+
 openingSuite : ElmTest.Test
 openingSuite =
-  ElmTest.suite "opening"
-    [ ElmTest.test "1NT allowed for 5-3-3-2 distribution and 15 HCP" <|
-        let
-          hand =
-            { spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Eight, Card.Two ]
-            , hearts = [ Card.King, Card.Queen, Card.Seven ]
-            , diamonds = [ Card.Queen, Card.Jack, Card.Four ]
-            , clubs = [ Card.Jack, Card.Eight ]
-            }
-        in
-          mayBid (Auction.Bid 1 Nothing) [] hand
+  ElmTest.suite "opening" <| List.map testBid
+    [ { name = "15 HCP, 5-3-3-2 distribution, 5 card major"
+      , expected = [Auction.Bid 1 Nothing]
+      , history = []
+      , hand =
+          { spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Eight, Card.Two ]
+          , hearts = [ Card.King, Card.Queen, Card.Seven ]
+          , diamonds = [ Card.Queen, Card.Jack, Card.Four ]
+          , clubs = [ Card.Jack, Card.Eight ]
+          }
+      }
 
-    , ElmTest.test "1NT required for 4-3-3-3 distribution and 15 HCP" <|
-        let
-          hand =
-            { spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Eight ]
-            , hearts = [ Card.King, Card.Queen, Card.Seven ]
-            , diamonds = [ Card.Queen, Card.Jack, Card.Four ]
-            , clubs = [ Card.Jack, Card.Eight, Card.Six ]
-            }
-        in
-          mustBid (Auction.Bid 1 Nothing) [] hand
+    , { name = "15 HCP, 4-3-3-3 distribution"
+      , expected = [Auction.Bid 1 Nothing]
+      , history = []
+      , hand =
+          { spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Eight ]
+          , hearts = [ Card.King, Card.Queen, Card.Seven ]
+          , diamonds = [ Card.Queen, Card.Jack, Card.Four ]
+          , clubs = [ Card.Jack, Card.Eight, Card.Six ]
+          }
+      }
 
-    , ElmTest.test "1NT required for 4-3-3-3 distribution and 17 HCP" <|
-        let
-          hand =
-            { spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Eight ]
-            , hearts = [ Card.King, Card.Queen, Card.Seven ]
-            , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
-            , clubs = [ Card.Jack, Card.Eight, Card.Six ]
-            }
-        in
-          mustBid (Auction.Bid 1 Nothing) [] hand
+    , { name = "17 HCP, 4-3-3-3 distribution"
+      , expected = [Auction.Bid 1 Nothing]
+      , history = []
+      , hand =
+          { spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Eight ]
+          , hearts = [ Card.King, Card.Queen, Card.Seven ]
+          , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
+          , clubs = [ Card.Jack, Card.Eight, Card.Six ]
+          }
+      }
 
-    , ElmTest.test "2NT required for 4-3-3-3 distribution and 20 HCP" <|
-        let
-          hand =
-            { spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
-            , hearts = [ Card.King, Card.Queen, Card.Seven ]
-            , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
-            , clubs = [ Card.Jack, Card.Eight, Card.Six ]
-            }
-        in
-          mustBid (Auction.Bid 2 Nothing) [] hand
+    , { name = "20 HCP, 4-3-3-3 distribution"
+      , expected = [Auction.Bid 2 Nothing]
+      , history = []
+      , hand =
+          { spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
+          , hearts = [ Card.King, Card.Queen, Card.Seven ]
+          , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
+          , clubs = [ Card.Jack, Card.Eight, Card.Six ]
+          }
+      }
 
-    , ElmTest.test "2NT required for 4-3-3-3 distribution and 21 HCP" <|
-        let
-          hand =
-            { spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
-            , hearts = [ Card.King, Card.Queen, Card.Seven ]
-            , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
-            , clubs = [ Card.Queen, Card.Eight, Card.Six ]
-            }
-        in
-          mustBid (Auction.Bid 2 Nothing) [] hand
+    , { name = "21 HCP, 4-3-3-3 distribution"
+      , expected = [Auction.Bid 2 Nothing]
+      , history = []
+      , hand =
+          { spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
+          , hearts = [ Card.King, Card.Queen, Card.Seven ]
+          , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
+          , clubs = [ Card.Queen, Card.Eight, Card.Six ]
+          }
+        }
 
-    , ElmTest.test "3NT required for 4-3-3-3 distribution and 25 HCP" <|
-        let
-          hand =
-            { spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
-            , hearts = [ Card.King, Card.Queen, Card.Seven ]
-            , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
-            , clubs = [ Card.Ace, Card.Queen, Card.Six ]
-            }
-        in
-          mustBid (Auction.Bid 3 Nothing) [] hand
+    , { name = "25 HCP, 4-3-3-3 distribution"
+      , expected = [Auction.Bid 3 Nothing]
+      , history = []
+      , hand =
+          { spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
+          , hearts = [ Card.King, Card.Queen, Card.Seven ]
+          , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
+          , clubs = [ Card.Ace, Card.Queen, Card.Six ]
+          }
+        }
 
-    , ElmTest.test "3NT required for 4-3-3-3 distribution and 27 HCP" <|
-        let
-          hand =
-            { spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
-            , hearts = [ Card.King, Card.Queen, Card.Seven ]
-            , diamonds = [ Card.Ace, Card.King, Card.Four ]
-            , clubs = [ Card.Ace, Card.Queen, Card.Six ]
-            }
-        in
-          mustBid (Auction.Bid 3 Nothing) [] hand
+    , { name = "27 HCP, 4-3-3-3 distribution"
+      , expected = [Auction.Bid 3 Nothing]
+      , history = []
+      , hand =
+          { spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
+          , hearts = [ Card.King, Card.Queen, Card.Seven ]
+          , diamonds = [ Card.Ace, Card.King, Card.Four ]
+          , clubs = [ Card.Ace, Card.Queen, Card.Six ]
+          }
+      }
     ]
 
 
-{-| Type of List.any or List.all, as applied to a bid.
+{-| Test that the expectd bids are suggested in a situation.
 -}
-type alias Combiner = (Auction.Bid -> Bool) -> List Auction.Bid -> Bool
-
-
-{-| Test that a particular bid must be made.
--}
-mustBid : Auction.Bid -> List Auction.Bid -> Card.SampleHand -> ElmTest.Assertion
-mustBid = checkChoice List.all
-
-
-{-| Test that a particular bid may be made, but that alternatives are allowed.
--}
-mayBid : Auction.Bid -> List Auction.Bid -> Card.SampleHand -> ElmTest.Assertion
-mayBid = checkChoice List.any
-
-
-{-| Run a bidding scenario and check for the expected result.
--}
-checkChoice : Combiner -> Auction.Bid -> List Auction.Bid -> Card.SampleHand -> ElmTest.Assertion
-checkChoice combiner expected history hand =
+testBid : BidTest -> ElmTest.Test
+testBid test =
   let
-    seeds = List.map Random.initialSeed [0 .. 99]
-    results = List.map (.bid << fst << Bidding.choose Bidding.StandardAmerican.system (annotate history) (Card.fromSuits hand)) seeds
+    chosen =
+      Bidding.viableChoices Bidding.StandardAmerican.system (annotate test.history) (Card.fromSuits test.hand)
+        |> List.map .bid
+    message = "expected " ++ toString (test.expected) ++ " but got " ++ toString (chosen)
   in
-    ElmTest.assert (combiner (\bid -> bid == expected) results)
+    ElmTest.test test.name <|
+      if chosen `List.Extra.isPermutationOf` test.expected
+        then ElmTest.pass
+        else ElmTest.fail message
 
 
 {-| Annotate an entire bidding history.

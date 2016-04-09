@@ -4,6 +4,7 @@ module Bidding
   , Meaning (..)
   , annotate
   , choose
+  , viableChoices
 
   , Role (..)
   , role
@@ -74,7 +75,15 @@ choose system history hand =
   let
     fallback = { bid = Auction.Pass, meaning = [OutOfSystem] }
   in
-    Random.generate (Random.Extra.selectWithDefault fallback <| List.filter (satisfiedBy hand) <| system.suggestions history)
+    Random.generate (Random.Extra.selectWithDefault fallback <| viableChoices system history hand)
+
+
+{-| Get a list of viable suggested bids, based on the contents of
+the bidder's hand.
+-}
+viableChoices : System -> List AnnotatedBid -> List Card -> List AnnotatedBid
+viableChoices system history hand =
+  List.filter (satisfiedBy hand) <| system.suggestions history
 
 
 {-| Check if a hand satisfies the meaning of a proposed bid.
