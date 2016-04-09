@@ -31,8 +31,152 @@ type alias BidTest =
 openingSuite : ElmTest.Test
 openingSuite =
   ElmTest.suite "opening" <| List.map testBid
-    [ { name = "15 HCP, 5-3-3-2 distribution, 5 card major"
-      , expected = [Auction.Bid 1 Nothing]
+    [ { name = "13 points, 5 spades"
+      , expected = [Auction.Bid 1 (Just Card.Spades)]
+      , history = []
+      , spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Nine, Card.Eight ]
+      , hearts = [ Card.King, Card.Ten, Card.Nine, Card.Eight ]
+      , diamonds = [ Card.Queen, Card.Ten ]
+      , clubs = [ Card.Jack, Card.Ten ]
+      }
+
+    , { name = "13 points, 5 hearts"
+      , expected = [Auction.Bid 1 (Just Card.Hearts)]
+      , history = []
+      , spades = [ Card.King, Card.Ten, Card.Nine, Card.Eight ]
+      , hearts = [ Card.Ace, Card.Queen, Card.Ten, Card.Nine, Card.Eight ]
+      , diamonds = [ Card.Queen, Card.Ten ]
+      , clubs = [ Card.Jack, Card.Ten ]
+      }
+
+    , { name = "13 points, 3 diamonds"
+      , expected = [Auction.Bid 1 (Just Card.Diamonds)]
+      , history = []
+      , spades = [ Card.King, Card.Ten, Card.Nine, Card.Eight ]
+      , hearts = [ Card.Ace, Card.Queen, Card.Ten, Card.Nine ]
+      , diamonds = [ Card.Queen, Card.Ten, Card.Nine ]
+      , clubs = [ Card.Queen, Card.Ten ]
+      }
+
+    , { name = "13 points, 3 clubs"
+      , expected = [Auction.Bid 1 (Just Card.Clubs)]
+      , history = []
+      , spades = [ Card.King, Card.Ten, Card.Nine, Card.Eight ]
+      , hearts = [ Card.Ace, Card.Queen, Card.Ten, Card.Nine ]
+      , diamonds = [ Card.Queen, Card.Ten ]
+      , clubs = [ Card.Queen, Card.Ten, Card.Nine ]
+      }
+
+    , { name = "13 points, 6 spades, 6 hearts"
+      , expected = [Auction.Bid 1 (Just Card.Spades)]
+      , history = []
+      , spades = [ Card.Queen, Card.Jack, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.King, Card.Queen, Card.Jack, Card.Ten, Card.Nine, Card.Eight ]
+      , diamonds = [ Card.Ten ]
+      , clubs = []
+      }
+
+    , { name = "13 points, 6 spades, 5 hearts"
+      , expected = [Auction.Bid 1 (Just Card.Spades)]
+      , history = []
+      , spades = [ Card.King, Card.Jack, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.King, Card.Queen, Card.Jack, Card.Ten, Card.Nine ]
+      , diamonds = [ Card.Ten ]
+      , clubs = [ Card.Eight ]
+      }
+
+    , { name = "13 points, 5 spades, 6 hearts"
+      , expected = [Auction.Bid 1 (Just Card.Hearts)]
+      , history = []
+      , spades = [ Card.King, Card.Jack, Card.Ten, Card.Nine, Card.Eight ]
+      , hearts = [ Card.King, Card.Queen, Card.Jack, Card.Ten, Card.Nine, Card.Seven ]
+      , diamonds = [ Card.Ten ]
+      , clubs = [ Card.Eight ]
+      }
+
+    , { name = "13 points, 5 spades, 5 hearts"
+      , expected = [Auction.Bid 1 (Just Card.Spades)]
+      , history = []
+      , spades = [ Card.King, Card.Queen, Card.Ten, Card.Nine, Card.Eight ]
+      , hearts = [ Card.King, Card.Queen, Card.Jack, Card.Ten, Card.Nine ]
+      , diamonds = [ Card.Ten, Card.Seven ]
+      , clubs = [ Card.Eight ]
+      }
+
+    , { name = "13 points, 4 diamonds, 4 clubs"
+      , expected = [Auction.Bid 1 (Just Card.Diamonds)]
+      , history = []
+      , spades = [ Card.King, Card.Ten, Card.Nine ]
+      , hearts = [ Card.King, Card.Jack ]
+      , diamonds = [ Card.Queen, Card.Ten, Card.Eight, Card.Seven ]
+      , clubs = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight ]
+      }
+
+    , { name = "13 points, 4 diamonds, 3 clubs"
+      , expected = [Auction.Bid 1 (Just Card.Diamonds)]
+      , history = []
+      , spades = [ Card.King, Card.Ten, Card.Nine ]
+      , hearts = [ Card.King, Card.Jack, Card.Eight ]
+      , diamonds = [ Card.Queen, Card.Ten, Card.Eight, Card.Seven ]
+      , clubs = [ Card.Ace, Card.Ten, Card.Nine ]
+      }
+
+    , { name = "13 points, 3 diamonds, 4 clubs"
+      , expected = [Auction.Bid 1 (Just Card.Clubs)]
+      , history = []
+      , spades = [ Card.King, Card.Ten, Card.Nine ]
+      , hearts = [ Card.King, Card.Jack, Card.Eight ]
+      , diamonds = [ Card.Queen, Card.Ten, Card.Eight ]
+      , clubs = [ Card.Ace, Card.Ten, Card.Nine, Card.Seven ]
+      }
+
+    , { name = "13 points, 3 diamonds, 3 clubs"
+      , expected = [Auction.Bid 1 (Just Card.Clubs)]
+      , history = []
+      , spades = [ Card.King, Card.Ten, Card.Nine ]
+      , hearts = [ Card.King, Card.Jack, Card.Eight, Card.Seven ]
+      , diamonds = [ Card.Queen, Card.Ten, Card.Eight ]
+      , clubs = [ Card.Ace, Card.Ten, Card.Nine ]
+      }
+
+    , { name = "13 points, 6 spades, 6 clubs"
+      , expected = [Auction.Bid 1 (Just Card.Spades)]
+      , history = []
+      , spades = [ Card.King, Card.Jack, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.Two ]
+      , diamonds = []
+      , clubs = [ Card.Ace, Card.Jack, Card.Six, Card.Five, Card.Four, Card.Three ]
+      }
+
+    , { name = "13 points, 6 spades, 5 clubs"
+      , expected = [Auction.Bid 1 (Just Card.Spades)]
+      , history = []
+      , spades = [ Card.King, Card.Jack, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.Two ]
+      , diamonds = [ Card.Three ]
+      , clubs = [ Card.Ace, Card.Queen, Card.Six, Card.Five, Card.Four ]
+      }
+
+    , { name = "13 points, 5 spades, 6 clubs"
+      , expected = [Auction.Bid 1 (Just Card.Clubs)]
+      , history = []
+      , spades = [ Card.Ace, Card.Queen, Card.Six, Card.Five, Card.Four ]
+      , hearts = [ Card.Two ]
+      , diamonds = [ Card.Three ]
+      , clubs = [ Card.King, Card.Jack, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      }
+
+    , { name = "13 points, 5 spades, 5 clubs"
+      , expected = [Auction.Bid 1 (Just Card.Spades)]
+      , history = []
+      , spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Nine, Card.Eight ]
+      , hearts = [ Card.Seven, Card.Two ]
+      , diamonds = [ Card.Three ]
+      , clubs = [ Card.Ace, Card.Jack, Card.Six, Card.Five, Card.Four ]
+      }
+
+    , { name = "15 HCP, 5-3-3-2 distribution, 5 card major"
+      , expected = [Auction.Bid 1 (Just Card.Spades), Auction.Bid 1 Nothing]
       , history = []
       , spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Eight, Card.Two ]
       , hearts = [ Card.King, Card.Queen, Card.Seven ]
