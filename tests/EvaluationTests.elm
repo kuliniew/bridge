@@ -10,6 +10,9 @@ all : ElmTest.Test
 all =
   ElmTest.suite "Evaluation"
     [ highCardPointsSuite
+    , lengthPointsSuite
+    , shortnessPointsSuite
+    , pointsSuite
     , distributionSuite
     , balancedSuite
     ]
@@ -51,6 +54,162 @@ highCardPointsSuite =
         in
           ElmTest.assertEqual 11 (Evaluation.highCardPoints (Card.fromSuits hand))
     ]
+
+
+lengthPointsSuite : ElmTest.Test
+lengthPointsSuite =
+  ElmTest.suite "lengthPoints"
+    [ ElmTest.test "no suits longer than 4" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , hearts = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , diamonds = [ Card.Two, Card.Three, Card.Four ]
+            , clubs = [ Card.Two, Card.Three ]
+            }
+        in
+          ElmTest.assertEqual 0 (Evaluation.lengthPoints hand)
+
+    , ElmTest.test "one suit of length 5" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Two, Card.Three, Card.Four, Card.Five, Card.Six ]
+            , hearts = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , diamonds = [ Card.Two, Card.Three ]
+            , clubs = [ Card.Two, Card.Three ]
+            }
+        in
+          ElmTest.assertEqual 1 (Evaluation.lengthPoints hand)
+
+    , ElmTest.test "two long suits" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Two, Card.Three, Card.Four, Card.Five, Card.Six, Card.Seven ]
+            , hearts = [ Card.Two, Card.Three, Card.Four, Card.Five, Card.Six ]
+            , diamonds = [ Card.Two, Card.Three ]
+            , clubs = []
+            }
+        in
+          ElmTest.assertEqual 3 (Evaluation.lengthPoints hand)
+
+    , ElmTest.test "one suit of length 13" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Two, Card.Three, Card.Four, Card.Five, Card.Six, Card.Seven, Card.Eight, Card.Nine, Card.Ten, Card.Jack, Card.Queen, Card.King, Card.Ace ]
+            , hearts = []
+            , diamonds = []
+            , clubs = []
+            }
+        in
+          ElmTest.assertEqual 9 (Evaluation.lengthPoints hand)
+    ]
+
+
+shortnessPointsSuite : ElmTest.Test
+shortnessPointsSuite =
+  ElmTest.suite "shortnessPoints"
+    [ ElmTest.test "no short suits" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , hearts = [ Card.Two, Card.Three, Card.Four ]
+            , diamonds = [ Card.Two, Card.Three, Card.Four ]
+            , clubs = [ Card.Two, Card.Three, Card.Four ]
+            }
+        in
+          ElmTest.assertEqual 0 (Evaluation.shortnessPoints Card.Spades hand)
+
+    , ElmTest.test "one doubleton" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , hearts = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , diamonds = [ Card.Two, Card.Three, Card.Four ]
+            , clubs = [ Card.Two, Card.Three ]
+            }
+        in
+          ElmTest.assertEqual 1 (Evaluation.shortnessPoints Card.Spades hand)
+
+    , ElmTest.test "one singleton" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , hearts = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , diamonds = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , clubs = [ Card.Two ]
+            }
+        in
+          ElmTest.assertEqual 2 (Evaluation.shortnessPoints Card.Spades hand)
+
+    , ElmTest.test "one void" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Two, Card.Three, Card.Four, Card.Five, Card.Six ]
+            , hearts = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , diamonds = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , clubs = []
+            }
+        in
+          ElmTest.assertEqual 3 (Evaluation.shortnessPoints Card.Spades hand)
+
+    , ElmTest.test "multiple short suits" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Two, Card.Three, Card.Four, Card.Five, Card.Six, Card.Seven ]
+            , hearts = [ Card.Two, Card.Three, Card.Four, Card.Five, Card.Six, Card.Seven ]
+            , diamonds = [ Card.Two ]
+            , clubs = []
+            }
+        in
+          ElmTest.assertEqual 5 (Evaluation.shortnessPoints Card.Spades hand)
+
+    , ElmTest.test "one suit of length 13" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Two, Card.Three, Card.Four, Card.Five, Card.Six, Card.Seven, Card.Eight, Card.Nine, Card.Ten, Card.Jack, Card.Queen, Card.King, Card.Ace ]
+            , hearts = []
+            , diamonds = []
+            , clubs = []
+            }
+        in
+          ElmTest.assertEqual 9 (Evaluation.shortnessPoints Card.Spades hand)
+
+    , ElmTest.test "shortness in trump suit is ignored" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Two ]
+            , hearts = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , diamonds = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            , clubs = [ Card.Two, Card.Three, Card.Four, Card.Five ]
+            }
+        in
+          ElmTest.assertEqual 0 (Evaluation.shortnessPoints Card.Spades hand)
+    ]
+
+
+pointsSuite : ElmTest.Test
+pointsSuite =
+  let
+    hand = Card.fromSuits
+      { spades = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.King, Card.Ten, Card.Nine, Card.Eight ]
+      , diamonds = [ Card.King, Card.Ten, Card.Nine ]
+      , clubs = [ Card.Two ]
+      }
+    hcp = 10
+    length = 1
+    shortness = 2
+  in
+    ElmTest.suite "pointsSuite"
+      [ ElmTest.test "before trumps are known, HCP and length points are counted" <|
+          ElmTest.assertEqual (hcp + length) (Evaluation.points Nothing hand)
+
+      , ElmTest.test "in a no-trump contract, only HCP are counted" <|
+          ElmTest.assertEqual hcp (Evaluation.points (Just Nothing) hand)
+
+      , ElmTest.test "in a trump contract, HCP and shortness points are counted" <|
+          ElmTest.assertEqual (hcp + shortness) (Evaluation.points (Just (Just Card.Spades)) hand)
+      ]
 
 
 distributionSuite : ElmTest.Test

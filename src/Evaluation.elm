@@ -1,5 +1,8 @@
 module Evaluation
   ( highCardPoints
+  , lengthPoints
+  , shortnessPoints
+  , points
 
   , distribution
   , balanced
@@ -27,18 +30,40 @@ highCardPoints =
      List.sum << List.map pointsForCard
 
 
+{-| Count the length points in a hand.
+-}
+lengthPoints : List Card -> Int
+lengthPoints cards =
+  List.map (\suit -> suitLength cards suit - 4) suits
+    |> List.filter (\pts -> pts > 0)
+    |> List.sum
+
+
+{-| Count the shortness points in a hand.
+-}
+shortnessPoints : Card.Suit -> List Card -> Int
+shortnessPoints trump cards =
+  List.filter (\suit -> suit /= trump) suits
+    |> List.map (\suit -> 3 - suitLength cards suit)
+    |> List.filter (\pts -> pts > 0)
+    |> List.sum
+
+
+{-| Count the total points in a hand, given knowledge of trumps.
+-}
+points : Maybe (Maybe Card.Suit) -> List Card -> Int
+points trump cards =
+  case trump of
+    Nothing -> highCardPoints cards + lengthPoints cards
+    Just Nothing -> highCardPoints cards
+    Just (Just suit) -> highCardPoints cards + shortnessPoints suit cards
+
+
 {-| Measure the distribution of cards across suits.
 -}
 distribution : List Card -> List Int
 distribution cards =
-  let
-    filterSuit suit = List.filter (\card -> card.suit == suit)
-    spades = filterSuit Card.Spades cards
-    hearts = filterSuit Card.Hearts cards
-    diamonds = filterSuit Card.Diamonds cards
-    clubs = filterSuit Card.Clubs cards
-  in
-    List.sortBy negate <| List.map List.length [spades, hearts, diamonds, clubs]
+  List.sortBy negate <| List.map (suitLength cards) suits
 
 
 {-| Check if a distribution is balanced.
@@ -50,3 +75,17 @@ balanced dist =
     [4, 3, 3, 3] -> True
     [5, 3, 3, 2] -> True
     _ -> False
+
+
+{-| Count the number of cards in a suit.
+-}
+suitLength : List Card -> Card.Suit -> Int
+suitLength cards suit =
+  List.length <| List.filter (\card -> card.suit == suit) cards
+
+
+{-| List of all suits.
+-}
+suits : List Card.Suit
+suits =
+  [ Card.Spades, Card.Hearts, Card.Diamonds, Card.Clubs ]
