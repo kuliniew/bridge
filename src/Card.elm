@@ -110,17 +110,13 @@ rankDescending card1 card2 = (numericalRank card2.rank) `compare` (numericalRank
 
 {-| Record used when writing test cases.
 -}
-type alias SampleHand =
-  { spades: List Rank
-  , hearts: List Rank
-  , diamonds: List Rank
-  , clubs: List Rank
-  }
+type alias SampleHand a =
+  { a | spades : List Rank, hearts : List Rank, diamonds : List Rank, clubs : List Rank }
 
 
 {-| Expand a sample hand into a full list of cards.
 -}
-fromSuits : SampleHand -> List Card
+fromSuits : SampleHand a -> List Card
 fromSuits sample =
   let
     addSuit suit rank =
