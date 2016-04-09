@@ -4,6 +4,7 @@ module Evaluation
   , shortnessPoints
   , points
 
+  , length
   , distribution
   , balanced
   ) where
@@ -34,7 +35,7 @@ highCardPoints =
 -}
 lengthPoints : List Card -> Int
 lengthPoints cards =
-  List.map (\suit -> suitLength cards suit - 4) suits
+  List.map (\suit -> length suit cards - 4) suits
     |> List.filter (\pts -> pts > 0)
     |> List.sum
 
@@ -59,11 +60,18 @@ points trump cards =
     Just (Just suit) -> highCardPoints cards + shortnessPoints suit cards
 
 
+{-| Measure the length of a particular suit.
+-}
+length : Card.Suit -> List Card -> Int
+length suit cards =
+  List.length <| List.filter (\card -> card.suit == suit) cards
+
+
 {-| Measure the distribution of cards across suits.
 -}
 distribution : List Card -> List Int
 distribution cards =
-  List.sortBy negate <| List.map (suitLength cards) suits
+  List.sortBy negate <| List.map (flip length cards) suits
 
 
 {-| Check if a distribution is balanced.
@@ -75,13 +83,6 @@ balanced dist =
     [4, 3, 3, 3] -> True
     [5, 3, 3, 2] -> True
     _ -> False
-
-
-{-| Count the number of cards in a suit.
--}
-suitLength : List Card -> Card.Suit -> Int
-suitLength cards suit =
-  List.length <| List.filter (\card -> card.suit == suit) cards
 
 
 {-| List of all suits.

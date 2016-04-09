@@ -13,6 +13,7 @@ all =
     , lengthPointsSuite
     , shortnessPointsSuite
     , pointsSuite
+    , lengthSuite
     , distributionSuite
     , balancedSuite
     ]
@@ -209,6 +210,25 @@ pointsSuite =
 
       , ElmTest.test "in a trump contract, HCP and shortness points are counted" <|
           ElmTest.assertEqual (hcp + shortness) (Evaluation.points (Just (Just Card.Spades)) hand)
+      ]
+
+
+lengthSuite : ElmTest.Test
+lengthSuite =
+  let
+    hand = Card.fromSuits
+      { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four, Card.Five, Card.Six ]
+      , hearts = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+      , diamonds = [ Card.Ace, Card.Two, Card.Three ]
+      , clubs = []
+      }
+  in
+    ElmTest.suite "lengthSuite"
+      [ ElmTest.test "non-void suit" <|
+          ElmTest.assertEqual 6 (Evaluation.length Card.Spades hand)
+
+      , ElmTest.test "void suit" <|
+          ElmTest.assertEqual 0 (Evaluation.length Card.Clubs hand)
       ]
 
 
