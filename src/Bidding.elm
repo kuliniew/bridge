@@ -2,6 +2,7 @@ module Bidding
   ( System
   , AnnotatedBid
   , Meaning (..)
+  , Metric (..)
   , annotate
   , choose
   , viableChoices
@@ -46,8 +47,22 @@ type alias AnnotatedBid =
 -}
 type Meaning
   = OutOfSystem
-  | HighCardPoints Int Int
+  | InRange Metric Int Int
+  | Minimum Metric Metric
+  | Maximum Metric Metric
+  | GreaterThan Metric Metric
+  | LessThan Metric Metric
   | Balanced
+  | Or (List Meaning)
+
+
+{-| A thing that can be measured in a hand.
+-}
+type Metric
+  = Constant Int
+  | HighCardPoints
+  | Points (Maybe Auction.Trump)
+  | Length Card.Suit
 
 
 {-| Annotate a bid with its meaning in a particular system.
@@ -94,14 +109,35 @@ satisfiedBy hand bid =
     satisfies meaning =
       case meaning of
         OutOfSystem -> True
-        HighCardPoints lo hi ->
+        InRange metric lo hi ->
           let
-            hcp = Evaluation.highCardPoints hand
+            value = eval metric hand
           in
-            lo <= hcp && hcp <= hi
+            lo <= value && value <= hi
+        Minimum metric lo ->
+          eval lo hand <= eval metric hand
+        Maximum metric hi ->
+          eval metric hand <= eval hi hand
+        GreaterThan metric below ->
+          eval below hand < eval metric hand
+        LessThan metric above ->
+          eval metric hand < eval above hand
         Balanced -> Evaluation.balanced (Evaluation.distribution hand)
+        Or alternatives ->
+          List.any satisfies alternatives
   in
     List.all satisfies bid.meaning
+
+
+{-| Evaluate a metric for a hand.
+-}
+eval : Metric -> List Card -> Int
+eval metric hand =
+  case metric of
+    Constant value -> value
+    HighCardPoints -> Evaluation.highCardPoints hand
+    Points trump -> Evaluation.points trump hand
+    Length suit -> Evaluation.length suit hand
 
 
 {-| A role that a seat can have during bidding, depending on what bids have

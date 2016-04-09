@@ -185,7 +185,7 @@ openingSuite =
       }
 
     , { name = "15 HCP, 4-3-3-3 distribution"
-      , expected = [Auction.Bid 1 Nothing]
+      , expected = [Auction.Bid 1 (Just Card.Clubs), Auction.Bid 1 Nothing]
       , history = []
       , spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Eight ]
       , hearts = [ Card.King, Card.Queen, Card.Seven ]
@@ -194,7 +194,7 @@ openingSuite =
       }
 
     , { name = "17 HCP, 4-3-3-3 distribution"
-      , expected = [Auction.Bid 1 Nothing]
+      , expected = [Auction.Bid 1 (Just Card.Clubs), Auction.Bid 1 Nothing]
       , history = []
       , spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Eight ]
       , hearts = [ Card.King, Card.Queen, Card.Seven ]
@@ -203,7 +203,7 @@ openingSuite =
       }
 
     , { name = "20 HCP, 4-3-3-3 distribution"
-      , expected = [Auction.Bid 2 Nothing]
+      , expected = [Auction.Bid 1 (Just Card.Clubs), Auction.Bid 2 Nothing]
       , history = []
       , spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
       , hearts = [ Card.King, Card.Queen, Card.Seven ]
@@ -212,7 +212,7 @@ openingSuite =
       }
 
     , { name = "21 HCP, 4-3-3-3 distribution"
-      , expected = [Auction.Bid 2 Nothing]
+      , expected = [Auction.Bid 1 (Just Card.Clubs), Auction.Bid 2 Nothing]
       , history = []
       , spades = [ Card.Ace, Card.King, Card.Queen, Card.Eight ]
       , hearts = [ Card.King, Card.Queen, Card.Seven ]

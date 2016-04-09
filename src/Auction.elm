@@ -1,5 +1,6 @@
 module Auction
-  ( Bid (..)
+  ( Trump
+  , Bid (..)
   , isOpen
   , legalBids
   ) where
@@ -12,6 +13,11 @@ import Card
 import List.Extra
 
 
+{-| The trump suit.
+-}
+type alias Trump = Maybe Card.Suit
+
+
 {-| A bid.  Lists of bids are interpreted as most-recent first, oldest
     last.  In other words, new bids are added to the front of the list.
 -}
@@ -19,7 +25,7 @@ type Bid
   = Pass
   | Double
   | Redouble
-  | Bid Int (Maybe Card.Suit)
+  | Bid Int Trump
 
 
 {-| Check whether the auction is still open.

@@ -12,6 +12,7 @@ module Evaluation
 {-| This module implements various hand evaluation functions.
 -}
 
+import Auction
 import Card exposing (Card)
 
 
@@ -45,14 +46,14 @@ lengthPoints cards =
 shortnessPoints : Card.Suit -> List Card -> Int
 shortnessPoints trump cards =
   List.filter (\suit -> suit /= trump) suits
-    |> List.map (\suit -> 3 - suitLength cards suit)
+    |> List.map (\suit -> 3 - length suit cards)
     |> List.filter (\pts -> pts > 0)
     |> List.sum
 
 
 {-| Count the total points in a hand, given knowledge of trumps.
 -}
-points : Maybe (Maybe Card.Suit) -> List Card -> Int
+points : Maybe Auction.Trump -> List Card -> Int
 points trump cards =
   case trump of
     Nothing -> highCardPoints cards + lengthPoints cards
