@@ -26,7 +26,7 @@ annotateSuite =
     , ElmTest.test "falls back to OutOfSystem" <|
         let
           expected =
-            { bid = Auction.Bid 3 Nothing, meaning = [Bidding.OutOfSystem] }
+            { bid = Auction.Bid 3 Nothing, meaning = Bidding.OutOfSystem }
         in
           ElmTest.assertEqual expected (Bidding.annotate testSystem [] (Auction.Bid 3 Nothing))
     ]
@@ -46,7 +46,7 @@ chooseSuite =
           nullSystem =
             { name = "Null System", suggestions = always [] }
           expected =
-            { bid = Auction.Pass, meaning = [Bidding.OutOfSystem] }
+            { bid = Auction.Pass, meaning = Bidding.OutOfSystem }
           (choice, _) =
             Bidding.choose nullSystem [] [] (Random.initialSeed 0)
         in
@@ -226,9 +226,12 @@ testSystem =
 
 oneNoTrump : Bidding.AnnotatedBid
 oneNoTrump =
-  { bid = Auction.Bid 1 Nothing, meaning = [] }
+  { bid = Auction.Bid 1 Nothing, meaning = nop }
 
 
 twoNoTrump : Bidding.AnnotatedBid
 twoNoTrump =
-  { bid = Auction.Bid 2 Nothing, meaning = [] }
+  { bid = Auction.Bid 2 Nothing, meaning = nop }
+
+nop : Bidding.Meaning
+nop = Bidding.Minimum (Bidding.Constant 0) (Bidding.Constant 0)

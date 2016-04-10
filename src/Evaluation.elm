@@ -9,6 +9,7 @@ module Evaluation
   , balanced
 
   , playingTricks
+  , playingTricksAny
   ) where
 
 {-| This module implements various hand evaluation functions.
@@ -140,3 +141,14 @@ playingTricks trump cards =
         fromAce + fromKing
   in
     List.sum <| List.map suitTricks suits
+
+
+{-| Count the playing tricks in a hand, for whichever the best
+trump suit may be.
+-}
+playingTricksAny : List Card -> Int
+playingTricksAny cards =
+  [Card.Spades, Card.Hearts, Card.Diamonds, Card.Clubs]
+    |> List.map (\suit -> playingTricks (Just suit) cards)
+    |> List.maximum
+    |> Maybe.withDefault 0

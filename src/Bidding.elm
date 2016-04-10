@@ -39,7 +39,7 @@ type alias System =
 -}
 type alias AnnotatedBid =
   { bid : Auction.Bid
-  , meaning : List Meaning
+  , meaning : Meaning
   }
 
 
@@ -54,6 +54,8 @@ type Meaning
   | LessThan Metric Metric
   | Balanced
   | Or (List Meaning)
+  | And (List Meaning)
+  | NoneOf (List Meaning)
 
 
 {-| A thing that can be measured in a hand.
@@ -63,6 +65,7 @@ type Metric
   | HighCardPoints
   | Points (Maybe Auction.Trump)
   | Length Card.Suit
+  | PlayingTricks
 
 
 {-| Annotate a bid with its meaning in a particular system.
@@ -71,7 +74,7 @@ annotate : System -> List AnnotatedBid -> Auction.Bid -> AnnotatedBid
 annotate system history bid =
   case lookup bid (system.suggestions history) of
     Just annotated -> annotated
-    Nothing -> { bid = bid, meaning = [OutOfSystem] }
+    Nothing -> { bid = bid, meaning = OutOfSystem }
 
 
 {-| Lookup a specific bid in a list of suggestions.
@@ -88,7 +91,7 @@ result will be Pass for reason of being OutOfSystem.
 choose : System -> List AnnotatedBid -> List Card -> Random.Seed -> (AnnotatedBid, Random.Seed)
 choose system history hand =
   let
-    fallback = { bid = Auction.Pass, meaning = [OutOfSystem] }
+    fallback = { bid = Auction.Pass, meaning = OutOfSystem }
   in
     Random.generate (Random.Extra.selectWithDefault fallback <| viableChoices system history hand)
 
@@ -125,8 +128,12 @@ satisfiedBy hand bid =
         Balanced -> Evaluation.balanced (Evaluation.distribution hand)
         Or alternatives ->
           List.any satisfies alternatives
+        And requirements ->
+          List.all satisfies requirements
+        NoneOf prohibitions ->
+          not (List.any satisfies prohibitions)
   in
-    List.all satisfies bid.meaning
+    satisfies bid.meaning
 
 
 {-| Evaluate a metric for a hand.
@@ -138,6 +145,7 @@ eval metric hand =
     HighCardPoints -> Evaluation.highCardPoints hand
     Points trump -> Evaluation.points trump hand
     Length suit -> Evaluation.length suit hand
+    PlayingTricks -> Evaluation.playingTricksAny hand
 
 
 {-| A role that a seat can have during bidding, depending on what bids have

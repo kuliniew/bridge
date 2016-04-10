@@ -193,6 +193,15 @@ openingSuite =
       , clubs = [ Card.Jack, Card.Eight, Card.Six ]
       }
 
+    , { name = "17 HCP, 9 playing tricks with spades"
+      , expected = [Auction.Bid 2 (Just Card.Clubs)]
+      , history = []
+      , spades = [ Card.Ace, Card.King, Card.Queen, Card.Jack, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.Ace, Card.King, Card.Ten ]
+      , diamonds = [ Card.Six, Card.Five, Card.Three ]
+      , clubs = []
+      }
+
     , { name = "17 HCP, 4-3-3-3 distribution"
       , expected = [Auction.Bid 1 (Just Card.Clubs), Auction.Bid 1 Nothing]
       , history = []
@@ -200,6 +209,24 @@ openingSuite =
       , hearts = [ Card.King, Card.Queen, Card.Seven ]
       , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
       , clubs = [ Card.Jack, Card.Eight, Card.Six ]
+      }
+
+    , { name = "20 HCP, 9 playing tricks with spades"
+      , expected = [Auction.Bid 2 (Just Card.Clubs)]
+      , history = []
+      , spades = [ Card.Ace, Card.King, Card.Queen, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.Ace, Card.King, Card.Six ]
+      , diamonds = [ Card.Ace, Card.Three, Card.Two ]
+      , clubs = [ Card.Five ]
+      }
+
+    , { name = "20 HCP, 10 playing tricks with clubs"
+      , expected = [Auction.Bid 2 (Just Card.Clubs)]
+      , history = []
+      , spades = [ Card.Five ]
+      , hearts = [ Card.King, Card.Queen, Card.Jack, Card.Ten ]
+      , diamonds = [ Card.Ace, Card.King ]
+      , clubs = [ Card.Ace, Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
       }
 
     , { name = "20 HCP, 4-3-3-3 distribution"
@@ -219,6 +246,15 @@ openingSuite =
       , diamonds = [ Card.Ace, Card.Jack, Card.Four ]
       , clubs = [ Card.Queen, Card.Eight, Card.Six ]
       }
+
+    , { name = "23 HCP"
+      , expected = [Auction.Bid 2 (Just Card.Clubs)]
+      , history = []
+      , spades = [ Card.Ace, Card.King, Card.Queen ]
+      , hearts = [ Card.Ace, Card.King, Card.Six ]
+      , diamonds = [ Card.Ace, Card.Three, Card.Two ]
+      , clubs = [ Card.King, Card.Ten, Card.Nine, Card.Four ]
+    }
 
     , { name = "25 HCP, 4-3-3-3 distribution"
       , expected = [Auction.Bid 3 Nothing]
