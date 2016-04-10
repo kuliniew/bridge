@@ -43,9 +43,10 @@ openingBids =
     threeNoTrump = noTrump 3 25 27
     majorLength = 5
     minorLength = 3
+    oneLevelPoints = 13
     strongPoints = 22
     oneLevelMinimumPoints =
-      Bidding.Minimum (Bidding.Points Nothing) (Bidding.Constant 13)
+      Bidding.Minimum (Bidding.Points Nothing) (Bidding.Constant oneLevelPoints)
     oneLevelMaximumPoints =
       Bidding.LessThan Bidding.HighCardPoints (Bidding.Constant strongPoints)
     openWithMinor minor major =
@@ -137,6 +138,14 @@ openingBids =
             , Bidding.Or [standardMeaning, weakerMeaning]
             ]
         }
+    weakTwo suit =
+      { bid = Auction.Bid 2 (Just suit)
+      , meaning = Bidding.And
+          [ Bidding.InRange Bidding.HighCardPoints 5 10    -- SAYC says 5-11, but 11 HCP + six cards == 13 points == 1-level opening
+          , Bidding.LessThan (Bidding.Points Nothing) (Bidding.Constant oneLevelPoints)
+          , Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 6)
+          ]
+      }
   in
     [ oneNoTrump
     , twoNoTrump
@@ -146,4 +155,7 @@ openingBids =
     , oneDiamonds
     , oneClubs
     , twoClubs
+    , weakTwo Card.Diamonds
+    , weakTwo Card.Hearts
+    , weakTwo Card.Spades
     ]
