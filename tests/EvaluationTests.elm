@@ -13,9 +13,12 @@ all =
     , lengthPointsSuite
     , shortnessPointsSuite
     , pointsSuite
+
     , lengthSuite
     , distributionSuite
     , balancedSuite
+
+    , playingTricksSuite
     ]
 
 
@@ -265,4 +268,108 @@ balancedSuite =
 
     , ElmTest.test "4-4-4-1 is not balanced" <|
         ElmTest.assert (not <| Evaluation.balanced [4, 4, 4, 1])
+    ]
+
+
+playingTricksSuite : ElmTest.Test
+playingTricksSuite =
+  ElmTest.suite "playingTricks"
+    [ ElmTest.test "3 spades, 2 hearts, 1 diamond, with no trumps" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Ace, Card.King, Card.Queen, Card.Nine, Card.Eight, Card.Seven ]
+            , hearts = [ Card.Ace, Card.King, Card.Six ]
+            , diamonds = [ Card.Ace, Card.Three, Card.Two ]
+            , clubs = [ Card.Five ]
+            }
+        in
+          ElmTest.assertEqual 6 (Evaluation.playingTricks Nothing hand)
+
+    , ElmTest.test "6 spades, 2 hearts, 1 diamond, with spades as trumps" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Ace, Card.King, Card.Queen, Card.Nine, Card.Eight, Card.Seven ]
+            , hearts = [ Card.Ace, Card.King, Card.Six ]
+            , diamonds = [ Card.Ace, Card.Three, Card.Two ]
+            , clubs = [ Card.Five ]
+            }
+        in
+          ElmTest.assertEqual 9 (Evaluation.playingTricks (Just Card.Spades) hand)
+
+    , ElmTest.test "5 clubs, 3 hearts, 2 diamonds, with clubs as trumps" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Five ]
+            , hearts = [ Card.King, Card.Queen, Card.Jack, Card.Ten ]
+            , diamonds = [ Card.Ace, Card.King ]
+            , clubs = [ Card.Ace, Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+            }
+        in
+          ElmTest.assertEqual 10 (Evaluation.playingTricks (Just Card.Clubs) hand)
+
+    , ElmTest.test "7 spades, 2 hearts, with spades as trumps" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Ace, Card.King, Card.Queen, Card.Jack, Card.Nine, Card.Eight, Card.Seven ]
+            , hearts = [ Card.Ace, Card.King, Card.Ten ]
+            , diamonds = [ Card.Six, Card.Five, Card.Three ]
+            , clubs = []
+            }
+        in
+          ElmTest.assertEqual 9 (Evaluation.playingTricks (Just Card.Spades) hand)
+
+    , ElmTest.test "6 spades, with spades as trumps" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.King, Card.Queen, Card.Jack, Card.Ten, Card.Nine, Card.Seven, Card.Five ]
+            , hearts = [ Card.Six, Card.Two ]
+            , diamonds = [ Card.Nine, Card.Five ]
+            , clubs = [ Card.Eight, Card.Three ]
+            }
+        in
+          ElmTest.assertEqual 6 (Evaluation.playingTricks (Just Card.Spades) hand)
+
+    , ElmTest.test "5 diamonds, 1 spade, with diamonds as trumps" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Ace, Card.Four ]
+            , hearts = [ Card.Nine, Card.Five, Card.Two ]
+            , diamonds = [ Card.Queen, Card.Jack, Card.Ten, Card.Nine, Card.Seven, Card.Three, Card.Two ]
+            , clubs = [ Card.Seven ]
+            }
+        in
+          ElmTest.assertEqual 6 (Evaluation.playingTricks (Just Card.Diamonds) hand)
+
+    , ElmTest.test "5 hearts, with hearts as trumps" <|
+        let
+          hand = Card.fromSuits
+            { spades = [ Card.Jack, Card.Five ]
+            , hearts = [ Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Five, Card.Four, Card.Three ]
+            , diamonds = [ Card.Seven, Card.Three ]
+            , clubs = [ Card.Six, Card.Two ]
+            }
+        in
+          ElmTest.assertEqual 5 (Evaluation.playingTricks (Just Card.Hearts) hand)
+
+    , ElmTest.test "8 clubs, with clubs as trumps" <|
+        let
+          hand = Card.fromSuits
+            { spades = []
+            , hearts = [ Card.Five, Card.Four, Card.Two ]
+            , diamonds = [ Card.Jack, Card.Eight ]
+            , clubs = [ Card.Ace, Card.King, Card.Queen, Card.Ten, Card.Nine, Card.Seven, Card.Six, Card.Three ]
+            }
+        in
+          ElmTest.assertEqual 8 (Evaluation.playingTricks (Just Card.Clubs) hand)
+
+    , ElmTest.test "3 clubs, with spades as trumps" <|
+        let
+          hand = Card.fromSuits
+            { spades = []
+            , hearts = [ Card.Five, Card.Four, Card.Two ]
+            , diamonds = [ Card.Jack, Card.Eight ]
+            , clubs = [ Card.Ace, Card.King, Card.Queen, Card.Ten, Card.Nine, Card.Seven, Card.Six, Card.Three ]
+            }
+        in
+          ElmTest.assertEqual 3 (Evaluation.playingTricks (Just Card.Spades) hand)
     ]

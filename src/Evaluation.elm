@@ -7,6 +7,8 @@ module Evaluation
   , length
   , distribution
   , balanced
+
+  , playingTricks
   ) where
 
 {-| This module implements various hand evaluation functions.
@@ -14,6 +16,8 @@ module Evaluation
 
 import Auction
 import Card exposing (Card)
+
+import List.Extra
 
 
 {-| Count the high-card points (HCP) in a hand.
@@ -91,3 +95,48 @@ balanced dist =
 suits : List Card.Suit
 suits =
   [ Card.Spades, Card.Hearts, Card.Diamonds, Card.Clubs ]
+
+
+{-| Count the playing tricks in a hand, given a trump suit.
+-}
+playingTricks : Auction.Trump -> List Card -> Int
+playingTricks trump cards =
+  let
+    suitTricks suit =
+      let
+        ranks =
+          List.filter (\card -> card.suit == suit) cards
+            |> List.sortWith Card.rankDescending
+            |> List.map .rank
+      in
+        if trump == Just suit
+          then trumpTricks ranks
+          else offTrumpTricks ranks
+
+    trumpTricks ranks =
+      let
+        rankTrick rank =
+          if List.member rank ranks then 1 else 0
+        lengthTricks =
+          max (List.length ranks - 3) 0
+      in
+        rankTrick Card.Ace + rankTrick Card.King + rankTrick Card.Queen + lengthTricks
+
+    offTrumpTricks ranks =
+      let
+        ranksFromKing =
+          [Card.King, Card.Queen, Card.Jack, Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six, Card.Five, Card.Four, Card.Three, Card.Two]
+        ranksFromAce =
+          Card.Ace :: ranksFromKing
+        matches goals =
+          List.map2 (==) ranks goals
+            |> List.Extra.takeWhile identity
+            |> List.length
+        fromAce =
+          matches ranksFromAce
+        fromKing =
+          max (matches ranksFromKing - 1) 0
+      in
+        fromAce + fromKing
+  in
+    List.sum <| List.map suitTricks suits
