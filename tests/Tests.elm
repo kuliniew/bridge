@@ -6,6 +6,7 @@ import BiddingTests
 import CardTests
 import EvaluationTests
 import SeatTests
+import VulnerabilityTests
 
 import ElmTest exposing (Test, suite)
 
@@ -19,4 +20,5 @@ all =
     , CardTests.all
     , EvaluationTests.all
     , SeatTests.all
+    , VulnerabilityTests.all
     ]
