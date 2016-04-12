@@ -14,11 +14,8 @@ import Seat exposing (Seat)
 
 import Array
 import Effects exposing (Effects)
-import Html exposing (Html)
-import Html.Events as Events
 import Random
 import Random.Array
-import Signal
 import Time exposing (Time)
 
 
