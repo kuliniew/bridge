@@ -11,6 +11,7 @@ import Bidding
 import Card exposing (Card)
 import Game exposing (Action)
 import Seat exposing (Seat)
+import Vulnerability exposing (Vulnerability)
 
 import Debug
 import Html exposing (Html)
@@ -34,7 +35,8 @@ viewState address state =
     seatCell seat = Html.td [] [viewHand seat (Seat.lookup seat state.hands)]
   in
     Html.div []
-      [ Html.table []
+      [ viewVulnerability state.vulnerability
+      , Html.table []
           [ Html.tr [] [ emptyCell, seatCell Seat.North, emptyCell ]
           , Html.tr [] [ seatCell Seat.West, emptyCell, seatCell Seat.East ]
           , Html.tr [] [ emptyCell, seatCell Seat.South, emptyCell ]
@@ -189,3 +191,16 @@ cluster filler count elems =
     case List.take count elems of
       [] -> []
       chunk -> pad chunk :: cluster filler count (List.drop count elems)
+
+
+viewVulnerability : Vulnerability -> Html
+viewVulnerability vuln =
+  let
+    message =
+      case (vuln.northSouth, vuln.eastWest) of
+        (False, False) -> "neither side vulnerable"
+        (False, True) -> "East/West vulnerable"
+        (True, False) -> "North/South vulnerable"
+        (True, True) -> "both sides vulnerable"
+  in
+    Html.text message

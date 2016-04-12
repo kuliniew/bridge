@@ -11,6 +11,7 @@ import Bidding
 import Bidding.StandardAmerican
 import Card exposing (Card)
 import Seat exposing (Seat)
+import Vulnerability exposing (Vulnerability)
 
 import Array
 import Effects exposing (Effects)
@@ -25,6 +26,7 @@ type alias Model = Maybe GameState
 type alias GameState =
   { hands : Seat.Each (List Card)
   , dealer : Seat
+  , vulnerability : Vulnerability
   , auction : List Bidding.AnnotatedBid
   , seed : Random.Seed
   }
@@ -47,12 +49,13 @@ update action model =
     (Reseed time, _) ->
       let
         seed = Random.initialSeed (round time)
-        state = deal Seat.South seed
+        state = deal Seat.South Vulnerability.initial seed
       in
         (Just state, Effects.none)
     (NewDeal, Just oldState) ->
       let
-        newState = bidForBots <| deal (Seat.next oldState.dealer) oldState.seed
+        newVulnerability = Vulnerability.next oldState.vulnerability
+        newState = bidForBots <| deal (Seat.next oldState.dealer) (Vulnerability.next oldState.vulnerability) oldState.seed
       in
         (Just newState, Effects.none)
     (Bid bid, Just oldState) ->
@@ -66,8 +69,8 @@ update action model =
       (Nothing, Effects.none)
 
 
-deal : Seat -> Random.Seed -> GameState
-deal dealer seed =
+deal : Seat -> Vulnerability -> Random.Seed -> GameState
+deal dealer vulnerability seed =
   let
     (shuffled, seed') = Random.generate (Random.Array.shuffle Card.deck) seed
     cardsPerHand = Array.length shuffled // 4
@@ -81,6 +84,7 @@ deal dealer seed =
     state =
       { hands = hands
       , dealer = dealer
+      , vulnerability = vulnerability
       , auction = []
       , seed = seed'
       }
