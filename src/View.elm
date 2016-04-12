@@ -1,13 +1,15 @@
 module View
-  ( viewHand
+  ( view
+  , viewState
+  , viewHand
   , viewSuit
   , viewAuction
   ) where
 
-import Action exposing (Action)
 import Auction
 import Bidding
 import Card exposing (Card)
+import Game exposing (Action)
 import Seat exposing (Seat)
 
 import Debug
@@ -16,6 +18,30 @@ import Html.Attributes as Attr
 import Html.Events as Events
 import Json.Decode
 import List.Extra
+
+
+view : Signal.Address Action -> Game.Model -> Html
+view address model =
+  case model of
+    Just state -> viewState address state
+    Nothing -> Html.div [] []
+
+
+viewState : Signal.Address Action -> Game.GameState -> Html
+viewState address state =
+  let
+    emptyCell = Html.td [] []
+    seatCell seat = Html.td [] [viewHand seat (Seat.lookup seat state.hands)]
+  in
+    Html.div []
+      [ Html.table []
+          [ Html.tr [] [ emptyCell, seatCell Seat.North, emptyCell ]
+          , Html.tr [] [ seatCell Seat.West, emptyCell, seatCell Seat.East ]
+          , Html.tr [] [ emptyCell, seatCell Seat.South, emptyCell ]
+          ]
+      , viewAuction address state.dealer state.auction
+      , Html.button [ Events.onClick address Game.NewDeal ] [ Html.text "Rage Quit" ]
+      ]
 
 
 viewHand : Seat -> List Card -> Html
@@ -109,11 +135,11 @@ makeBidCell address auction =
     getSelectedIndex =
       Json.Decode.at ["target", "selectedIndex"] Json.Decode.int
     onSelect =
-      Events.on "change" getSelectedIndex (Signal.message address << Action.Bid << lookupLegalBid)
+      Events.on "change" getSelectedIndex (Signal.message address << Game.Bid << lookupLegalBid)
     header =
       Html.option [] [Html.text "Make a bid..."]
     toChoice bid =
-      Html.option [Events.onClick address (Action.Bid bid)] (viewBid bid)
+      Html.option [Events.onClick address (Game.Bid bid)] (viewBid bid)
     choices =
       List.map toChoice legalBids
   in

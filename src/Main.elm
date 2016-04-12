@@ -1,6 +1,7 @@
 module Main (main) where
 
 import Game
+import View
 
 import Effects
 import Html exposing (Html)
@@ -20,4 +21,4 @@ port tasks =
 
 app : StartApp.App Game.Model
 app =
-  StartApp.start { init = Game.init, view = Game.view, update = Game.update, inputs = [] }
+  StartApp.start { init = Game.init, view = View.view, update = Game.update, inputs = [] }

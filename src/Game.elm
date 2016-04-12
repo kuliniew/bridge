@@ -1,12 +1,16 @@
-module Game (Model, init, view, update) where
+module Game
+  ( Model
+  , GameState
+  , Action (..)
+  , init
+  , update
+  ) where
 
-import Action exposing (Action)
 import Auction
 import Bidding
 import Bidding.StandardAmerican
 import Card exposing (Card)
 import Seat exposing (Seat)
-import View
 
 import Array
 import Effects exposing (Effects)
@@ -15,6 +19,7 @@ import Html.Events as Events
 import Random
 import Random.Array
 import Signal
+import Time exposing (Time)
 
 
 type alias Model = Maybe GameState
@@ -28,26 +33,32 @@ type alias GameState =
   }
 
 
+type Action
+  = Reseed Time
+  | NewDeal
+  | Bid Auction.Bid
+
+
 init : (Model, Effects Action)
 init =
-  ( Nothing, Effects.tick Action.Reseed )
+  ( Nothing, Effects.tick Reseed )
 
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
   case (action, model) of
-    (Action.Reseed time, _) ->
+    (Reseed time, _) ->
       let
         seed = Random.initialSeed (round time)
         state = deal Seat.South seed
       in
         (Just state, Effects.none)
-    (Action.NewDeal, Just oldState) ->
+    (NewDeal, Just oldState) ->
       let
         newState = bidForBots <| deal (Seat.next oldState.dealer) oldState.seed
       in
         (Just newState, Effects.none)
-    (Action.Bid bid, Just oldState) ->
+    (Bid bid, Just oldState) ->
       let
         annotated = Bidding.annotate Bidding.StandardAmerican.system oldState.auction bid
         newState = bidForBots { oldState | auction = annotated :: oldState.auction }
@@ -94,27 +105,3 @@ bidForBots oldState =
         in
           bidForBots { oldState | auction = newAuction, seed = newSeed }
       else oldState
-
-
-view : Signal.Address Action -> Model -> Html
-view address model =
-  case model of
-    Just state -> viewState address state
-    Nothing -> Html.div [] []
-
-
-viewState : Signal.Address Action -> GameState -> Html
-viewState address state =
-  let
-    emptyCell = Html.td [] []
-    seatCell seat = Html.td [] [View.viewHand seat (Seat.lookup seat state.hands)]
-  in
-    Html.div []
-      [ Html.table []
-          [ Html.tr [] [ emptyCell, seatCell Seat.North, emptyCell ]
-          , Html.tr [] [ seatCell Seat.West, emptyCell, seatCell Seat.East ]
-          , Html.tr [] [ emptyCell, seatCell Seat.South, emptyCell ]
-          ]
-      , View.viewAuction address state.dealer state.auction
-      , Html.button [ Events.onClick address Action.NewDeal ] [ Html.text "Rage Quit" ]
-      ]
