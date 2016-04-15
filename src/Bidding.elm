@@ -19,6 +19,7 @@ common functions used by several different systems.
 import Auction
 import Card exposing (Card)
 import Evaluation
+import Vulnerability
 
 import List.Extra
 import Random
@@ -31,7 +32,7 @@ system.
 -}
 type alias System =
   { name : String
-  , suggestions : List AnnotatedBid -> List AnnotatedBid
+  , suggestions : Vulnerability.Favorability -> List AnnotatedBid -> List AnnotatedBid
   }
 
 
@@ -70,9 +71,9 @@ type Metric
 
 {-| Annotate a bid with its meaning in a particular system.
 -}
-annotate : System -> List AnnotatedBid -> Auction.Bid -> AnnotatedBid
-annotate system history bid =
-  case lookup bid (system.suggestions history) of
+annotate : System -> Vulnerability.Favorability -> List AnnotatedBid -> Auction.Bid -> AnnotatedBid
+annotate system favorability history bid =
+  case lookup bid (system.suggestions favorability history) of
     Just annotated -> annotated
     Nothing -> { bid = bid, meaning = OutOfSystem }
 
@@ -88,20 +89,20 @@ lookup bid =
 suggestions is chosen at random.  If the system makes no suggestion, the
 result will be Pass for reason of being OutOfSystem.
 -}
-choose : System -> List AnnotatedBid -> List Card -> Random.Seed -> (AnnotatedBid, Random.Seed)
-choose system history hand =
+choose : System -> Vulnerability.Favorability -> List AnnotatedBid -> List Card -> Random.Seed -> (AnnotatedBid, Random.Seed)
+choose system favorability history hand =
   let
     fallback = { bid = Auction.Pass, meaning = OutOfSystem }
   in
-    Random.generate (Random.Extra.selectWithDefault fallback <| viableChoices system history hand)
+    Random.generate (Random.Extra.selectWithDefault fallback <| viableChoices system favorability history hand)
 
 
 {-| Get a list of viable suggested bids, based on the contents of
 the bidder's hand.
 -}
-viableChoices : System -> List AnnotatedBid -> List Card -> List AnnotatedBid
-viableChoices system history hand =
-  List.filter (satisfiedBy hand) <| system.suggestions history
+viableChoices : System -> Vulnerability.Favorability -> List AnnotatedBid -> List Card -> List AnnotatedBid
+viableChoices system favorability history hand =
+  List.filter (satisfiedBy hand) <| system.suggestions favorability history
 
 
 {-| Check if a hand satisfies the meaning of a proposed bid.

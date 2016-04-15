@@ -3,6 +3,7 @@ module BiddingTests (all) where
 import Auction
 import Bidding
 import Card
+import Vulnerability
 
 import ElmTest
 import Random
@@ -21,14 +22,14 @@ annotateSuite : ElmTest.Test
 annotateSuite =
   ElmTest.suite "annotate"
     [ ElmTest.test "takes annotations from the system" <|
-        ElmTest.assertEqual twoNoTrump (Bidding.annotate testSystem [] (Auction.Bid 2 Nothing))
+        ElmTest.assertEqual twoNoTrump (Bidding.annotate testSystem Vulnerability.Equal [] (Auction.Bid 2 Nothing))
 
     , ElmTest.test "falls back to OutOfSystem" <|
         let
           expected =
             { bid = Auction.Bid 3 Nothing, meaning = Bidding.OutOfSystem }
         in
-          ElmTest.assertEqual expected (Bidding.annotate testSystem [] (Auction.Bid 3 Nothing))
+          ElmTest.assertEqual expected (Bidding.annotate testSystem Vulnerability.Equal [] (Auction.Bid 3 Nothing))
     ]
 
 
@@ -37,18 +38,18 @@ chooseSuite =
   ElmTest.suite "choose"
     [ ElmTest.test "picks one of the bids suggested by the system" <|
         let
-          (choice, _) = Bidding.choose testSystem [] [] (Random.initialSeed 0)
+          (choice, _) = Bidding.choose testSystem Vulnerability.Equal [] [] (Random.initialSeed 0)
         in
           ElmTest.assert (choice == oneNoTrump || choice == twoNoTrump)
 
     , ElmTest.test "falls back to Pass" <|
         let
           nullSystem =
-            { name = "Null System", suggestions = always [] }
+            { name = "Null System", suggestions = \_ _ -> [] }
           expected =
             { bid = Auction.Pass, meaning = Bidding.OutOfSystem }
           (choice, _) =
-            Bidding.choose nullSystem [] [] (Random.initialSeed 0)
+            Bidding.choose nullSystem Vulnerability.Equal [] [] (Random.initialSeed 0)
         in
           ElmTest.assertEqual expected choice
     ]
@@ -220,7 +221,7 @@ roleSuite =
 testSystem : Bidding.System
 testSystem =
   { name = "Test System"
-  , suggestions = always [oneNoTrump, twoNoTrump]
+  , suggestions = \_ _ -> [oneNoTrump, twoNoTrump]
   }
 
 

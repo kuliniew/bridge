@@ -6,6 +6,7 @@ module Bidding.StandardAmerican (system) where
 import Auction
 import Bidding
 import Card
+import Vulnerability
 
 
 {-| The bidding system itself.
@@ -19,8 +20,8 @@ system =
 
 {-| The suggestion function.
 -}
-suggest : List Bidding.AnnotatedBid -> List Bidding.AnnotatedBid
-suggest history =
+suggest : Vulnerability.Favorability -> List Bidding.AnnotatedBid -> List Bidding.AnnotatedBid
+suggest favorability history =
   case Bidding.role history of
     Bidding.Openable -> openingBids
     _ -> []

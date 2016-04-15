@@ -60,7 +60,8 @@ update action model =
         (Just newState, Effects.none)
     (Bid bid, Just oldState) ->
       let
-        annotated = Bidding.annotate Bidding.StandardAmerican.system oldState.auction bid
+        favorability = Vulnerability.favorability (currentBidder oldState) oldState.vulnerability
+        annotated = Bidding.annotate Bidding.StandardAmerican.system favorability oldState.auction bid
         newState = bidForBots { oldState | auction = annotated :: oldState.auction }
       in
         (Just newState, Effects.none)
@@ -95,14 +96,19 @@ deal dealer vulnerability seed =
 bidForBots : GameState -> GameState
 bidForBots oldState =
   let
-    nextBidder = List.foldl (<|) oldState.dealer (List.repeat (List.length oldState.auction) Seat.next)
+    nextBidder = currentBidder oldState
   in
     if nextBidder /= Seat.South && Auction.isOpen (List.map .bid oldState.auction)
       then
         let
+          favorability = Vulnerability.favorability nextBidder oldState.vulnerability
           (newBid, newSeed) =
-            Bidding.choose Bidding.StandardAmerican.system oldState.auction (Seat.lookup nextBidder oldState.hands) oldState.seed
+            Bidding.choose Bidding.StandardAmerican.system favorability oldState.auction (Seat.lookup nextBidder oldState.hands) oldState.seed
           newAuction = newBid :: oldState.auction
         in
           bidForBots { oldState | auction = newAuction, seed = newSeed }
       else oldState
+
+
+currentBidder : GameState -> Seat
+currentBidder state = List.foldl (<|) state.dealer (List.repeat (List.length state.auction) Seat.next)
