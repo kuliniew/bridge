@@ -79,34 +79,29 @@ openingBids favorability history =
     oneSpades =
       { bid = Auction.Bid 1 (Just Card.Spades)
       , meaning = Bidding.And
-          [ Bidding.NoneOf [twoClubs.meaning]
-          , oneLevelMinimumPoints
+          [ oneLevelMinimumPoints
           , oneLevelMaximumPoints
           , Bidding.Minimum (Bidding.Length Card.Spades) (Bidding.Constant majorLength)
           , Bidding.Minimum (Bidding.Length Card.Spades) (Bidding.Length Card.Hearts)
           , Bidding.Minimum (Bidding.Length Card.Spades) (Bidding.Length Card.Diamonds)
           , Bidding.Minimum (Bidding.Length Card.Spades) (Bidding.Length Card.Clubs)
-          , Bidding.NoneOf [threeInsteadOfOne Card.Spades]
           ]
       }
     oneHearts =
       { bid = Auction.Bid 1 (Just Card.Hearts)
       , meaning = Bidding.And
-          [ Bidding.NoneOf [twoClubs.meaning]
-          , oneLevelMinimumPoints
+          [ oneLevelMinimumPoints
           , oneLevelMaximumPoints
           , Bidding.Minimum (Bidding.Length Card.Hearts) (Bidding.Constant majorLength)
           , Bidding.GreaterThan (Bidding.Length Card.Hearts) (Bidding.Length Card.Spades)
           , Bidding.Minimum (Bidding.Length Card.Hearts) (Bidding.Length Card.Diamonds)
           , Bidding.Minimum (Bidding.Length Card.Hearts) (Bidding.Length Card.Clubs)
-          , Bidding.NoneOf [threeInsteadOfOne Card.Hearts]
           ]
       }
     oneDiamonds =
       { bid = Auction.Bid 1 (Just Card.Diamonds)
       , meaning = Bidding.And
-          [ Bidding.NoneOf [twoClubs.meaning]
-          , oneLevelMinimumPoints
+          [ oneLevelMinimumPoints
           , oneLevelMaximumPoints
           , Bidding.Minimum (Bidding.Length Card.Diamonds) (Bidding.Constant minorLength)
           , openWithMinor Card.Diamonds Card.Spades
@@ -116,14 +111,12 @@ openingBids favorability history =
               [ Bidding.GreaterThan (Bidding.Length Card.Diamonds) (Bidding.Length Card.Clubs)
               , Bidding.Minimum (Bidding.Length Card.Diamonds) (Bidding.Constant <| minorLength + 1)
               ]
-          , Bidding.NoneOf [threeInsteadOfOne Card.Diamonds]
           ]
       }
     oneClubs =
       { bid = Auction.Bid 1 (Just Card.Clubs)
       , meaning = Bidding.And
-          [ Bidding.NoneOf [twoClubs.meaning]
-          , oneLevelMinimumPoints
+          [ oneLevelMinimumPoints
           , oneLevelMaximumPoints
           , Bidding.Minimum (Bidding.Length Card.Clubs) (Bidding.Constant minorLength)
           , openWithMinor Card.Clubs Card.Spades
@@ -133,7 +126,6 @@ openingBids favorability history =
               [ Bidding.GreaterThan (Bidding.Length Card.Clubs) (Bidding.Length Card.Diamonds)
               , Bidding.Maximum (Bidding.Length Card.Diamonds) (Bidding.Constant minorLength)
               ]
-          , Bidding.NoneOf [threeInsteadOfOne Card.Clubs]
           ]
       }
     twoClubs =
@@ -159,10 +151,7 @@ openingBids favorability history =
             ]
       in
         { bid = Auction.Bid 2 (Just Card.Clubs)
-        , meaning = Bidding.And
-            [ Bidding.NoneOf [threeNoTrump.meaning]
-            , Bidding.Or [standardMeaning, weakerMeaning]
-            ]
+        , meaning = Bidding.Or [standardMeaning, weakerMeaning]
         }
     weakTwo suit =
       { bid = Auction.Bid 2 (Just suit)
@@ -213,15 +202,30 @@ openingBids favorability history =
           , highestPreempt 5 Card.Diamonds
           ]
   in
-    [ oneNoTrump
-    , twoNoTrump
-    , threeNoTrump
-    , oneSpades
-    , oneHearts
-    , oneDiamonds
-    , oneClubs
-    , twoClubs
-    , weakTwo Card.Diamonds
-    , weakTwo Card.Hearts
-    , weakTwo Card.Spades
-    ] ++ preempts
+    prioritized
+      [ [threeNoTrump]
+      , preempts
+      , [twoClubs, weakTwo Card.Diamonds, weakTwo Card.Hearts, weakTwo Card.Spades]
+      , [oneNoTrump, twoNoTrump, oneSpades, oneHearts, oneDiamonds, oneClubs]
+      ]
+
+
+{-| Flatten a prioritized list of bids, such that the nth set of choices
+deny having been able to make any of the bids in the previous sets.
+-}
+prioritized : List (List Bidding.AnnotatedBid) -> List Bidding.AnnotatedBid
+prioritized =
+  let
+    downgrade denied bid =
+      { bid | meaning = Bidding.And [Bidding.NoneOf denied, bid.meaning] }
+    prioritized' denied prefs =
+      case prefs of
+        [] -> []
+        (next :: rest) ->
+          let
+            downgraded = List.map (downgrade denied) next
+            denied' = denied ++ List.map .meaning next
+          in
+            downgraded ++ prioritized' denied' rest
+  in
+    prioritized' []
