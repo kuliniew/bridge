@@ -201,12 +201,17 @@ openingBids favorability history =
           , highestPreempt 5 Card.Clubs
           , highestPreempt 5 Card.Diamonds
           ]
+    pass =
+      { bid = Auction.Pass
+      , meaning = Bidding.LessThan (Bidding.Points Nothing) (Bidding.Constant oneLevelPoints)
+      }
   in
     prioritized
       [ [threeNoTrump]
       , preempts
       , [twoClubs, weakTwo Card.Diamonds, weakTwo Card.Hearts, weakTwo Card.Spades]
       , [oneNoTrump, twoNoTrump, oneSpades, oneHearts, oneDiamonds, oneClubs]
+      , [pass]
       ]
 
 

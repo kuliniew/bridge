@@ -34,7 +34,7 @@ openingSuite : ElmTest.Test
 openingSuite =
   ElmTest.suite "opening" <| List.map testBid
     [ { name = "4 HCP, 7 hearts, 5 tricks, unfavorable vulnerability"
-      , expected = [ {- Auction.Pass -} ]
+      , expected = [Auction.Pass]
       , favorability = Vulnerability.Unfavorable
       , history = []
       , spades = [ Card.Jack, Card.Five ]
@@ -44,7 +44,7 @@ openingSuite =
       }
 
     , { name = "4 HCP, 7 hearts, 5 tricks, equal vulnerability"
-      , expected = [ {- Auction.Pass -} ]
+      , expected = [Auction.Pass]
       , favorability = Vulnerability.Equal
       , history = []
       , spades = [ Card.Jack, Card.Five ]
@@ -64,7 +64,7 @@ openingSuite =
       }
 
     , { name = "4 HCP, 7 hearts, 5 tricks, favorable vulnerability, fourth seat"
-      , expected = [ {- Auction.Pass -} ]
+      , expected = [Auction.Pass]
       , favorability = Vulnerability.Favorable
       , history = [Auction.Pass, Auction.Pass, Auction.Pass]
       , spades = [ Card.Jack, Card.Five ]
