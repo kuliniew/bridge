@@ -216,16 +216,16 @@ deny having been able to make any of the bids in the previous sets.
 prioritized : List (List Bidding.AnnotatedBid) -> List Bidding.AnnotatedBid
 prioritized =
   let
-    downgrade denied bid =
-      { bid | meaning = Bidding.And [Bidding.NoneOf denied, bid.meaning] }
-    prioritized' denied prefs =
+    downgrade denials bid =
+      { bid | meaning = Bidding.And (bid.meaning :: denials) }
+    prioritized' denials prefs =
       case prefs of
         [] -> []
         (next :: rest) ->
           let
-            downgraded = List.map (downgrade denied) next
-            denied' = denied ++ List.map .meaning next
+            downgraded = List.map (downgrade denials) next
+            denials' = denials ++ List.map (Bidding.Deny << .meaning) next
           in
-            downgraded ++ prioritized' denied' rest
+            downgraded ++ prioritized' denials' rest
   in
     prioritized' []

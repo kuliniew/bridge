@@ -57,7 +57,7 @@ type Meaning
   | Balanced
   | Or (List Meaning)
   | And (List Meaning)
-  | NoneOf (List Meaning)
+  | Deny Meaning
 
 
 {-| A thing that can be measured in a hand.
@@ -134,8 +134,8 @@ satisfiedBy hand bid =
           List.any satisfies alternatives
         And requirements ->
           List.all satisfies requirements
-        NoneOf prohibitions ->
-          not (List.any satisfies prohibitions)
+        Deny prohibition ->
+          not (satisfies prohibition)
   in
     satisfies bid.meaning
 
