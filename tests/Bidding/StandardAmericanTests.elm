@@ -423,6 +423,16 @@ openingSuite =
       , clubs = []
       }
 
+    , { name = "17 HCP, 9 playing tricks with herats"
+      , expected = [Auction.Bid 2 (Just Card.Clubs)]
+      , favorability = Vulnerability.Equal
+      , history = []
+      , spades = [ Card.Ace, Card.King, Card.Ten ]
+      , hearts = [ Card.Ace, Card.King, Card.Queen, Card.Jack, Card.Nine, Card.Eight, Card.Seven ]
+      , diamonds = [ Card.Six, Card.Five, Card.Three ]
+      , clubs = []
+      }
+
     , { name = "17 HCP, 4-3-3-3 distribution"
       , expected = [Auction.Bid 1 (Just Card.Clubs), Auction.Bid 1 Nothing]
       , favorability = Vulnerability.Equal

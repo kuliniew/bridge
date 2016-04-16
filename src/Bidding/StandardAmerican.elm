@@ -147,7 +147,7 @@ openingBids favorability history =
         fiveCardMajor =
           Bidding.Or
             [ Bidding.Minimum (Bidding.Length Card.Spades) (Bidding.Constant majorLength)
-            , Bidding.Maximum (Bidding.Length Card.Hearts) (Bidding.Constant minorLength)
+            , Bidding.Minimum (Bidding.Length Card.Hearts) (Bidding.Constant majorLength)
             ]
       in
         { bid = Auction.Bid 2 (Just Card.Clubs)
