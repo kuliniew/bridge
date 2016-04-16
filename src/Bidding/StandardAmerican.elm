@@ -23,15 +23,19 @@ system =
 suggest : Vulnerability.Favorability -> List Bidding.AnnotatedBid -> List Bidding.AnnotatedBid
 suggest favorability history =
   case Bidding.role history of
-    Bidding.Openable -> openingBids
+    Bidding.Openable -> openingBids favorability history
     _ -> []
 
 
 {-| Possible opening bids.
 -}
-openingBids : List Bidding.AnnotatedBid
-openingBids =
+openingBids : Vulnerability.Favorability -> List Bidding.AnnotatedBid -> List Bidding.AnnotatedBid
+openingBids favorability history =
   let
+    fourthSeat =
+      case history of
+        [_, _, _] -> True
+        _ -> False
     noTrump level lo hi =
       { bid = Auction.Bid level Nothing
       , meaning = Bidding.And
@@ -55,6 +59,23 @@ openingBids =
         [ Bidding.LessThan (Bidding.Length major) (Bidding.Constant majorLength)
         , Bidding.GreaterThan (Bidding.Length minor) (Bidding.Length major)
         ]
+    preemptTricks level =
+      let
+        margin =
+          case favorability of
+            Vulnerability.Unfavorable -> 2
+            Vulnerability.Equal -> 3
+            Vulnerability.Favorable -> 4
+      in
+        Bidding.Constant (6 + level - margin)
+    threeInsteadOfOne suit =
+      let
+        betterBid =
+          if fourthSeat
+            then fourthSeatThree suit
+            else highestPreempt 3 suit
+      in
+        betterBid.meaning
     oneSpades =
       { bid = Auction.Bid 1 (Just Card.Spades)
       , meaning = Bidding.And
@@ -65,6 +86,7 @@ openingBids =
           , Bidding.Minimum (Bidding.Length Card.Spades) (Bidding.Length Card.Hearts)
           , Bidding.Minimum (Bidding.Length Card.Spades) (Bidding.Length Card.Diamonds)
           , Bidding.Minimum (Bidding.Length Card.Spades) (Bidding.Length Card.Clubs)
+          , Bidding.NoneOf [threeInsteadOfOne Card.Spades]
           ]
       }
     oneHearts =
@@ -77,6 +99,7 @@ openingBids =
           , Bidding.GreaterThan (Bidding.Length Card.Hearts) (Bidding.Length Card.Spades)
           , Bidding.Minimum (Bidding.Length Card.Hearts) (Bidding.Length Card.Diamonds)
           , Bidding.Minimum (Bidding.Length Card.Hearts) (Bidding.Length Card.Clubs)
+          , Bidding.NoneOf [threeInsteadOfOne Card.Hearts]
           ]
       }
     oneDiamonds =
@@ -93,6 +116,7 @@ openingBids =
               [ Bidding.GreaterThan (Bidding.Length Card.Diamonds) (Bidding.Length Card.Clubs)
               , Bidding.Minimum (Bidding.Length Card.Diamonds) (Bidding.Constant <| minorLength + 1)
               ]
+          , Bidding.NoneOf [threeInsteadOfOne Card.Diamonds]
           ]
       }
     oneClubs =
@@ -109,6 +133,7 @@ openingBids =
               [ Bidding.GreaterThan (Bidding.Length Card.Clubs) (Bidding.Length Card.Diamonds)
               , Bidding.Maximum (Bidding.Length Card.Diamonds) (Bidding.Constant minorLength)
               ]
+          , Bidding.NoneOf [threeInsteadOfOne Card.Clubs]
           ]
       }
     twoClubs =
@@ -145,8 +170,48 @@ openingBids =
           [ Bidding.InRange Bidding.HighCardPoints 5 10    -- SAYC says 5-11, but 11 HCP + six cards == 13 points == 1-level opening
           , Bidding.LessThan (Bidding.Points Nothing) (Bidding.Constant oneLevelPoints)
           , Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 6)
+          , Bidding.LessThan Bidding.PlayingTricks (preemptTricks 3)
           ]
       }
+    preempt level suit trickCondition =
+      { bid = Auction.Bid level (Just suit)
+      , meaning = Bidding.And
+          [ Bidding.Maximum Bidding.HighCardPoints (Bidding.Constant 10)
+          , Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 7)
+          , trickCondition Bidding.PlayingTricks (preemptTricks level)
+          ]
+      }
+    highestPreempt level suit =
+      preempt level suit Bidding.Minimum
+    moderatePreempt level suit =
+      preempt level suit Bidding.Equal
+    fourthSeatThree suit =
+      { bid = Auction.Bid 3 (Just suit)
+      , meaning = Bidding.And
+          [ Bidding.InRange Bidding.HighCardPoints 10 12
+          , Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 7)
+          ]
+      }
+    preempts =
+      if fourthSeat
+        then
+          [ fourthSeatThree Card.Clubs
+          , fourthSeatThree Card.Diamonds
+          , fourthSeatThree Card.Hearts
+          , fourthSeatThree Card.Spades
+          ]
+        else
+          [ moderatePreempt 3 Card.Clubs
+          , moderatePreempt 3 Card.Diamonds
+          , moderatePreempt 3 Card.Hearts
+          , moderatePreempt 3 Card.Spades
+          , moderatePreempt 4 Card.Clubs
+          , moderatePreempt 4 Card.Diamonds
+          , highestPreempt 4 Card.Hearts
+          , highestPreempt 4 Card.Spades
+          , highestPreempt 5 Card.Clubs
+          , highestPreempt 5 Card.Diamonds
+          ]
   in
     [ oneNoTrump
     , twoNoTrump
@@ -159,4 +224,4 @@ openingBids =
     , weakTwo Card.Diamonds
     , weakTwo Card.Hearts
     , weakTwo Card.Spades
-    ]
+    ] ++ preempts

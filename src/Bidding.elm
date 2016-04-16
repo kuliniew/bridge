@@ -49,6 +49,7 @@ type alias AnnotatedBid =
 type Meaning
   = OutOfSystem
   | InRange Metric Int Int
+  | Equal Metric Metric
   | Minimum Metric Metric
   | Maximum Metric Metric
   | GreaterThan Metric Metric
@@ -113,6 +114,8 @@ satisfiedBy hand bid =
     satisfies meaning =
       case meaning of
         OutOfSystem -> True
+        Equal metric val ->
+          eval metric hand == eval val hand
         InRange metric lo hi ->
           let
             value = eval metric hand

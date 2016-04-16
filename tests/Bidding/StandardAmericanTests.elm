@@ -33,7 +33,47 @@ type alias BidTest =
 openingSuite : ElmTest.Test
 openingSuite =
   ElmTest.suite "opening" <| List.map testBid
-    [ { name = "5 HCP, 6 spades"
+    [ { name = "4 HCP, 7 hearts, 5 tricks, unfavorable vulnerability"
+      , expected = [ {- Auction.Pass -} ]
+      , favorability = Vulnerability.Unfavorable
+      , history = []
+      , spades = [ Card.Jack, Card.Five ]
+      , hearts = [ Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Five, Card.Four, Card.Three ]
+      , diamonds = [ Card.Seven, Card.Three ]
+      , clubs = [ Card.Six, Card.Two ]
+      }
+
+    , { name = "4 HCP, 7 hearts, 5 tricks, equal vulnerability"
+      , expected = [ {- Auction.Pass -} ]
+      , favorability = Vulnerability.Equal
+      , history = []
+      , spades = [ Card.Jack, Card.Five ]
+      , hearts = [ Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Five, Card.Four, Card.Three ]
+      , diamonds = [ Card.Seven, Card.Three ]
+      , clubs = [ Card.Six, Card.Two ]
+      }
+
+    , { name = "4 HCP, 7 hearts, 5 tricks, favorable vulnerability"
+      , expected = [Auction.Bid 3 (Just Card.Hearts)]
+      , favorability = Vulnerability.Favorable
+      , history = []
+      , spades = [ Card.Jack, Card.Five ]
+      , hearts = [ Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Five, Card.Four, Card.Three ]
+      , diamonds = [ Card.Seven, Card.Three ]
+      , clubs = [ Card.Six, Card.Two ]
+      }
+
+    , { name = "4 HCP, 7 hearts, 5 tricks, favorable vulnerability, fourth seat"
+      , expected = [ {- Auction.Pass -} ]
+      , favorability = Vulnerability.Favorable
+      , history = [Auction.Pass, Auction.Pass, Auction.Pass]
+      , spades = [ Card.Jack, Card.Five ]
+      , hearts = [ Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Five, Card.Four, Card.Three ]
+      , diamonds = [ Card.Seven, Card.Three ]
+      , clubs = [ Card.Six, Card.Two ]
+      }
+
+    , { name = "5 HCP, 6 spades"
       , expected = [Auction.Bid 2 (Just Card.Spades)]
       , favorability = Vulnerability.Equal
       , history = []
@@ -61,6 +101,36 @@ openingSuite =
       , hearts = [ Card.Four, Card.Three, Card.Two ]
       , diamonds = [ Card.Ace, Card.Jack, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
       , clubs = [ Card.Two ]
+      }
+
+    , { name = "7 HCP, 7 diamonds, 6 playing tricks, unfavorable vulnerability"
+      , expected = [Auction.Bid 2 (Just Card.Diamonds)]
+      , favorability = Vulnerability.Unfavorable
+      , history = []
+      , spades = [ Card.Ace, Card.Four ]
+      , hearts = [ Card.Nine, Card.Five, Card.Two ]
+      , diamonds = [ Card.Queen, Card.Jack, Card.Ten, Card.Nine, Card.Seven, Card.Three, Card.Two ]
+      , clubs = [ Card.Seven ]
+      }
+
+    , { name = "7 HCP, 7 diamonds, 6 playing tricks, equal vulnerability"
+      , expected = [Auction.Bid 3 (Just Card.Diamonds)]
+      , favorability = Vulnerability.Equal
+      , history = []
+      , spades = [ Card.Ace, Card.Four ]
+      , hearts = [ Card.Nine, Card.Five, Card.Two ]
+      , diamonds = [ Card.Queen, Card.Jack, Card.Ten, Card.Nine, Card.Seven, Card.Three, Card.Two ]
+      , clubs = [ Card.Seven ]
+      }
+
+    , { name = "7 HCP, 7 diamonds, 6 playing tricks, favorable vulnerability"
+      , expected = [Auction.Bid 4 (Just Card.Diamonds)]
+      , favorability = Vulnerability.Favorable
+      , history = []
+      , spades = [ Card.Ace, Card.Four ]
+      , hearts = [ Card.Nine, Card.Five, Card.Two ]
+      , diamonds = [ Card.Queen, Card.Jack, Card.Ten, Card.Nine, Card.Seven, Card.Three, Card.Two ]
+      , clubs = [ Card.Seven ]
       }
 
     , { name = "10 HCP, 6 spades"
@@ -91,6 +161,76 @@ openingSuite =
       , hearts = [ Card.Four, Card.Three, Card.Two ]
       , diamonds = [ Card.Ace, Card.King, Card.Jack, Card.Ten, Card.Nine, Card.Eight ]
       , clubs = [ Card.Queen ]
+      }
+
+    , { name = "10 HCP, 8 clubs, 8 playing tricks, unfavorable vulnerability"
+      , expected = [Auction.Bid 4 (Just Card.Clubs)]
+      , favorability = Vulnerability.Unfavorable
+      , history = []
+      , spades = []
+      , hearts = [ Card.Five, Card.Four, Card.Two ]
+      , diamonds = [ Card.Jack, Card.Eight ]
+      , clubs = [ Card.Ace, Card.King, Card.Queen, Card.Ten, Card.Nine, Card.Seven, Card.Six, Card.Three ]
+      }
+
+    , { name = "10 HCP, 8 clubs, 8 playing tricks, equal vulnerability"
+      , expected = [Auction.Bid 5 (Just Card.Clubs)]
+      , favorability = Vulnerability.Equal
+      , history = []
+      , spades = []
+      , hearts = [ Card.Five, Card.Four, Card.Two ]
+      , diamonds = [ Card.Jack, Card.Eight ]
+      , clubs = [ Card.Ace, Card.King, Card.Queen, Card.Ten, Card.Nine, Card.Seven, Card.Six, Card.Three ]
+      }
+
+    , { name = "10 HCP, 8 clubs, 8 playing tricks, favorable vulnerability"
+      , expected = [Auction.Bid 5 (Just Card.Clubs)]
+      , favorability = Vulnerability.Favorable
+      , history = []
+      , spades = []
+      , hearts = [ Card.Five, Card.Four, Card.Two ]
+      , diamonds = [ Card.Jack, Card.Eight ]
+      , clubs = [ Card.Ace, Card.King, Card.Queen, Card.Ten, Card.Nine, Card.Seven, Card.Six, Card.Three ]
+      }
+
+    , { name = "11 HCP, 7 hearts, first seat"
+      , expected = [Auction.Bid 1 (Just Card.Hearts)]
+      , favorability = Vulnerability.Equal
+      , history = []
+      , spades = [ Card.Seven, Card.Four ]
+      , hearts = [ Card.Ace, Card.Queen, Card.Jack, Card.Nine, Card.Eight, Card.Seven, Card.Three ]
+      , diamonds = [ Card.Ace, Card.Eight, Card.Two ]
+      , clubs = [ Card.Four ]
+      }
+
+    , { name = "11 HCP, 7 hearts, second seat"
+      , expected = [Auction.Bid 1 (Just Card.Hearts)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass ]
+      , spades = [ Card.Seven, Card.Four ]
+      , hearts = [ Card.Ace, Card.Queen, Card.Jack, Card.Nine, Card.Eight, Card.Seven, Card.Three ]
+      , diamonds = [ Card.Ace, Card.Eight, Card.Two ]
+      , clubs = [ Card.Four ]
+      }
+
+    , { name = "11 HCP, 7 hearts, third seat"
+      , expected = [Auction.Bid 1 (Just Card.Hearts)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Pass ]
+      , spades = [ Card.Seven, Card.Four ]
+      , hearts = [ Card.Ace, Card.Queen, Card.Jack, Card.Nine, Card.Eight, Card.Seven, Card.Three ]
+      , diamonds = [ Card.Ace, Card.Eight, Card.Two ]
+      , clubs = [ Card.Four ]
+      }
+
+    , { name = "11 HCP, 7 hearts, fourth seat"
+      , expected = [Auction.Bid 3 (Just Card.Hearts)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Pass, Auction.Pass ]
+      , spades = [ Card.Seven, Card.Four ]
+      , hearts = [ Card.Ace, Card.Queen, Card.Jack, Card.Nine, Card.Eight, Card.Seven, Card.Three ]
+      , diamonds = [ Card.Ace, Card.Eight, Card.Two ]
+      , clubs = [ Card.Four ]
       }
 
     , { name = "13 points, 5 spades"
