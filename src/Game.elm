@@ -29,6 +29,7 @@ type alias GameState =
   , vulnerability : Vulnerability
   , auction : List Bidding.AnnotatedBid
   , seed : Random.Seed
+  , explained : Maybe Bidding.Meaning
   }
 
 
@@ -36,6 +37,7 @@ type Action
   = Reseed Time
   | NewDeal
   | Bid Auction.Bid
+  | Explain (Maybe Bidding.Meaning)
 
 
 init : (Model, Effects Action)
@@ -65,6 +67,11 @@ update action model =
         newState = bidForBots { oldState | auction = annotated :: oldState.auction }
       in
         (Just newState, Effects.none)
+    (Explain explained, Just oldState) ->
+      let
+        newState = { oldState | explained = explained }
+      in
+        (Just newState, Effects.none)
     (_, Nothing) ->
       {- TODO: indicate some kind of error for this impossible state -}
       (Nothing, Effects.none)
@@ -88,6 +95,7 @@ deal dealer vulnerability seed =
       , vulnerability = vulnerability
       , auction = []
       , seed = seed'
+      , explained = Nothing
       }
   in
     state

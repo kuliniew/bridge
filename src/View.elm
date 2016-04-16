@@ -43,6 +43,7 @@ viewState address state =
           ]
       , viewAuction address state.dealer state.auction
       , Html.button [ Events.onClick address Game.NewDeal ] [ Html.text "Rage Quit" ]
+      , viewExplanation state.explained
       ]
 
 
@@ -98,7 +99,13 @@ viewAuction address dealer annotatedAuction =
     headerCell name =
       Html.td [] [Html.text name]
     bidCell bid =
-      Html.td [] (viewBid bid)
+      let
+        events =
+          [ Events.onMouseEnter address (Game.Explain <| Just bid.meaning)
+          , Events.onMouseLeave address (Game.Explain Nothing)
+          ]
+      in
+        Html.td events (viewBid bid.bid)
     blankCell =
       Html.td [] []
     nullCell =
@@ -113,7 +120,7 @@ viewAuction address dealer annotatedAuction =
       if Auction.isOpen auction
         then [makeBidCell address auction]
         else []
-    allCells = nullCells ++ List.reverse (List.map bidCell auction) ++ makeBidCells
+    allCells = nullCells ++ List.reverse (List.map bidCell annotatedAuction) ++ makeBidCells
     row cells =
       Html.tr [] cells
   in
@@ -164,12 +171,6 @@ suitClass suit =
 viewBid : Auction.Bid -> List Html
 viewBid bid =
   let
-    suitText suit =
-      case suit of
-        Card.Clubs -> "♣"
-        Card.Diamonds -> "♦"
-        Card.Hearts -> "♥"
-        Card.Spades -> "♠"
     viewTrump trump =
       case trump of
         Just suit -> Html.span [suitClass suit] [Html.text <| suitText suit]
@@ -180,6 +181,20 @@ viewBid bid =
       Auction.Double -> [Html.text "Double"]
       Auction.Redouble -> [Html.text "Redouble"]
       Auction.Bid level trump -> [Html.text (toString level), viewTrump trump]
+
+
+suitText : Card.Suit -> String
+suitText suit =
+  case suit of
+    Card.Clubs -> "♣"
+    Card.Diamonds -> "♦"
+    Card.Hearts -> "♥"
+    Card.Spades -> "♠"
+
+
+suitSymbol : Card.Suit -> Html
+suitSymbol suit =
+  Html.span [suitClass suit] [Html.text <| suitText suit]
 
 
 cluster : a -> Int -> List a -> List (List a)
@@ -204,3 +219,168 @@ viewVulnerability vuln =
         (True, True) -> "both sides vulnerable"
   in
     Html.text message
+
+
+viewExplanation : Maybe Bidding.Meaning -> Html
+viewExplanation explained =
+  let
+    content =
+      case explained of
+        Nothing -> []
+        Just meaning ->
+          [ Html.h1 [] [ Html.text "Explanation" ]
+          , viewMeaning (simplify meaning)
+          ]
+  in
+    Html.div [] content
+
+
+viewMeaning : Bidding.Meaning -> Html
+viewMeaning meaning =
+  let
+    list description meanings =
+      Html.div []
+        [ Html.text description
+        , Html.ul [] (List.map (\m -> Html.li [] [viewMeaning m]) meanings)
+        ]
+  in
+    case meaning of
+      Bidding.OutOfSystem ->
+        Html.text "(not part of the bidding system)"
+      Bidding.InRange metric lo hi ->
+        Html.span []
+          [ viewMetric metric
+          , Html.text (" between " ++ toString lo ++ " and " ++ toString hi)
+          ]
+      Bidding.Equal metric1 metric2 ->
+        Html.span []
+          [ viewMetric metric1
+          , Html.text " = "
+          , viewMetric metric2
+          ]
+      Bidding.Minimum metric bound ->
+        Html.span []
+          [ viewMetric metric
+          , Html.text " ≥ "
+          , viewMetric bound
+          ]
+      Bidding.Maximum metric bound ->
+        Html.span []
+          [ viewMetric metric
+          , Html.text " ≤ "
+          , viewMetric bound
+          ]
+      Bidding.GreaterThan metric bound ->
+        Html.span []
+          [ viewMetric metric
+          , Html.text " > "
+          , viewMetric bound
+          ]
+      Bidding.LessThan metric bound ->
+        Html.span []
+          [ viewMetric metric
+          , Html.text " < "
+          , viewMetric bound
+          ]
+      Bidding.Balanced ->
+        Html.text "Balanced (4-3-3-3, 4-4-3-2, or 5-3-3-2)"
+      Bidding.Or meanings ->
+        list "Any of:" meanings
+      Bidding.And meanings ->
+        list "All of:" meanings
+      Bidding.Deny sub ->
+        list "Deny:" [sub]
+
+
+viewMetric : Bidding.Metric -> Html
+viewMetric metric =
+  case metric of
+    Bidding.Constant val ->
+      Html.text (toString val)
+    Bidding.HighCardPoints ->
+      Html.text "HCP"
+    Bidding.Points Nothing ->
+      Html.text "Points (counting length)"
+    Bidding.Points (Just Nothing) ->
+      Html.text "Points (NT)"
+    Bidding.Points (Just (Just suit)) ->
+      Html.span [] [ Html.text "Points (", suitSymbol suit, Html.text ")" ]
+    Bidding.Length suit ->
+      Html.span [] [ Html.text "Length of ", suitSymbol suit ]
+    Bidding.PlayingTricks ->
+      Html.text "Playing Tricks"
+
+
+simplify : Bidding.Meaning -> Bidding.Meaning
+simplify = hideDenials >> collapseDegenerates >> collapseRedundancies
+
+
+{-| Remove Deny nodes from And nodes of a meaning tree, to make the
+displayed meaning more comprehensible.  (The Deny nodes are mostly
+there to indicate preference between technically mutually allowed bids
+rather than to convey human-level significance.)
+-}
+hideDenials : Bidding.Meaning -> Bidding.Meaning
+hideDenials meaning =
+  let
+    scrub child =
+      case child of
+        Bidding.And children -> Just <| Bidding.And (List.map hideDenials children)
+        Bidding.Or children -> Just <| Bidding.Or (List.map hideDenials children)
+        Bidding.Deny _ -> Nothing
+        _ -> Just child
+  in
+    case meaning of
+      Bidding.And children -> Bidding.And (List.filterMap scrub children)
+      Bidding.Or children -> Bidding.Or (List.map hideDenials children)
+      _ -> meaning
+
+
+{-| Remove And or Or nodes with only one child, since they're useless.
+-}
+collapseDegenerates : Bidding.Meaning -> Bidding.Meaning
+collapseDegenerates meaning =
+  case meaning of
+    Bidding.And [child] -> collapseDegenerates child
+    Bidding.And children -> Bidding.And (List.map collapseDegenerates children)
+    Bidding.Or [child] -> collapseDegenerates child
+    Bidding.Or children -> Bidding.Or (List.map collapseDegenerates children)
+    Bidding.Deny child -> Bidding.Deny (collapseDegenerates child)
+    _ -> meaning
+
+
+{-| Collapse conjunctions who children are all the same conjunction.
+-}
+collapseRedundancies : Bidding.Meaning -> Bidding.Meaning
+collapseRedundancies meaning =
+  let
+    isAnd meaning =
+      case meaning of
+        Bidding.And _ -> True
+        _ -> False
+    isOr meaning =
+      case meaning of
+        Bidding.Or _ -> True
+        _ -> False
+    grandchildren meaning =
+      case meaning of
+        Bidding.And grands -> grands
+        Bidding.Or grands -> grands
+        _ -> Debug.crash "tried to take grandchildren over non-conjunction nodes"
+  in
+    case meaning of
+      Bidding.And children ->
+        let
+          children' = List.map collapseRedundancies children
+        in
+          if List.all isAnd children'
+            then Bidding.And (List.concatMap grandchildren children')
+            else Bidding.And children'
+      Bidding.Or children ->
+        let
+          children' = List.map collapseRedundancies children
+        in
+          if List.all isOr children'
+            then Bidding.Or (List.concatMap grandchildren children')
+            else Bidding.Or children'
+      _ -> meaning
