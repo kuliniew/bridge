@@ -17,8 +17,6 @@ import Debug
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
-import Json.Decode
-import List.Extra
 
 
 view : Signal.Address Action -> Game.Model -> Html
@@ -41,7 +39,7 @@ viewState address state =
           , Html.tr [] [ seatCell Seat.West, emptyCell, seatCell Seat.East ]
           , Html.tr [] [ emptyCell, seatCell Seat.South, emptyCell ]
           ]
-      , viewAuction address state.dealer state.auction
+      , viewAuction address state.dealer state.system state.vulnerability state.auction
       , Html.button [ Events.onClick address Game.NewDeal ] [ Html.text "Rage Quit" ]
       , viewExplanation state.explained
       ]
@@ -91,11 +89,13 @@ viewRank card =
     Html.li [] [Html.text value]
 
 
-viewAuction : Signal.Address Action -> Seat -> List Bidding.AnnotatedBid -> Html
-viewAuction address dealer annotatedAuction =
+viewAuction : Signal.Address Action -> Seat -> Bidding.System -> Vulnerability -> List Bidding.AnnotatedBid -> Html
+viewAuction address dealer system vulnerability annotatedAuction =
   let
     auction =
       List.map .bid annotatedAuction
+    favorability =
+      Vulnerability.favorability (Game.currentBidder dealer annotatedAuction) vulnerability
     headerCell name =
       Html.td [] [Html.text name]
     bidCell bid =
@@ -118,7 +118,7 @@ viewAuction address dealer annotatedAuction =
         Seat.South -> [nullCell, nullCell, nullCell]
     makeBidCells =
       if Auction.isOpen auction
-        then [makeBidCell address auction]
+        then [makeBidCell address system favorability annotatedAuction]
         else []
     allCells = nullCells ++ List.reverse (List.map bidCell annotatedAuction) ++ makeBidCells
     row cells =
@@ -132,27 +132,24 @@ viewAuction address dealer annotatedAuction =
       ]
 
 
-makeBidCell : Signal.Address Action -> List Auction.Bid -> Html
-makeBidCell address auction =
+makeBidCell : Signal.Address Action -> Bidding.System -> Vulnerability.Favorability -> List Bidding.AnnotatedBid -> Html
+makeBidCell address system favorability history =
   let
     legalBids =
-      Auction.legalBids auction
-    lookupLegalBid index =
-      case List.Extra.getAt legalBids (index - 1) of
-        Just bid -> bid
-        Nothing -> Debug.crash "failed to lookup the selected bid"
-    getSelectedIndex =
-      Json.Decode.at ["target", "selectedIndex"] Json.Decode.int
-    onSelect =
-      Events.on "change" getSelectedIndex (Signal.message address << Game.Bid << lookupLegalBid)
-    header =
-      Html.option [] [Html.text "Make a bid..."]
-    toChoice bid =
-      Html.option [Events.onClick address (Game.Bid bid)] (viewBid bid)
-    choices =
-      List.map toChoice legalBids
+      Auction.legalBids (List.map .bid history)
+    annotatedLegalBids =
+      List.map (Bidding.annotate system favorability history) legalBids
+    button bid =
+      let
+        events =
+          [ Events.onClick address (Game.Bid bid.bid)
+          , Events.onMouseEnter address (Game.Explain <| Just bid.meaning)
+          , Events.onMouseLeave address (Game.Explain Nothing)
+          ]
+      in
+        Html.button events (viewBid bid.bid)
   in
-    Html.td [] [Html.select [onSelect] (header :: choices)]
+    Html.td [] (List.map button annotatedLegalBids)
 
 
 suitClass : Card.Suit -> Html.Attribute
