@@ -2,6 +2,10 @@
 
 A tool for practicing bridge against computer opponents.
 
+## Live Demo
+
+If you don't feel like running your own copy, you can [check out the live demo](https://kuliniew.github.io/bridge/).
+
 ## Running
 
 You must have [Elm](http://elm-lang.org/) installed.
