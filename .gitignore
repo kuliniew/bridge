@@ -1,0 +1,6 @@
+/elm-stuff/
+/src/
+/tests/
+
+build.sh
+elm-package.json
