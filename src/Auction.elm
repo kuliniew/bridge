@@ -3,6 +3,7 @@ module Auction
   , Bid (..)
   , isOpen
   , legalBids
+  , level
   ) where
 
 {-| This module models the auction phase of a hand of bridge.
@@ -102,3 +103,15 @@ contractualBids =
       List.map (Bid level) [Just Card.Clubs, Just Card.Diamonds, Just Card.Hearts, Just Card.Spades, Nothing]
   in
     List.concatMap bidsAtLevel [1 .. 7]
+
+
+{-| The notional "level" of a bid, where Pass, Double, and Redouble are
+considered 0-level bids.
+-}
+level : Bid -> Int
+level bid =
+  case bid of
+    Pass -> 0
+    Double -> 0
+    Redouble -> 0
+    Bid lev _ -> lev

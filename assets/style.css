@@ -1,3 +1,19 @@
+th {
+  text-align: left;
+}
+
+table.auction td {
+  vertical-align: top;
+}
+
+td.choices {
+  text-align: right;
+}
+
+td.choices button {
+  width: 5em;
+}
+
 ul.suits {
   list-style-type: none;
   padding-left: 0;

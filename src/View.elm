@@ -17,6 +17,7 @@ import Debug
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
+import List.Extra
 
 
 view : Signal.Address Action -> Game.Model -> Html
@@ -97,7 +98,7 @@ viewAuction address dealer system vulnerability annotatedAuction =
     favorability =
       Vulnerability.favorability (Game.currentBidder dealer annotatedAuction) vulnerability
     headerCell name =
-      Html.td [] [Html.text name]
+      Html.th [] [Html.text name]
     bidCell bid =
       let
         events =
@@ -124,7 +125,7 @@ viewAuction address dealer system vulnerability annotatedAuction =
     row cells =
       Html.tr [] cells
   in
-    Html.table []
+    Html.table [Attr.class "auction"]
       [ Html.thead []
           [ Html.tr [] (List.map headerCell ["West", "North", "East", "South"])
           ]
@@ -148,8 +149,23 @@ makeBidCell address system favorability history =
           ]
       in
         Html.button events (viewBid bid.bid)
+    buttons =
+      annotatedLegalBids
+        |> movePassToRightSide
+        |> List.Extra.groupBy levels
+        |> List.map (List.map button)
+        |> List.Extra.intercalate [Html.br [] []]
+    movePassToRightSide bids =
+      case bids of
+        bid1 :: bid2 :: rest ->
+          if Auction.level bid2.bid == 0
+             then bid2 :: bid1 :: rest
+             else bids
+        _ -> bids
+    levels bid1 bid2 =
+      Auction.level bid1.bid == Auction.level bid2.bid
   in
-    Html.td [] (List.map button annotatedLegalBids)
+    Html.td [Attr.class "choices"] buttons
 
 
 suitClass : Card.Suit -> Html.Attribute
