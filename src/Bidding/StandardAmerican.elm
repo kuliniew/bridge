@@ -238,6 +238,7 @@ responseBids history =
 responsesToOneNoTrump : List Bidding.AnnotatedBid
 responsesToOneNoTrump =
   let
+    inviteSlamPoints = Bidding.Constant (33 - 16)
     noFourCardMajor =
       Bidding.And
         [ Bidding.Maximum (Bidding.Length Card.Spades) (Bidding.Constant 3)
@@ -249,13 +250,19 @@ responsesToOneNoTrump =
       Bidding.Or <| List.map (\suit -> Bidding.Maximum (Bidding.Length suit) (Bidding.Constant 2)) suits
     jacobyTransfer target via =
       { bid = Auction.Bid 2 (Just via)
-      , meaning = Bidding.Minimum (Bidding.Length target) (Bidding.Constant 5)
+      , meaning = Bidding.And
+          [ Bidding.Minimum (Bidding.Length target) (Bidding.Constant 5)
+          , Bidding.Deny (inviteSlam target).meaning
+          ]
       }
     minorTransfer =
       { bid = Auction.Bid 2 (Just Card.Spades)
-      , meaning = Bidding.Or
-          [ Bidding.Minimum (Bidding.Length Card.Clubs) (Bidding.Constant 6)
-          , Bidding.Minimum (Bidding.Length Card.Diamonds) (Bidding.Constant 6)
+      , meaning = Bidding.And
+          [ Bidding.Or
+              [ Bidding.Minimum (Bidding.Length Card.Clubs) (Bidding.Constant 6)
+              , Bidding.Minimum (Bidding.Length Card.Diamonds) (Bidding.Constant 6)
+              ]
+          , Bidding.LessThan Bidding.HighCardPoints (Bidding.Constant 7)
           ]
       }
     stayman =
@@ -277,12 +284,35 @@ responsesToOneNoTrump =
           , Bidding.Or [noFourCardMajor, fourThreeThreeThree]
           ]
       }
+    inviteGameWithLongMinor suit =
+      { bid = Auction.Bid 3 (Just suit)
+      , meaning = Bidding.And
+          [ Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 6)
+          , Bidding.InRange Bidding.HighCardPoints 7 8
+          ]
+      }
+    bidGame =
+      { bid = Auction.Bid 3 Nothing
+      , meaning = Bidding.InRange Bidding.HighCardPoints 10 13
+      }
+    inviteSlam suit =
+      { bid = Auction.Bid 3 (Just suit)
+      , meaning = Bidding.And
+          [ Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 6)
+          , Bidding.Equal (Bidding.Points <| Just (Just suit)) inviteSlamPoints
+          ]
+      }
   in
     [ jacobyTransfer Card.Hearts Card.Diamonds
     , jacobyTransfer Card.Spades Card.Hearts
     , minorTransfer
     , stayman
     , inviteGame
+    , inviteGameWithLongMinor Card.Clubs
+    , inviteGameWithLongMinor Card.Diamonds
+    , bidGame
+    , inviteSlam Card.Hearts
+    , inviteSlam Card.Spades
     ]
 
 

@@ -579,6 +579,46 @@ oneNoTrumpResponseSuite =   -- TODO: Also need cases for the 2 Spades response, 
       , clubs = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six, Card.Five ]
       }
 
+    , { name = "7 HCP, 6 clubs"
+      , expected = [Auction.Bid 3 (Just Card.Clubs)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.King, Card.Ten, Card.Nine ]
+      , hearts = [ Card.Ten, Card.Nine ]
+      , diamonds = [ Card.Ten, Card.Nine ]
+      , clubs = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+      }
+
+    , { name = "7 HCP, 6 diamonds"
+      , expected = [Auction.Bid 3 (Just Card.Diamonds)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.King, Card.Ten, Card.Nine ]
+      , hearts = [ Card.Ten, Card.Nine ]
+      , diamonds = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+      , clubs = [ Card.Ten, Card.Nine ]
+      }
+
+    , { name = "8 HCP, 6 clubs"
+      , expected = [Auction.Bid 3 (Just Card.Clubs)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.Ace, Card.Ten, Card.Nine ]
+      , hearts = [ Card.Ten, Card.Nine ]
+      , diamonds = [ Card.Ten, Card.Nine ]
+      , clubs = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+      }
+
+    , { name = "8 HCP, 6 diamonds"
+      , expected = [Auction.Bid 3 (Just Card.Diamonds)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.Ace, Card.Ten, Card.Nine ]
+      , hearts = [ Card.Ten, Card.Nine ]
+      , diamonds = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+      , clubs = [ Card.Ten, Card.Nine ]
+      }
+
     , { name = "8 HCP, 5 spades"
       , expected = [Auction.Bid 2 (Just Card.Hearts)]
       , favorability = Vulnerability.Equal
@@ -687,6 +727,46 @@ oneNoTrumpResponseSuite =   -- TODO: Also need cases for the 2 Spades response, 
       , hearts = [ Card.Ace, Card.Ten, Card.Seven ]
       , diamonds = [ Card.Queen, Card.Ten, Card.Nine, Card.Eight, Card.Two ]
       , clubs = [ Card.King, Card.Nine ]
+      }
+
+    , { name = "10 HCP"
+      , expected = [Auction.Bid 3 Nothing]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.King, Card.Ten, Card.Nine ]
+      , hearts = [ Card.King, Card.Ten, Card.Nine ]
+      , diamonds = [ Card.Queen, Card.Ten, Card.Nine, Card.Eight ]
+      , clubs = [ Card.Queen, Card.Ten, Card.Nine ]
+      }
+
+    , { name = "13 HCP"
+      , expected = [Auction.Bid 3 Nothing]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.King, Card.Ten, Card.Nine ]
+      , hearts = [ Card.King, Card.Ten, Card.Nine ]
+      , diamonds = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight ]
+      , clubs = [ Card.King, Card.Ten, Card.Nine ]
+      }
+
+    , { name = "17 points, 6 hearts"
+      , expected = [Auction.Bid 3 (Just Card.Hearts)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.Ace, Card.Ten, Card.Nine ]
+      , hearts = [ Card.Ace, Card.Jack, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , diamonds = [ Card.King, Card.Ten ]
+      , clubs = [ Card.King, Card.Ten ]
+      }
+
+    , { name = "17 points, 6 spades"
+      , expected = [Auction.Bid 3 (Just Card.Spades)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.Ace, Card.Jack, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.Ace, Card.Ten, Card.Nine ]
+      , diamonds = [ Card.King, Card.Ten ]
+      , clubs = [ Card.King, Card.Ten ]
       }
     ]
 
