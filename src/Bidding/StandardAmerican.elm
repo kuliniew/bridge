@@ -24,6 +24,7 @@ suggest : Vulnerability.Favorability -> List Bidding.AnnotatedBid -> List Biddin
 suggest favorability history =
   case Bidding.role history of
     Bidding.Openable -> openingBids favorability history
+    Bidding.Responder -> responseBids history
     _ -> []
 
 
@@ -215,6 +216,76 @@ openingBids favorability history =
       ]
 
 
+{-| Dispatcher for the various types of response bidding.
+-}
+responseBids : List Bidding.AnnotatedBid -> List Bidding.AnnotatedBid
+responseBids history =
+  let
+    justOpenedOneNoTrump =
+      case List.map .bid history of
+        Auction.Pass :: Auction.Bid 1 Nothing :: rest ->
+          List.all (\bid -> bid == Auction.Pass) rest
+        _ ->
+          False
+  in
+    if justOpenedOneNoTrump
+    then responsesToOneNoTrump
+    else []
+
+
+{-| Responses to an opening bid of 1NT.
+-}
+responsesToOneNoTrump : List Bidding.AnnotatedBid
+responsesToOneNoTrump =
+  let
+    noFourCardMajor =
+      Bidding.And
+        [ Bidding.Maximum (Bidding.Length Card.Spades) (Bidding.Constant 3)
+        , Bidding.Maximum (Bidding.Length Card.Hearts) (Bidding.Constant 3)
+        ]
+    fourThreeThreeThree =
+      Bidding.And <| List.map (\suit -> Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 3)) suits
+    notFourThreeThreeThree =
+      Bidding.Or <| List.map (\suit -> Bidding.Maximum (Bidding.Length suit) (Bidding.Constant 2)) suits
+    jacobyTransfer target via =
+      { bid = Auction.Bid 2 (Just via)
+      , meaning = Bidding.Minimum (Bidding.Length target) (Bidding.Constant 5)
+      }
+    minorTransfer =
+      { bid = Auction.Bid 2 (Just Card.Spades)
+      , meaning = Bidding.Or
+          [ Bidding.Minimum (Bidding.Length Card.Clubs) (Bidding.Constant 6)
+          , Bidding.Minimum (Bidding.Length Card.Diamonds) (Bidding.Constant 6)
+          ]
+      }
+    stayman =
+      { bid = Auction.Bid 2 (Just Card.Clubs)
+      , meaning = Bidding.And
+          [ Bidding.Minimum (Bidding.Points Nothing) (Bidding.Constant 8)
+          , Bidding.Or
+              [ Bidding.Equal (Bidding.Length Card.Hearts) (Bidding.Constant 4)
+              , Bidding.Equal (Bidding.Length Card.Spades) (Bidding.Constant 4)
+              ]
+          , notFourThreeThreeThree
+          ]
+      }
+    inviteGame =
+      { bid = Auction.Bid 2 Nothing
+      , meaning = Bidding.And
+          [ Bidding.InRange Bidding.HighCardPoints 8 9
+          , Bidding.Balanced
+          , Bidding.Or [noFourCardMajor, fourThreeThreeThree]
+          ]
+      }
+  in
+    [ jacobyTransfer Card.Hearts Card.Diamonds
+    , jacobyTransfer Card.Spades Card.Hearts
+    , minorTransfer
+    , stayman
+    , inviteGame
+    ]
+
+
 {-| Flatten a prioritized list of bids, such that the nth set of choices
 deny having been able to make any of the bids in the previous sets.
 -}
@@ -234,3 +305,9 @@ prioritized =
             downgraded ++ prioritized' denials' rest
   in
     prioritized' []
+
+
+{-| List of all suits.
+-}
+suits : List Card.Suit
+suits = [ Card.Spades, Card.Hearts, Card.Diamonds, Card.Clubs ]
