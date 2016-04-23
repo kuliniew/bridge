@@ -1,8 +1,13 @@
 module EvaluationTests (all) where
 
 import Card
+import Card.Producer
 import Evaluation
+import TestUtils
 
+import Array
+import Check
+import Check.Producer
 import ElmTest
 
 
@@ -19,6 +24,8 @@ all =
     , balancedSuite
 
     , playingTricksSuite
+
+    , quickLosersSuite
     ]
 
 
@@ -373,3 +380,51 @@ playingTricksSuite =
         in
           ElmTest.assertEqual 3 (Evaluation.playingTricks (Just Card.Spades) hand)
     ]
+
+
+quickLosersSuite : ElmTest.Test
+quickLosersSuite =
+  let
+    spadesHand ranks = Card.fromSuits
+      { spades = ranks
+      , hearts = []
+      , diamonds = []
+      , clubs = Array.toList (Array.slice 0 (13 - List.length ranks) Card.ranks)
+      }
+    test name expected ranks =
+      ElmTest.test name <| ElmTest.assertEqual expected (Evaluation.quickLosers Card.Spades <| spadesHand ranks)
+  in
+    ElmTest.suite "quickLosers"
+      [ test "void suit" 0 []
+
+      , test "singleton ace" 0 [ Card.Ace ]
+      , test "doubleton ace-king" 0 [ Card.Ace, Card.King ]
+      , test "doubleton ace-queen" 0 [ Card.Ace, Card.Queen ]
+      , test "doubleton ace-spot" 0 [ Card.Ace, Card.Ten ]
+
+      , test "singleton king" 1 [ Card.King ]
+      , test "doubleton king-queen" 1 [ Card.King, Card.Queen ]
+      , test "doubleton king-spot" 1 [ Card.King, Card.Ten ]
+
+      , test "singleton queen" 1 [ Card.Queen ]
+      , test "doubleton queen-jack" 2 [ Card.Queen, Card.Jack ]
+      , test "three-length queen-jack-spot" 2 [ Card.Queen, Card.Jack, Card.Ten ]
+
+      , test "singleton jack" 1 [ Card.Jack ]
+      , test "doubleton jack-spot" 2 [ Card.Jack, Card.Ten ]
+      , test "three-length jack-spot-spot" 3 [ Card.Jack, Card.Ten, Card.Nine ]
+      , test "four-length jack-spot-spot-spot" 3 [ Card.Jack, Card.Ten, Card.Nine, Card.Eight ]
+
+      , test "singleton spot" 1 [ Card.Ten ]
+      , test "doubleton spot-spot" 2 [ Card.Ten, Card.Nine ]
+      , test "three-length spot-spot-spot" 3 [ Card.Ten, Card.Nine, Card.Eight ]
+      , test "four-length spot-spot-spot-spot" 4 [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "is never more than the length of the suit"
+          `Check.true`
+            (\(suit, hand) -> Evaluation.quickLosers suit hand <= Evaluation.length suit hand)
+          `Check.for`
+            Check.Producer.tuple (Card.Producer.suit, Card.Producer.hand)
+      ]

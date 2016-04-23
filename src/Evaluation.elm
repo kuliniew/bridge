@@ -10,6 +10,8 @@ module Evaluation
 
   , playingTricks
   , playingTricksAny
+
+  , quickLosers
   ) where
 
 {-| This module implements various hand evaluation functions.
@@ -152,3 +154,24 @@ playingTricksAny cards =
     |> List.map (\suit -> playingTricks (Just suit) cards)
     |> List.maximum
     |> Maybe.withDefault 0
+
+
+{-| Count the number of quick losers in a suit.  This is used
+when investigating a slam, to look for suits that can't win
+early tricks.
+-}
+quickLosers : Card.Suit -> List Card -> Int
+quickLosers suit cards =
+  let
+    ranks =
+      List.filterMap (\card -> if card.suit == suit then Just card.rank else Nothing) cards
+    winners =
+      [ Card.Ace, Card.King, Card.Queen, Card.Jack ]
+        |> List.take (List.length ranks)
+        |> List.indexedMap (,)
+    heldWinners =
+      List.filter (\pair -> List.member (snd pair) ranks) winners
+  in
+    case List.head heldWinners of
+      Just (losers, _) -> losers
+      Nothing -> List.length ranks

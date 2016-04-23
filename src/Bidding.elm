@@ -68,6 +68,7 @@ type Metric
   | Points (Maybe Auction.Trump)
   | Length Card.Suit
   | PlayingTricks
+  | QuickLosers Card.Suit
 
 
 {-| Annotate a bid with its meaning in a particular system.
@@ -150,6 +151,7 @@ eval metric hand =
     Points trump -> Evaluation.points trump hand
     Length suit -> Evaluation.length suit hand
     PlayingTricks -> Evaluation.playingTricksAny hand
+    QuickLosers suit -> Evaluation.quickLosers suit hand
 
 
 {-| A role that a seat can have during bidding, depending on what bids have

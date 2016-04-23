@@ -284,6 +284,8 @@ responsesToOneNoTrump =
               , Bidding.Equal (Bidding.Length Card.Spades) (Bidding.Constant 4)
               ]
           , notFourThreeThreeThree
+          , Bidding.Maximum (Bidding.Length Card.Hearts) (Bidding.Constant 4)
+          , Bidding.Maximum (Bidding.Length Card.Spades) (Bidding.Constant 4)
           ]
       }
     inviteGame =
@@ -309,7 +311,7 @@ responsesToOneNoTrump =
       { bid = Auction.Bid 3 (Just suit)
       , meaning = Bidding.And
           [ Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 6)
-          , Bidding.Equal (Bidding.Points <| Just (Just suit)) inviteSlamPoints
+          , Bidding.Minimum (Bidding.Points <| Just (Just suit)) inviteSlamPoints
           ]
       }
     inviteSlamNoTrump =
@@ -319,8 +321,29 @@ responsesToOneNoTrump =
           , Bidding.Balanced
           ]
       }
+    noVoids =
+      let
+        noVoidIn suit =
+          Bidding.GreaterThan (Bidding.Length suit) (Bidding.Constant 0)
+      in
+        List.map noVoidIn suits
+    noTwoQuickLosers =
+      let
+        noTwoQuickLosersIn suit =
+          Bidding.LessThan (Bidding.QuickLosers suit) (Bidding.Constant 2)
+      in
+        List.map noTwoQuickLosersIn suits
+    gerber =
+      { bid = Auction.Bid 4 (Just Card.Clubs)
+      , meaning = Bidding.And
+          ( Bidding.GreaterThan (Bidding.Points Nothing) inviteSlamPoints    -- FIXME: probably should be based on a known fit?
+          :: noVoids
+          ++ noTwoQuickLosers
+          )
+      }
     priority1 =
       [ inviteSlamNoTrump
+      , gerber
       ]
     priority2 =
       [ pass

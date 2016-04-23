@@ -818,6 +818,68 @@ oneNoTrumpResponseSuite =   -- TODO: Also need cases for the 2 Spades response, 
       , diamonds = [ Card.Ace, Card.Ten, Card.Nine ]
       , clubs = [ Card.Ace, Card.Ten ]
       }
+
+      -- FIXME: These are probably better for general tests for using Gerber
+
+    , { name = "18 points, 6 spades, no voids, no 2 quick losers in any suit"
+      , expected = [Auction.Bid 4 (Just Card.Clubs)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.Ace, Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.King, Card.Jack, Card.Ten ]
+      , diamonds = [ Card.Ace, Card.Ten ]
+      , clubs = [ Card.King, Card.Ten ]
+      }
+
+    , { name = "18 points, 6 hearts, no voids, no 2 quick losers in any suit"
+      , expected = [Auction.Bid 4 (Just Card.Clubs)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.King, Card.Jack, Card.Ten ]
+      , hearts = [ Card.Ace, Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , diamonds = [ Card.Ace, Card.Ten ]
+      , clubs = [ Card.King, Card.Ten ]
+      }
+
+    , { name = "18 points, 6 diamonds, no voids, no 2 quick losers in any suit"
+      , expected = [Auction.Bid 4 (Just Card.Clubs)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.King, Card.Jack, Card.Ten ]
+      , hearts = [ Card.Ace, Card.Ten ]
+      , diamonds = [ Card.Ace, Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , clubs = [ Card.King, Card.Ten ]
+      }
+
+    , { name = "18 points, 6 clubs, no voids, no 2 quick losers in any suit"
+      , expected = [Auction.Bid 4 (Just Card.Clubs)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.King, Card.Jack, Card.Ten ]
+      , hearts = [ Card.Ace, Card.Ten ]
+      , diamonds = [ Card.King, Card.Ten ]
+      , clubs = [ Card.Ace, Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      }
+
+    , { name = "18 points, 6 spades, void in diamonds"
+      , expected = [Auction.Bid 3 (Just Card.Spades)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.Ace, Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.Ace, Card.King, Card.Jack, Card.Ten ]
+      , diamonds = []
+      , clubs = [ Card.King, Card.Ten, Card.Nine ]
+      }
+
+    , { name = "18 points, 6 spades, 2 quick losers in diamonds"
+      , expected = [Auction.Bid 3 (Just Card.Spades)]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.Ace, Card.King, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.Ace, Card.Jack ]
+      , diamonds = [ Card.Queen, Card.Ten, Card.Nine ]
+      , clubs = [ Card.Ace, Card.Ten ]
+      }
     ]
 
 

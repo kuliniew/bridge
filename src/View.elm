@@ -322,6 +322,8 @@ viewMetric metric =
       Html.span [] [ Html.text "Length of ", suitSymbol suit ]
     Bidding.PlayingTricks ->
       Html.text "Playing Tricks"
+    Bidding.QuickLosers suit ->
+      Html.span [] [ Html.text "Quick Losers (", suitSymbol suit, Html.text ")" ]
 
 
 simplify : Bidding.Meaning -> Bidding.Meaning
