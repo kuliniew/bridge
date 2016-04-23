@@ -519,7 +519,27 @@ openingSuite =
 oneNoTrumpResponseSuite : ElmTest.Test
 oneNoTrumpResponseSuite =   -- TODO: Also need cases for the 2 Spades response, to cover all the 2-level responses
   ElmTest.suite "response to 1NT" <| List.map testBid
-    [ { name = "0 HCP, 5 spades"
+    [ { name = "0 HCP, 4 spades, 4 hearts"
+      , expected = [Auction.Pass]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+      , diamonds = [ Card.Ten, Card.Nine, Card.Eight ]
+      , clubs = [ Card.Ten, Card.Nine ]
+      }
+
+    , { name = "0 HCP, 5 diamonds, 5 clubs"
+      , expected = [Auction.Pass]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.Ten ]
+      , hearts = [ Card.Ten, Card.Nine ]
+      , diamonds = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+      , clubs = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+      }
+
+    , { name = "0 HCP, 5 spades"
       , expected = [Auction.Bid 2 (Just Card.Hearts)]
       , favorability = Vulnerability.Equal
       , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
@@ -597,6 +617,26 @@ oneNoTrumpResponseSuite =   -- TODO: Also need cases for the 2 Spades response, 
       , hearts = [ Card.Ten, Card.Nine ]
       , diamonds = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
       , clubs = [ Card.Ten, Card.Nine ]
+      }
+
+    , { name = "7 points, 4 spades, 4 hearts"
+      , expected = [Auction.Pass]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.Ace, Card.Nine, Card.Eight, Card.Seven ]
+      , hearts = [ Card.King, Card.Nine, Card.Eight, Card.Seven ]
+      , diamonds = [ Card.Ten, Card.Nine, Card.Eight ]
+      , clubs = [ Card.Ten, Card.Nine ]
+      }
+
+    , { name = "7 points, 5 diamonds, 5 clubs"
+      , expected = [Auction.Pass]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.Ten, Card.Nine ]
+      , hearts = [ Card.King ]
+      , diamonds = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+      , clubs = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
       }
 
     , { name = "8 HCP, 6 clubs"

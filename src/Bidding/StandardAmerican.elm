@@ -248,6 +248,16 @@ responsesToOneNoTrump =
       Bidding.And <| List.map (\suit -> Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 3)) suits
     notFourThreeThreeThree =
       Bidding.Or <| List.map (\suit -> Bidding.Maximum (Bidding.Length suit) (Bidding.Constant 2)) suits
+    pass =
+      { bid = Auction.Pass
+      , meaning = Bidding.And
+          [ Bidding.Maximum (Bidding.Points Nothing) (Bidding.Constant 7)
+          , Bidding.LessThan (Bidding.Length Card.Spades) (Bidding.Constant 5)
+          , Bidding.LessThan (Bidding.Length Card.Hearts) (Bidding.Constant 5)
+          , Bidding.LessThan (Bidding.Length Card.Diamonds) (Bidding.Constant 6)
+          , Bidding.LessThan (Bidding.Length Card.Clubs) (Bidding.Constant 6)
+          ]
+      }
     jacobyTransfer target via =
       { bid = Auction.Bid 2 (Just via)
       , meaning = Bidding.And
@@ -313,7 +323,8 @@ responsesToOneNoTrump =
       [ inviteSlamNoTrump
       ]
     priority2 =
-      [ jacobyTransfer Card.Hearts Card.Diamonds
+      [ pass
+      , jacobyTransfer Card.Hearts Card.Diamonds
       , jacobyTransfer Card.Spades Card.Hearts
       , minorTransfer
       , stayman
