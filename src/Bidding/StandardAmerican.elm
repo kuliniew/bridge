@@ -284,8 +284,6 @@ responsesToOneNoTrump =
               , Bidding.Equal (Bidding.Length Card.Spades) (Bidding.Constant 4)
               ]
           , notFourThreeThreeThree
-          , Bidding.Maximum (Bidding.Length Card.Hearts) (Bidding.Constant 4)
-          , Bidding.Maximum (Bidding.Length Card.Spades) (Bidding.Constant 4)
           ]
       }
     inviteGame =
@@ -346,20 +344,22 @@ responsesToOneNoTrump =
       , gerber
       ]
     priority2 =
+      [ inviteGameWithLongMinor Card.Clubs
+      , inviteGameWithLongMinor Card.Diamonds
+      , inviteSlam Card.Hearts
+      , inviteSlam Card.Spades
+      ]
+    priority3 =
       [ pass
       , jacobyTransfer Card.Hearts Card.Diamonds
       , jacobyTransfer Card.Spades Card.Hearts
       , minorTransfer
       , stayman
       , inviteGame
-      , inviteGameWithLongMinor Card.Clubs
-      , inviteGameWithLongMinor Card.Diamonds
       , bidGame
-      , inviteSlam Card.Hearts
-      , inviteSlam Card.Spades
       ]
   in
-    prioritized [priority1, priority2]
+    prioritized [priority1, priority2, priority3]
 
 
 {-| Flatten a prioritized list of bids, such that the nth set of choices
