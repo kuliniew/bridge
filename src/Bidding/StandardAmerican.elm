@@ -302,18 +302,30 @@ responsesToOneNoTrump =
           , Bidding.Equal (Bidding.Points <| Just (Just suit)) inviteSlamPoints
           ]
       }
+    inviteSlamNoTrump =
+      { bid = Auction.Bid 4 Nothing
+      , meaning = Bidding.And
+          [ Bidding.Equal Bidding.HighCardPoints inviteSlamPoints
+          , Bidding.Balanced
+          ]
+      }
+    priority1 =
+      [ inviteSlamNoTrump
+      ]
+    priority2 =
+      [ jacobyTransfer Card.Hearts Card.Diamonds
+      , jacobyTransfer Card.Spades Card.Hearts
+      , minorTransfer
+      , stayman
+      , inviteGame
+      , inviteGameWithLongMinor Card.Clubs
+      , inviteGameWithLongMinor Card.Diamonds
+      , bidGame
+      , inviteSlam Card.Hearts
+      , inviteSlam Card.Spades
+      ]
   in
-    [ jacobyTransfer Card.Hearts Card.Diamonds
-    , jacobyTransfer Card.Spades Card.Hearts
-    , minorTransfer
-    , stayman
-    , inviteGame
-    , inviteGameWithLongMinor Card.Clubs
-    , inviteGameWithLongMinor Card.Diamonds
-    , bidGame
-    , inviteSlam Card.Hearts
-    , inviteSlam Card.Spades
-    ]
+    prioritized [priority1, priority2]
 
 
 {-| Flatten a prioritized list of bids, such that the nth set of choices

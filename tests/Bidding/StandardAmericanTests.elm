@@ -768,6 +768,16 @@ oneNoTrumpResponseSuite =   -- TODO: Also need cases for the 2 Spades response, 
       , diamonds = [ Card.King, Card.Ten ]
       , clubs = [ Card.King, Card.Ten ]
       }
+
+    , { name = "17 HCP, 4-4-3-2 distribution"
+      , expected = [Auction.Bid 4 Nothing]
+      , favorability = Vulnerability.Equal
+      , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+      , spades = [ Card.Ace, Card.Jack, Card.Ten, Card.Nine ]
+      , hearts = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight ]
+      , diamonds = [ Card.Ace, Card.Ten, Card.Nine ]
+      , clubs = [ Card.Ace, Card.Ten ]
+      }
     ]
 
 
