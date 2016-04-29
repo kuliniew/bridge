@@ -1,0 +1,15 @@
+language: node_js
+node_js:
+  - 5.1
+cache:
+  directories:
+    - elm-stuff/build-artifacts
+    - tests/elm-stuff/build-artifacts
+install:
+  - npm install -g elm@0.16.0
+  - npm install -g elm-test@0.16.1-alpha3
+  - ./download-dependencies.sh .
+  - ./download-dependencies.sh tests
+script:
+  - ./build.sh
+  - elm test
