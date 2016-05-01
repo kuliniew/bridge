@@ -13,3 +13,5 @@ install:
 script:
   - ./build.sh
   - elm test
+after_success:
+  - ./deploy.sh
