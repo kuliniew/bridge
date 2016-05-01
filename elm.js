@@ -1441,17 +1441,10 @@ Elm.Basics.make = function (_elm) {
    "use strict";
    _elm.Basics = _elm.Basics || {};
    if (_elm.Basics.values) return _elm.Basics.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Native$Basics = Elm.Native.Basics.make(_elm),
-   $Native$Utils = Elm.Native.Utils.make(_elm);
+   var _U = Elm.Native.Utils.make(_elm),$Native$Basics = Elm.Native.Basics.make(_elm),$Native$Utils = Elm.Native.Utils.make(_elm);
    var _op = {};
-   var uncurry = F2(function (f,_p0) {
-      var _p1 = _p0;
-      return A2(f,_p1._0,_p1._1);
-   });
-   var curry = F3(function (f,a,b) {
-      return f({ctor: "_Tuple2",_0: a,_1: b});
-   });
+   var uncurry = F2(function (f,_p0) {    var _p1 = _p0;return A2(f,_p1._0,_p1._1);});
+   var curry = F3(function (f,a,b) {    return f({ctor: "_Tuple2",_0: a,_1: b});});
    var flip = F3(function (f,b,a) {    return A2(f,a,b);});
    var snd = function (_p2) {    var _p3 = _p2;return _p3._1;};
    var fst = function (_p4) {    var _p5 = _p4;return _p5._0;};
@@ -1565,14 +1558,7 @@ Elm.Maybe.make = function (_elm) {
    if (_elm.Maybe.values) return _elm.Maybe.values;
    var _U = Elm.Native.Utils.make(_elm);
    var _op = {};
-   var withDefault = F2(function ($default,maybe) {
-      var _p0 = maybe;
-      if (_p0.ctor === "Just") {
-            return _p0._0;
-         } else {
-            return $default;
-         }
-   });
+   var withDefault = F2(function ($default,maybe) {    var _p0 = maybe;if (_p0.ctor === "Just") {    return _p0._0;} else {    return $default;}});
    var Nothing = {ctor: "Nothing"};
    var oneOf = function (maybes) {
       oneOf: while (true) {
@@ -1601,18 +1587,10 @@ Elm.Maybe.make = function (_elm) {
          }
    });
    var Just = function (a) {    return {ctor: "Just",_0: a};};
-   var map = F2(function (f,maybe) {
-      var _p5 = maybe;
-      if (_p5.ctor === "Just") {
-            return Just(f(_p5._0));
-         } else {
-            return Nothing;
-         }
-   });
+   var map = F2(function (f,maybe) {    var _p5 = maybe;if (_p5.ctor === "Just") {    return Just(f(_p5._0));} else {    return Nothing;}});
    var map2 = F3(function (func,ma,mb) {
       var _p6 = {ctor: "_Tuple2",_0: ma,_1: mb};
-      if (_p6.ctor === "_Tuple2" && _p6._0.ctor === "Just" && _p6._1.ctor === "Just")
-      {
+      if (_p6.ctor === "_Tuple2" && _p6._0.ctor === "Just" && _p6._1.ctor === "Just") {
             return Just(A2(func,_p6._0._0,_p6._1._0));
          } else {
             return Nothing;
@@ -1620,8 +1598,7 @@ Elm.Maybe.make = function (_elm) {
    });
    var map3 = F4(function (func,ma,mb,mc) {
       var _p7 = {ctor: "_Tuple3",_0: ma,_1: mb,_2: mc};
-      if (_p7.ctor === "_Tuple3" && _p7._0.ctor === "Just" && _p7._1.ctor === "Just" && _p7._2.ctor === "Just")
-      {
+      if (_p7.ctor === "_Tuple3" && _p7._0.ctor === "Just" && _p7._1.ctor === "Just" && _p7._2.ctor === "Just") {
             return Just(A3(func,_p7._0._0,_p7._1._0,_p7._2._0));
          } else {
             return Nothing;
@@ -1629,32 +1606,17 @@ Elm.Maybe.make = function (_elm) {
    });
    var map4 = F5(function (func,ma,mb,mc,md) {
       var _p8 = {ctor: "_Tuple4",_0: ma,_1: mb,_2: mc,_3: md};
-      if (_p8.ctor === "_Tuple4" && _p8._0.ctor === "Just" && _p8._1.ctor === "Just" && _p8._2.ctor === "Just" && _p8._3.ctor === "Just")
-      {
-            return Just(A4(func,
-            _p8._0._0,
-            _p8._1._0,
-            _p8._2._0,
-            _p8._3._0));
+      if (_p8.ctor === "_Tuple4" && _p8._0.ctor === "Just" && _p8._1.ctor === "Just" && _p8._2.ctor === "Just" && _p8._3.ctor === "Just") {
+            return Just(A4(func,_p8._0._0,_p8._1._0,_p8._2._0,_p8._3._0));
          } else {
             return Nothing;
          }
    });
    var map5 = F6(function (func,ma,mb,mc,md,me) {
-      var _p9 = {ctor: "_Tuple5"
-                ,_0: ma
-                ,_1: mb
-                ,_2: mc
-                ,_3: md
-                ,_4: me};
+      var _p9 = {ctor: "_Tuple5",_0: ma,_1: mb,_2: mc,_3: md,_4: me};
       if (_p9.ctor === "_Tuple5" && _p9._0.ctor === "Just" && _p9._1.ctor === "Just" && _p9._2.ctor === "Just" && _p9._3.ctor === "Just" && _p9._4.ctor === "Just")
       {
-            return Just(A5(func,
-            _p9._0._0,
-            _p9._1._0,
-            _p9._2._0,
-            _p9._3._0,
-            _p9._4._0));
+            return Just(A5(func,_p9._0._0,_p9._1._0,_p9._2._0,_p9._3._0,_p9._4._0));
          } else {
             return Nothing;
          }
@@ -1841,16 +1803,11 @@ Elm.List.make = function (_elm) {
    "use strict";
    _elm.List = _elm.List || {};
    if (_elm.List.values) return _elm.List.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Native$List = Elm.Native.List.make(_elm);
+   var _U = Elm.Native.Utils.make(_elm),$Basics = Elm.Basics.make(_elm),$Maybe = Elm.Maybe.make(_elm),$Native$List = Elm.Native.List.make(_elm);
    var _op = {};
    var sortWith = $Native$List.sortWith;
    var sortBy = $Native$List.sortBy;
-   var sort = function (xs) {
-      return A2(sortBy,$Basics.identity,xs);
-   };
+   var sort = function (xs) {    return A2(sortBy,$Basics.identity,xs);};
    var drop = F2(function (n,list) {
       drop: while (true) if (_U.cmp(n,0) < 1) return list; else {
             var _p0 = list;
@@ -1884,33 +1841,12 @@ Elm.List.make = function (_elm) {
             }
       }
    });
-   var all = F2(function (isOkay,list) {
-      return $Basics.not(A2(any,
-      function (_p2) {
-         return $Basics.not(isOkay(_p2));
-      },
-      list));
-   });
+   var all = F2(function (isOkay,list) {    return $Basics.not(A2(any,function (_p2) {    return $Basics.not(isOkay(_p2));},list));});
    var foldr = $Native$List.foldr;
    var foldl = $Native$List.foldl;
-   var length = function (xs) {
-      return A3(foldl,
-      F2(function (_p3,i) {    return i + 1;}),
-      0,
-      xs);
-   };
-   var sum = function (numbers) {
-      return A3(foldl,
-      F2(function (x,y) {    return x + y;}),
-      0,
-      numbers);
-   };
-   var product = function (numbers) {
-      return A3(foldl,
-      F2(function (x,y) {    return x * y;}),
-      1,
-      numbers);
-   };
+   var length = function (xs) {    return A3(foldl,F2(function (_p3,i) {    return i + 1;}),0,xs);};
+   var sum = function (numbers) {    return A3(foldl,F2(function (x,y) {    return x + y;}),0,numbers);};
+   var product = function (numbers) {    return A3(foldl,F2(function (x,y) {    return x * y;}),1,numbers);};
    var maximum = function (list) {
       var _p4 = list;
       if (_p4.ctor === "::") {
@@ -1927,66 +1863,20 @@ Elm.List.make = function (_elm) {
             return $Maybe.Nothing;
          }
    };
-   var indexedMap = F2(function (f,xs) {
-      return A3(map2,f,_U.range(0,length(xs) - 1),xs);
-   });
-   var member = F2(function (x,xs) {
-      return A2(any,function (a) {    return _U.eq(a,x);},xs);
-   });
-   var isEmpty = function (xs) {
-      var _p6 = xs;
-      if (_p6.ctor === "[]") {
-            return true;
-         } else {
-            return false;
-         }
-   };
-   var tail = function (list) {
-      var _p7 = list;
-      if (_p7.ctor === "::") {
-            return $Maybe.Just(_p7._1);
-         } else {
-            return $Maybe.Nothing;
-         }
-   };
-   var head = function (list) {
-      var _p8 = list;
-      if (_p8.ctor === "::") {
-            return $Maybe.Just(_p8._0);
-         } else {
-            return $Maybe.Nothing;
-         }
-   };
+   var indexedMap = F2(function (f,xs) {    return A3(map2,f,_U.range(0,length(xs) - 1),xs);});
+   var member = F2(function (x,xs) {    return A2(any,function (a) {    return _U.eq(a,x);},xs);});
+   var isEmpty = function (xs) {    var _p6 = xs;if (_p6.ctor === "[]") {    return true;} else {    return false;}};
+   var tail = function (list) {    var _p7 = list;if (_p7.ctor === "::") {    return $Maybe.Just(_p7._1);} else {    return $Maybe.Nothing;}};
+   var head = function (list) {    var _p8 = list;if (_p8.ctor === "::") {    return $Maybe.Just(_p8._0);} else {    return $Maybe.Nothing;}};
    _op["::"] = $Native$List.cons;
-   var map = F2(function (f,xs) {
-      return A3(foldr,
-      F2(function (x,acc) {    return A2(_op["::"],f(x),acc);}),
-      _U.list([]),
-      xs);
-   });
+   var map = F2(function (f,xs) {    return A3(foldr,F2(function (x,acc) {    return A2(_op["::"],f(x),acc);}),_U.list([]),xs);});
    var filter = F2(function (pred,xs) {
-      var conditionalCons = F2(function (x,xs$) {
-         return pred(x) ? A2(_op["::"],x,xs$) : xs$;
-      });
+      var conditionalCons = F2(function (x,xs$) {    return pred(x) ? A2(_op["::"],x,xs$) : xs$;});
       return A3(foldr,conditionalCons,_U.list([]),xs);
    });
-   var maybeCons = F3(function (f,mx,xs) {
-      var _p9 = f(mx);
-      if (_p9.ctor === "Just") {
-            return A2(_op["::"],_p9._0,xs);
-         } else {
-            return xs;
-         }
-   });
-   var filterMap = F2(function (f,xs) {
-      return A3(foldr,maybeCons(f),_U.list([]),xs);
-   });
-   var reverse = function (list) {
-      return A3(foldl,
-      F2(function (x,y) {    return A2(_op["::"],x,y);}),
-      _U.list([]),
-      list);
-   };
+   var maybeCons = F3(function (f,mx,xs) {    var _p9 = f(mx);if (_p9.ctor === "Just") {    return A2(_op["::"],_p9._0,xs);} else {    return xs;}});
+   var filterMap = F2(function (f,xs) {    return A3(foldr,maybeCons(f),_U.list([]),xs);});
+   var reverse = function (list) {    return A3(foldl,F2(function (x,y) {    return A2(_op["::"],x,y);}),_U.list([]),list);};
    var scanl = F3(function (f,b,xs) {
       var scan1 = F2(function (x,accAcc) {
          var _p10 = accAcc;
@@ -2003,74 +1893,48 @@ Elm.List.make = function (_elm) {
       if (_p11.ctor === "[]") {
             return xs;
          } else {
-            return A3(foldr,
-            F2(function (x,y) {    return A2(_op["::"],x,y);}),
-            ys,
-            xs);
+            return A3(foldr,F2(function (x,y) {    return A2(_op["::"],x,y);}),ys,xs);
          }
    });
-   var concat = function (lists) {
-      return A3(foldr,append,_U.list([]),lists);
-   };
-   var concatMap = F2(function (f,list) {
-      return concat(A2(map,f,list));
-   });
+   var concat = function (lists) {    return A3(foldr,append,_U.list([]),lists);};
+   var concatMap = F2(function (f,list) {    return concat(A2(map,f,list));});
    var partition = F2(function (pred,list) {
       var step = F2(function (x,_p12) {
          var _p13 = _p12;
          var _p15 = _p13._0;
          var _p14 = _p13._1;
-         return pred(x) ? {ctor: "_Tuple2"
-                          ,_0: A2(_op["::"],x,_p15)
-                          ,_1: _p14} : {ctor: "_Tuple2"
-                                       ,_0: _p15
-                                       ,_1: A2(_op["::"],x,_p14)};
+         return pred(x) ? {ctor: "_Tuple2",_0: A2(_op["::"],x,_p15),_1: _p14} : {ctor: "_Tuple2",_0: _p15,_1: A2(_op["::"],x,_p14)};
       });
-      return A3(foldr,
-      step,
-      {ctor: "_Tuple2",_0: _U.list([]),_1: _U.list([])},
-      list);
+      return A3(foldr,step,{ctor: "_Tuple2",_0: _U.list([]),_1: _U.list([])},list);
    });
    var unzip = function (pairs) {
       var step = F2(function (_p17,_p16) {
          var _p18 = _p17;
          var _p19 = _p16;
-         return {ctor: "_Tuple2"
-                ,_0: A2(_op["::"],_p18._0,_p19._0)
-                ,_1: A2(_op["::"],_p18._1,_p19._1)};
+         return {ctor: "_Tuple2",_0: A2(_op["::"],_p18._0,_p19._0),_1: A2(_op["::"],_p18._1,_p19._1)};
       });
-      return A3(foldr,
-      step,
-      {ctor: "_Tuple2",_0: _U.list([]),_1: _U.list([])},
-      pairs);
+      return A3(foldr,step,{ctor: "_Tuple2",_0: _U.list([]),_1: _U.list([])},pairs);
    };
    var intersperse = F2(function (sep,xs) {
       var _p20 = xs;
       if (_p20.ctor === "[]") {
             return _U.list([]);
          } else {
-            var step = F2(function (x,rest) {
-               return A2(_op["::"],sep,A2(_op["::"],x,rest));
-            });
+            var step = F2(function (x,rest) {    return A2(_op["::"],sep,A2(_op["::"],x,rest));});
             var spersed = A3(foldr,step,_U.list([]),_p20._1);
             return A2(_op["::"],_p20._0,spersed);
          }
    });
    var repeatHelp = F3(function (result,n,value) {
-      repeatHelp: while (true) if (_U.cmp(n,0) < 1) return result;
-      else {
-            var _v18 = A2(_op["::"],value,result),
-            _v19 = n - 1,
-            _v20 = value;
+      repeatHelp: while (true) if (_U.cmp(n,0) < 1) return result; else {
+            var _v18 = A2(_op["::"],value,result),_v19 = n - 1,_v20 = value;
             result = _v18;
             n = _v19;
             value = _v20;
             continue repeatHelp;
          }
    });
-   var repeat = F2(function (n,value) {
-      return A3(repeatHelp,_U.list([]),n,value);
-   });
+   var repeat = F2(function (n,value) {    return A3(repeatHelp,_U.list([]),n,value);});
    return _elm.List.values = {_op: _op
                              ,isEmpty: isEmpty
                              ,length: length
@@ -2224,15 +2088,12 @@ Elm.Transform2D.make = function (_elm) {
    "use strict";
    _elm.Transform2D = _elm.Transform2D || {};
    if (_elm.Transform2D.values) return _elm.Transform2D.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Native$Transform2D = Elm.Native.Transform2D.make(_elm);
+   var _U = Elm.Native.Utils.make(_elm),$Native$Transform2D = Elm.Native.Transform2D.make(_elm);
    var _op = {};
    var multiply = $Native$Transform2D.multiply;
    var rotation = $Native$Transform2D.rotation;
    var matrix = $Native$Transform2D.matrix;
-   var translation = F2(function (x,y) {
-      return A6(matrix,1,0,0,1,x,y);
-   });
+   var translation = F2(function (x,y) {    return A6(matrix,1,0,0,1,x,y);});
    var scale = function (s) {    return A6(matrix,s,0,0,s,0,0);};
    var scaleX = function (x) {    return A6(matrix,x,0,0,1,0,0);};
    var scaleY = function (y) {    return A6(matrix,1,0,0,y,0,0);};
@@ -2958,23 +2819,13 @@ Elm.Color.make = function (_elm) {
    "use strict";
    _elm.Color = _elm.Color || {};
    if (_elm.Color.values) return _elm.Color.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm);
+   var _U = Elm.Native.Utils.make(_elm),$Basics = Elm.Basics.make(_elm);
    var _op = {};
-   var Radial = F5(function (a,b,c,d,e) {
-      return {ctor: "Radial",_0: a,_1: b,_2: c,_3: d,_4: e};
-   });
+   var Radial = F5(function (a,b,c,d,e) {    return {ctor: "Radial",_0: a,_1: b,_2: c,_3: d,_4: e};});
    var radial = Radial;
-   var Linear = F3(function (a,b,c) {
-      return {ctor: "Linear",_0: a,_1: b,_2: c};
-   });
+   var Linear = F3(function (a,b,c) {    return {ctor: "Linear",_0: a,_1: b,_2: c};});
    var linear = Linear;
-   var fmod = F2(function (f,n) {
-      var integer = $Basics.floor(f);
-      return $Basics.toFloat(A2($Basics._op["%"],
-      integer,
-      n)) + f - $Basics.toFloat(integer);
-   });
+   var fmod = F2(function (f,n) {    var integer = $Basics.floor(f);return $Basics.toFloat(A2($Basics._op["%"],integer,n)) + f - $Basics.toFloat(integer);});
    var rgbToHsl = F3(function (red,green,blue) {
       var b = $Basics.toFloat(blue) / 255;
       var g = $Basics.toFloat(green) / 255;
@@ -2983,36 +2834,20 @@ Elm.Color.make = function (_elm) {
       var cMin = A2($Basics.min,A2($Basics.min,r,g),b);
       var c = cMax - cMin;
       var lightness = (cMax + cMin) / 2;
-      var saturation = _U.eq(lightness,
-      0) ? 0 : c / (1 - $Basics.abs(2 * lightness - 1));
-      var hue = $Basics.degrees(60) * (_U.eq(cMax,r) ? A2(fmod,
-      (g - b) / c,
-      6) : _U.eq(cMax,g) ? (b - r) / c + 2 : (r - g) / c + 4);
+      var saturation = _U.eq(lightness,0) ? 0 : c / (1 - $Basics.abs(2 * lightness - 1));
+      var hue = $Basics.degrees(60) * (_U.eq(cMax,r) ? A2(fmod,(g - b) / c,6) : _U.eq(cMax,g) ? (b - r) / c + 2 : (r - g) / c + 4);
       return {ctor: "_Tuple3",_0: hue,_1: saturation,_2: lightness};
    });
    var hslToRgb = F3(function (hue,saturation,lightness) {
       var hue$ = hue / $Basics.degrees(60);
       var chroma = (1 - $Basics.abs(2 * lightness - 1)) * saturation;
       var x = chroma * (1 - $Basics.abs(A2(fmod,hue$,2) - 1));
-      var _p0 = _U.cmp(hue$,0) < 0 ? {ctor: "_Tuple3"
-                                     ,_0: 0
-                                     ,_1: 0
-                                     ,_2: 0} : _U.cmp(hue$,1) < 0 ? {ctor: "_Tuple3"
-                                                                    ,_0: chroma
-                                                                    ,_1: x
-                                                                    ,_2: 0} : _U.cmp(hue$,2) < 0 ? {ctor: "_Tuple3"
-                                                                                                   ,_0: x
-                                                                                                   ,_1: chroma
-                                                                                                   ,_2: 0} : _U.cmp(hue$,3) < 0 ? {ctor: "_Tuple3"
-                                                                                                                                  ,_0: 0
-                                                                                                                                  ,_1: chroma
-                                                                                                                                  ,_2: x} : _U.cmp(hue$,
-      4) < 0 ? {ctor: "_Tuple3",_0: 0,_1: x,_2: chroma} : _U.cmp(hue$,
-      5) < 0 ? {ctor: "_Tuple3",_0: x,_1: 0,_2: chroma} : _U.cmp(hue$,
-      6) < 0 ? {ctor: "_Tuple3"
-               ,_0: chroma
-               ,_1: 0
-               ,_2: x} : {ctor: "_Tuple3",_0: 0,_1: 0,_2: 0};
+      var _p0 = _U.cmp(hue$,0) < 0 ? {ctor: "_Tuple3",_0: 0,_1: 0,_2: 0} : _U.cmp(hue$,1) < 0 ? {ctor: "_Tuple3",_0: chroma,_1: x,_2: 0} : _U.cmp(hue$,
+      2) < 0 ? {ctor: "_Tuple3",_0: x,_1: chroma,_2: 0} : _U.cmp(hue$,3) < 0 ? {ctor: "_Tuple3",_0: 0,_1: chroma,_2: x} : _U.cmp(hue$,4) < 0 ? {ctor: "_Tuple3"
+                                                                                                                                               ,_0: 0
+                                                                                                                                               ,_1: x
+                                                                                                                                               ,_2: chroma} : _U.cmp(hue$,
+      5) < 0 ? {ctor: "_Tuple3",_0: x,_1: 0,_2: chroma} : _U.cmp(hue$,6) < 0 ? {ctor: "_Tuple3",_0: chroma,_1: 0,_2: x} : {ctor: "_Tuple3",_0: 0,_1: 0,_2: 0};
       var r = _p0._0;
       var g = _p0._1;
       var b = _p0._2;
@@ -3022,28 +2857,19 @@ Elm.Color.make = function (_elm) {
    var toRgb = function (color) {
       var _p1 = color;
       if (_p1.ctor === "RGBA") {
-            return {red: _p1._0
-                   ,green: _p1._1
-                   ,blue: _p1._2
-                   ,alpha: _p1._3};
+            return {red: _p1._0,green: _p1._1,blue: _p1._2,alpha: _p1._3};
          } else {
             var _p2 = A3(hslToRgb,_p1._0,_p1._1,_p1._2);
             var r = _p2._0;
             var g = _p2._1;
             var b = _p2._2;
-            return {red: $Basics.round(255 * r)
-                   ,green: $Basics.round(255 * g)
-                   ,blue: $Basics.round(255 * b)
-                   ,alpha: _p1._3};
+            return {red: $Basics.round(255 * r),green: $Basics.round(255 * g),blue: $Basics.round(255 * b),alpha: _p1._3};
          }
    };
    var toHsl = function (color) {
       var _p3 = color;
       if (_p3.ctor === "HSLA") {
-            return {hue: _p3._0
-                   ,saturation: _p3._1
-                   ,lightness: _p3._2
-                   ,alpha: _p3._3};
+            return {hue: _p3._0,saturation: _p3._1,lightness: _p3._2,alpha: _p3._3};
          } else {
             var _p4 = A3(rgbToHsl,_p3._0,_p3._1,_p3._2);
             var h = _p4._0;
@@ -3052,27 +2878,15 @@ Elm.Color.make = function (_elm) {
             return {hue: h,saturation: s,lightness: l,alpha: _p3._3};
          }
    };
-   var HSLA = F4(function (a,b,c,d) {
-      return {ctor: "HSLA",_0: a,_1: b,_2: c,_3: d};
-   });
+   var HSLA = F4(function (a,b,c,d) {    return {ctor: "HSLA",_0: a,_1: b,_2: c,_3: d};});
    var hsla = F4(function (hue,saturation,lightness,alpha) {
-      return A4(HSLA,
-      hue - $Basics.turns($Basics.toFloat($Basics.floor(hue / (2 * $Basics.pi)))),
-      saturation,
-      lightness,
-      alpha);
+      return A4(HSLA,hue - $Basics.turns($Basics.toFloat($Basics.floor(hue / (2 * $Basics.pi)))),saturation,lightness,alpha);
    });
-   var hsl = F3(function (hue,saturation,lightness) {
-      return A4(hsla,hue,saturation,lightness,1);
-   });
+   var hsl = F3(function (hue,saturation,lightness) {    return A4(hsla,hue,saturation,lightness,1);});
    var complement = function (color) {
       var _p5 = color;
       if (_p5.ctor === "HSLA") {
-            return A4(hsla,
-            _p5._0 + $Basics.degrees(180),
-            _p5._1,
-            _p5._2,
-            _p5._3);
+            return A4(hsla,_p5._0 + $Basics.degrees(180),_p5._1,_p5._2,_p5._3);
          } else {
             var _p6 = A3(rgbToHsl,_p5._0,_p5._1,_p5._2);
             var h = _p6._0;
@@ -3083,9 +2897,7 @@ Elm.Color.make = function (_elm) {
    };
    var grayscale = function (p) {    return A4(HSLA,0,0,1 - p,1);};
    var greyscale = function (p) {    return A4(HSLA,0,0,1 - p,1);};
-   var RGBA = F4(function (a,b,c,d) {
-      return {ctor: "RGBA",_0: a,_1: b,_2: c,_3: d};
-   });
+   var RGBA = F4(function (a,b,c,d) {    return {ctor: "RGBA",_0: a,_1: b,_2: c,_3: d};});
    var rgba = RGBA;
    var rgb = F3(function (r,g,b) {    return A4(RGBA,r,g,b,1);});
    var lightRed = A4(RGBA,239,41,41,1);
@@ -4213,26 +4025,10 @@ Elm.Text.make = function (_elm) {
    var append = $Native$Text.append;
    var fromString = $Native$Text.fromString;
    var empty = fromString("");
-   var concat = function (texts) {
-      return A3($List.foldr,append,empty,texts);
-   };
-   var join = F2(function (seperator,texts) {
-      return concat(A2($List.intersperse,seperator,texts));
-   });
-   var defaultStyle = {typeface: _U.list([])
-                      ,height: $Maybe.Nothing
-                      ,color: $Color.black
-                      ,bold: false
-                      ,italic: false
-                      ,line: $Maybe.Nothing};
-   var Style = F6(function (a,b,c,d,e,f) {
-      return {typeface: a
-             ,height: b
-             ,color: c
-             ,bold: d
-             ,italic: e
-             ,line: f};
-   });
+   var concat = function (texts) {    return A3($List.foldr,append,empty,texts);};
+   var join = F2(function (seperator,texts) {    return concat(A2($List.intersperse,seperator,texts));});
+   var defaultStyle = {typeface: _U.list([]),height: $Maybe.Nothing,color: $Color.black,bold: false,italic: false,line: $Maybe.Nothing};
+   var Style = F6(function (a,b,c,d,e,f) {    return {typeface: a,height: b,color: c,bold: d,italic: e,line: f};});
    var Through = {ctor: "Through"};
    var Over = {ctor: "Over"};
    var Under = {ctor: "Under"};
@@ -4264,8 +4060,7 @@ Elm.Graphics.Element.make = function (_elm) {
    "use strict";
    _elm.Graphics = _elm.Graphics || {};
    _elm.Graphics.Element = _elm.Graphics.Element || {};
-   if (_elm.Graphics.Element.values)
-   return _elm.Graphics.Element.values;
+   if (_elm.Graphics.Element.values) return _elm.Graphics.Element.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Color = Elm.Color.make(_elm),
@@ -4286,180 +4081,76 @@ Elm.Graphics.Element.make = function (_elm) {
    var down = DDown;
    var DUp = {ctor: "DUp"};
    var up = DUp;
-   var RawPosition = F4(function (a,b,c,d) {
-      return {horizontal: a,vertical: b,x: c,y: d};
-   });
-   var Position = function (a) {
-      return {ctor: "Position",_0: a};
-   };
-   var Relative = function (a) {
-      return {ctor: "Relative",_0: a};
-   };
+   var RawPosition = F4(function (a,b,c,d) {    return {horizontal: a,vertical: b,x: c,y: d};});
+   var Position = function (a) {    return {ctor: "Position",_0: a};};
+   var Relative = function (a) {    return {ctor: "Relative",_0: a};};
    var relative = Relative;
-   var Absolute = function (a) {
-      return {ctor: "Absolute",_0: a};
-   };
+   var Absolute = function (a) {    return {ctor: "Absolute",_0: a};};
    var absolute = Absolute;
    var N = {ctor: "N"};
-   var bottomLeft = Position({horizontal: N
-                             ,vertical: N
-                             ,x: Absolute(0)
-                             ,y: Absolute(0)});
-   var bottomLeftAt = F2(function (x,y) {
-      return Position({horizontal: N,vertical: N,x: x,y: y});
-   });
+   var bottomLeft = Position({horizontal: N,vertical: N,x: Absolute(0),y: Absolute(0)});
+   var bottomLeftAt = F2(function (x,y) {    return Position({horizontal: N,vertical: N,x: x,y: y});});
    var Z = {ctor: "Z"};
-   var middle = Position({horizontal: Z
-                         ,vertical: Z
-                         ,x: Relative(0.5)
-                         ,y: Relative(0.5)});
-   var midLeft = Position({horizontal: N
-                          ,vertical: Z
-                          ,x: Absolute(0)
-                          ,y: Relative(0.5)});
-   var midBottom = Position({horizontal: Z
-                            ,vertical: N
-                            ,x: Relative(0.5)
-                            ,y: Absolute(0)});
-   var middleAt = F2(function (x,y) {
-      return Position({horizontal: Z,vertical: Z,x: x,y: y});
-   });
-   var midLeftAt = F2(function (x,y) {
-      return Position({horizontal: N,vertical: Z,x: x,y: y});
-   });
-   var midBottomAt = F2(function (x,y) {
-      return Position({horizontal: Z,vertical: N,x: x,y: y});
-   });
+   var middle = Position({horizontal: Z,vertical: Z,x: Relative(0.5),y: Relative(0.5)});
+   var midLeft = Position({horizontal: N,vertical: Z,x: Absolute(0),y: Relative(0.5)});
+   var midBottom = Position({horizontal: Z,vertical: N,x: Relative(0.5),y: Absolute(0)});
+   var middleAt = F2(function (x,y) {    return Position({horizontal: Z,vertical: Z,x: x,y: y});});
+   var midLeftAt = F2(function (x,y) {    return Position({horizontal: N,vertical: Z,x: x,y: y});});
+   var midBottomAt = F2(function (x,y) {    return Position({horizontal: Z,vertical: N,x: x,y: y});});
    var P = {ctor: "P"};
-   var topLeft = Position({horizontal: N
-                          ,vertical: P
-                          ,x: Absolute(0)
-                          ,y: Absolute(0)});
-   var topRight = Position({horizontal: P
-                           ,vertical: P
-                           ,x: Absolute(0)
-                           ,y: Absolute(0)});
-   var bottomRight = Position({horizontal: P
-                              ,vertical: N
-                              ,x: Absolute(0)
-                              ,y: Absolute(0)});
-   var midRight = Position({horizontal: P
-                           ,vertical: Z
-                           ,x: Absolute(0)
-                           ,y: Relative(0.5)});
-   var midTop = Position({horizontal: Z
-                         ,vertical: P
-                         ,x: Relative(0.5)
-                         ,y: Absolute(0)});
-   var topLeftAt = F2(function (x,y) {
-      return Position({horizontal: N,vertical: P,x: x,y: y});
-   });
-   var topRightAt = F2(function (x,y) {
-      return Position({horizontal: P,vertical: P,x: x,y: y});
-   });
-   var bottomRightAt = F2(function (x,y) {
-      return Position({horizontal: P,vertical: N,x: x,y: y});
-   });
-   var midRightAt = F2(function (x,y) {
-      return Position({horizontal: P,vertical: Z,x: x,y: y});
-   });
-   var midTopAt = F2(function (x,y) {
-      return Position({horizontal: Z,vertical: P,x: x,y: y});
-   });
+   var topLeft = Position({horizontal: N,vertical: P,x: Absolute(0),y: Absolute(0)});
+   var topRight = Position({horizontal: P,vertical: P,x: Absolute(0),y: Absolute(0)});
+   var bottomRight = Position({horizontal: P,vertical: N,x: Absolute(0),y: Absolute(0)});
+   var midRight = Position({horizontal: P,vertical: Z,x: Absolute(0),y: Relative(0.5)});
+   var midTop = Position({horizontal: Z,vertical: P,x: Relative(0.5),y: Absolute(0)});
+   var topLeftAt = F2(function (x,y) {    return Position({horizontal: N,vertical: P,x: x,y: y});});
+   var topRightAt = F2(function (x,y) {    return Position({horizontal: P,vertical: P,x: x,y: y});});
+   var bottomRightAt = F2(function (x,y) {    return Position({horizontal: P,vertical: N,x: x,y: y});});
+   var midRightAt = F2(function (x,y) {    return Position({horizontal: P,vertical: Z,x: x,y: y});});
+   var midTopAt = F2(function (x,y) {    return Position({horizontal: Z,vertical: P,x: x,y: y});});
    var justified = $Native$Graphics$Element.block("justify");
    var centered = $Native$Graphics$Element.block("center");
    var rightAligned = $Native$Graphics$Element.block("right");
    var leftAligned = $Native$Graphics$Element.block("left");
-   var show = function (value) {
-      return leftAligned($Text.monospace($Text.fromString($Basics.toString(value))));
-   };
+   var show = function (value) {    return leftAligned($Text.monospace($Text.fromString($Basics.toString(value))));};
    var Tiled = {ctor: "Tiled"};
-   var Cropped = function (a) {
-      return {ctor: "Cropped",_0: a};
-   };
+   var Cropped = function (a) {    return {ctor: "Cropped",_0: a};};
    var Fitted = {ctor: "Fitted"};
    var Plain = {ctor: "Plain"};
    var Custom = {ctor: "Custom"};
    var RawHtml = {ctor: "RawHtml"};
    var Spacer = {ctor: "Spacer"};
-   var Flow = F2(function (a,b) {
-      return {ctor: "Flow",_0: a,_1: b};
-   });
-   var Container = F2(function (a,b) {
-      return {ctor: "Container",_0: a,_1: b};
-   });
-   var Image = F4(function (a,b,c,d) {
-      return {ctor: "Image",_0: a,_1: b,_2: c,_3: d};
-   });
+   var Flow = F2(function (a,b) {    return {ctor: "Flow",_0: a,_1: b};});
+   var Container = F2(function (a,b) {    return {ctor: "Container",_0: a,_1: b};});
+   var Image = F4(function (a,b,c,d) {    return {ctor: "Image",_0: a,_1: b,_2: c,_3: d};});
    var newElement = $Native$Graphics$Element.newElement;
-   var image = F3(function (w,h,src) {
-      return A3(newElement,w,h,A4(Image,Plain,w,h,src));
-   });
-   var fittedImage = F3(function (w,h,src) {
-      return A3(newElement,w,h,A4(Image,Fitted,w,h,src));
-   });
-   var croppedImage = F4(function (pos,w,h,src) {
-      return A3(newElement,w,h,A4(Image,Cropped(pos),w,h,src));
-   });
-   var tiledImage = F3(function (w,h,src) {
-      return A3(newElement,w,h,A4(Image,Tiled,w,h,src));
-   });
-   var container = F4(function (w,h,_p0,e) {
-      var _p1 = _p0;
-      return A3(newElement,w,h,A2(Container,_p1._0,e));
-   });
-   var spacer = F2(function (w,h) {
-      return A3(newElement,w,h,Spacer);
-   });
-   var sizeOf = function (_p2) {
-      var _p3 = _p2;
-      var _p4 = _p3._0;
-      return {ctor: "_Tuple2"
-             ,_0: _p4.props.width
-             ,_1: _p4.props.height};
-   };
-   var heightOf = function (_p5) {
-      var _p6 = _p5;
-      return _p6._0.props.height;
-   };
-   var widthOf = function (_p7) {
-      var _p8 = _p7;
-      return _p8._0.props.width;
-   };
+   var image = F3(function (w,h,src) {    return A3(newElement,w,h,A4(Image,Plain,w,h,src));});
+   var fittedImage = F3(function (w,h,src) {    return A3(newElement,w,h,A4(Image,Fitted,w,h,src));});
+   var croppedImage = F4(function (pos,w,h,src) {    return A3(newElement,w,h,A4(Image,Cropped(pos),w,h,src));});
+   var tiledImage = F3(function (w,h,src) {    return A3(newElement,w,h,A4(Image,Tiled,w,h,src));});
+   var container = F4(function (w,h,_p0,e) {    var _p1 = _p0;return A3(newElement,w,h,A2(Container,_p1._0,e));});
+   var spacer = F2(function (w,h) {    return A3(newElement,w,h,Spacer);});
+   var sizeOf = function (_p2) {    var _p3 = _p2;var _p4 = _p3._0;return {ctor: "_Tuple2",_0: _p4.props.width,_1: _p4.props.height};};
+   var heightOf = function (_p5) {    var _p6 = _p5;return _p6._0.props.height;};
+   var widthOf = function (_p7) {    var _p8 = _p7;return _p8._0.props.width;};
    var above = F2(function (hi,lo) {
-      return A3(newElement,
-      A2($Basics.max,widthOf(hi),widthOf(lo)),
-      heightOf(hi) + heightOf(lo),
-      A2(Flow,DDown,_U.list([hi,lo])));
+      return A3(newElement,A2($Basics.max,widthOf(hi),widthOf(lo)),heightOf(hi) + heightOf(lo),A2(Flow,DDown,_U.list([hi,lo])));
    });
    var below = F2(function (lo,hi) {
-      return A3(newElement,
-      A2($Basics.max,widthOf(hi),widthOf(lo)),
-      heightOf(hi) + heightOf(lo),
-      A2(Flow,DDown,_U.list([hi,lo])));
+      return A3(newElement,A2($Basics.max,widthOf(hi),widthOf(lo)),heightOf(hi) + heightOf(lo),A2(Flow,DDown,_U.list([hi,lo])));
    });
    var beside = F2(function (lft,rht) {
-      return A3(newElement,
-      widthOf(lft) + widthOf(rht),
-      A2($Basics.max,heightOf(lft),heightOf(rht)),
-      A2(Flow,right,_U.list([lft,rht])));
+      return A3(newElement,widthOf(lft) + widthOf(rht),A2($Basics.max,heightOf(lft),heightOf(rht)),A2(Flow,right,_U.list([lft,rht])));
    });
    var layers = function (es) {
       var hs = A2($List.map,heightOf,es);
       var ws = A2($List.map,widthOf,es);
-      return A3(newElement,
-      A2($Maybe.withDefault,0,$List.maximum(ws)),
-      A2($Maybe.withDefault,0,$List.maximum(hs)),
-      A2(Flow,DOut,es));
+      return A3(newElement,A2($Maybe.withDefault,0,$List.maximum(ws)),A2($Maybe.withDefault,0,$List.maximum(hs)),A2(Flow,DOut,es));
    };
    var empty = A2(spacer,0,0);
    var flow = F2(function (dir,es) {
-      var newFlow = F2(function (w,h) {
-         return A3(newElement,w,h,A2(Flow,dir,es));
-      });
-      var maxOrZero = function (list) {
-         return A2($Maybe.withDefault,0,$List.maximum(list));
-      };
+      var newFlow = F2(function (w,h) {    return A3(newElement,w,h,A2(Flow,dir,es));});
+      var maxOrZero = function (list) {    return A2($Maybe.withDefault,0,$List.maximum(list));};
       var hs = A2($List.map,heightOf,es);
       var ws = A2($List.map,widthOf,es);
       if (_U.eq(es,_U.list([]))) return empty; else {
@@ -4473,20 +4164,8 @@ Elm.Graphics.Element.make = function (_elm) {
                default: return A2(newFlow,maxOrZero(ws),maxOrZero(hs));}
          }
    });
-   var Properties = F9(function (a,b,c,d,e,f,g,h,i) {
-      return {id: a
-             ,width: b
-             ,height: c
-             ,opacity: d
-             ,color: e
-             ,href: f
-             ,tag: g
-             ,hover: h
-             ,click: i};
-   });
-   var Element_elm_builtin = function (a) {
-      return {ctor: "Element_elm_builtin",_0: a};
-   };
+   var Properties = F9(function (a,b,c,d,e,f,g,h,i) {    return {id: a,width: b,height: c,opacity: d,color: e,href: f,tag: g,hover: h,click: i};});
+   var Element_elm_builtin = function (a) {    return {ctor: "Element_elm_builtin",_0: a};};
    var width = F2(function (newWidth,_p10) {
       var _p11 = _p10;
       var _p14 = _p11._0.props;
@@ -4494,44 +4173,29 @@ Elm.Graphics.Element.make = function (_elm) {
       var newHeight = function () {
          var _p12 = _p13;
          switch (_p12.ctor)
-         {case "Image":
-            return $Basics.round($Basics.toFloat(_p12._2) / $Basics.toFloat(_p12._1) * $Basics.toFloat(newWidth));
-            case "RawHtml":
-            return $Basics.snd(A2($Native$Graphics$Element.htmlHeight,
-              newWidth,
-              _p13));
+         {case "Image": return $Basics.round($Basics.toFloat(_p12._2) / $Basics.toFloat(_p12._1) * $Basics.toFloat(newWidth));
+            case "RawHtml": return $Basics.snd(A2($Native$Graphics$Element.htmlHeight,newWidth,_p13));
             default: return _p14.height;}
       }();
-      return Element_elm_builtin({element: _p13
-                                 ,props: _U.update(_p14,{width: newWidth,height: newHeight})});
+      return Element_elm_builtin({element: _p13,props: _U.update(_p14,{width: newWidth,height: newHeight})});
    });
    var height = F2(function (newHeight,_p15) {
       var _p16 = _p15;
-      return Element_elm_builtin({element: _p16._0.element
-                                 ,props: _U.update(_p16._0.props,{height: newHeight})});
+      return Element_elm_builtin({element: _p16._0.element,props: _U.update(_p16._0.props,{height: newHeight})});
    });
-   var size = F3(function (w,h,e) {
-      return A2(height,h,A2(width,w,e));
-   });
+   var size = F3(function (w,h,e) {    return A2(height,h,A2(width,w,e));});
    var opacity = F2(function (givenOpacity,_p17) {
       var _p18 = _p17;
-      return Element_elm_builtin({element: _p18._0.element
-                                 ,props: _U.update(_p18._0.props,{opacity: givenOpacity})});
+      return Element_elm_builtin({element: _p18._0.element,props: _U.update(_p18._0.props,{opacity: givenOpacity})});
    });
    var color = F2(function (clr,_p19) {
       var _p20 = _p19;
-      return Element_elm_builtin({element: _p20._0.element
-                                 ,props: _U.update(_p20._0.props,{color: $Maybe.Just(clr)})});
+      return Element_elm_builtin({element: _p20._0.element,props: _U.update(_p20._0.props,{color: $Maybe.Just(clr)})});
    });
-   var tag = F2(function (name,_p21) {
-      var _p22 = _p21;
-      return Element_elm_builtin({element: _p22._0.element
-                                 ,props: _U.update(_p22._0.props,{tag: name})});
-   });
+   var tag = F2(function (name,_p21) {    var _p22 = _p21;return Element_elm_builtin({element: _p22._0.element,props: _U.update(_p22._0.props,{tag: name})});});
    var link = F2(function (href,_p23) {
       var _p24 = _p23;
-      return Element_elm_builtin({element: _p24._0.element
-                                 ,props: _U.update(_p24._0.props,{href: href})});
+      return Element_elm_builtin({element: _p24._0.element,props: _U.update(_p24._0.props,{href: href})});
    });
    return _elm.Graphics.Element.values = {_op: _op
                                          ,image: image
@@ -4594,8 +4258,7 @@ Elm.Graphics.Collage.make = function (_elm) {
    "use strict";
    _elm.Graphics = _elm.Graphics || {};
    _elm.Graphics.Collage = _elm.Graphics.Collage || {};
-   if (_elm.Graphics.Collage.values)
-   return _elm.Graphics.Collage.values;
+   if (_elm.Graphics.Collage.values) return _elm.Graphics.Collage.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Color = Elm.Color.make(_elm),
@@ -4621,166 +4284,68 @@ Elm.Graphics.Collage.make = function (_elm) {
       var hw = w / 2;
       var n = 50;
       var t = 2 * $Basics.pi / n;
-      var f = function (i) {
-         return {ctor: "_Tuple2"
-                ,_0: hw * $Basics.cos(t * i)
-                ,_1: hh * $Basics.sin(t * i)};
-      };
+      var f = function (i) {    return {ctor: "_Tuple2",_0: hw * $Basics.cos(t * i),_1: hh * $Basics.sin(t * i)};};
       return Shape(A2($List.map,f,_U.range(0,n - 1)));
    });
    var circle = function (r) {    return A2(oval,2 * r,2 * r);};
    var ngon = F2(function (n,r) {
       var m = $Basics.toFloat(n);
       var t = 2 * $Basics.pi / m;
-      var f = function (i) {
-         return {ctor: "_Tuple2"
-                ,_0: r * $Basics.cos(t * i)
-                ,_1: r * $Basics.sin(t * i)};
-      };
+      var f = function (i) {    return {ctor: "_Tuple2",_0: r * $Basics.cos(t * i),_1: r * $Basics.sin(t * i)};};
       return Shape(A2($List.map,f,_U.range(0,m - 1)));
    });
    var Path = function (a) {    return {ctor: "Path",_0: a};};
    var path = function (ps) {    return Path(ps);};
-   var segment = F2(function (p1,p2) {
-      return Path(_U.list([p1,p2]));
-   });
+   var segment = F2(function (p1,p2) {    return Path(_U.list([p1,p2]));});
    var collage = $Native$Graphics$Collage.collage;
    var Fill = function (a) {    return {ctor: "Fill",_0: a};};
    var Line = function (a) {    return {ctor: "Line",_0: a};};
-   var FGroup = F2(function (a,b) {
-      return {ctor: "FGroup",_0: a,_1: b};
-   });
-   var FElement = function (a) {
-      return {ctor: "FElement",_0: a};
-   };
-   var FImage = F4(function (a,b,c,d) {
-      return {ctor: "FImage",_0: a,_1: b,_2: c,_3: d};
-   });
+   var FGroup = F2(function (a,b) {    return {ctor: "FGroup",_0: a,_1: b};});
+   var FElement = function (a) {    return {ctor: "FElement",_0: a};};
+   var FImage = F4(function (a,b,c,d) {    return {ctor: "FImage",_0: a,_1: b,_2: c,_3: d};});
    var FText = function (a) {    return {ctor: "FText",_0: a};};
-   var FOutlinedText = F2(function (a,b) {
-      return {ctor: "FOutlinedText",_0: a,_1: b};
-   });
-   var FShape = F2(function (a,b) {
-      return {ctor: "FShape",_0: a,_1: b};
-   });
-   var FPath = F2(function (a,b) {
-      return {ctor: "FPath",_0: a,_1: b};
-   });
-   var LineStyle = F6(function (a,b,c,d,e,f) {
-      return {color: a
-             ,width: b
-             ,cap: c
-             ,join: d
-             ,dashing: e
-             ,dashOffset: f};
-   });
+   var FOutlinedText = F2(function (a,b) {    return {ctor: "FOutlinedText",_0: a,_1: b};});
+   var FShape = F2(function (a,b) {    return {ctor: "FShape",_0: a,_1: b};});
+   var FPath = F2(function (a,b) {    return {ctor: "FPath",_0: a,_1: b};});
+   var LineStyle = F6(function (a,b,c,d,e,f) {    return {color: a,width: b,cap: c,join: d,dashing: e,dashOffset: f};});
    var Clipped = {ctor: "Clipped"};
    var Sharp = function (a) {    return {ctor: "Sharp",_0: a};};
    var Smooth = {ctor: "Smooth"};
    var Padded = {ctor: "Padded"};
    var Round = {ctor: "Round"};
    var Flat = {ctor: "Flat"};
-   var defaultLine = {color: $Color.black
-                     ,width: 1
-                     ,cap: Flat
-                     ,join: Sharp(10)
-                     ,dashing: _U.list([])
-                     ,dashOffset: 0};
-   var solid = function (clr) {
-      return _U.update(defaultLine,{color: clr});
-   };
-   var dashed = function (clr) {
-      return _U.update(defaultLine,
-      {color: clr,dashing: _U.list([8,4])});
-   };
-   var dotted = function (clr) {
-      return _U.update(defaultLine,
-      {color: clr,dashing: _U.list([3,3])});
-   };
+   var defaultLine = {color: $Color.black,width: 1,cap: Flat,join: Sharp(10),dashing: _U.list([]),dashOffset: 0};
+   var solid = function (clr) {    return _U.update(defaultLine,{color: clr});};
+   var dashed = function (clr) {    return _U.update(defaultLine,{color: clr,dashing: _U.list([8,4])});};
+   var dotted = function (clr) {    return _U.update(defaultLine,{color: clr,dashing: _U.list([3,3])});};
    var Grad = function (a) {    return {ctor: "Grad",_0: a};};
-   var Texture = function (a) {
-      return {ctor: "Texture",_0: a};
-   };
+   var Texture = function (a) {    return {ctor: "Texture",_0: a};};
    var Solid = function (a) {    return {ctor: "Solid",_0: a};};
-   var Form_elm_builtin = function (a) {
-      return {ctor: "Form_elm_builtin",_0: a};
-   };
-   var form = function (f) {
-      return Form_elm_builtin({theta: 0
-                              ,scale: 1
-                              ,x: 0
-                              ,y: 0
-                              ,alpha: 1
-                              ,form: f});
-   };
-   var fill = F2(function (style,_p0) {
-      var _p1 = _p0;
-      return form(A2(FShape,Fill(style),_p1._0));
-   });
-   var filled = F2(function (color,shape) {
-      return A2(fill,Solid(color),shape);
-   });
-   var textured = F2(function (src,shape) {
-      return A2(fill,Texture(src),shape);
-   });
-   var gradient = F2(function (grad,shape) {
-      return A2(fill,Grad(grad),shape);
-   });
-   var outlined = F2(function (style,_p2) {
-      var _p3 = _p2;
-      return form(A2(FShape,Line(style),_p3._0));
-   });
-   var traced = F2(function (style,_p4) {
-      var _p5 = _p4;
-      return form(A2(FPath,style,_p5._0));
-   });
-   var sprite = F4(function (w,h,pos,src) {
-      return form(A4(FImage,w,h,pos,src));
-   });
+   var Form_elm_builtin = function (a) {    return {ctor: "Form_elm_builtin",_0: a};};
+   var form = function (f) {    return Form_elm_builtin({theta: 0,scale: 1,x: 0,y: 0,alpha: 1,form: f});};
+   var fill = F2(function (style,_p0) {    var _p1 = _p0;return form(A2(FShape,Fill(style),_p1._0));});
+   var filled = F2(function (color,shape) {    return A2(fill,Solid(color),shape);});
+   var textured = F2(function (src,shape) {    return A2(fill,Texture(src),shape);});
+   var gradient = F2(function (grad,shape) {    return A2(fill,Grad(grad),shape);});
+   var outlined = F2(function (style,_p2) {    var _p3 = _p2;return form(A2(FShape,Line(style),_p3._0));});
+   var traced = F2(function (style,_p4) {    var _p5 = _p4;return form(A2(FPath,style,_p5._0));});
+   var sprite = F4(function (w,h,pos,src) {    return form(A4(FImage,w,h,pos,src));});
    var toForm = function (e) {    return form(FElement(e));};
-   var group = function (fs) {
-      return form(A2(FGroup,$Transform2D.identity,fs));
-   };
-   var groupTransform = F2(function (matrix,fs) {
-      return form(A2(FGroup,matrix,fs));
-   });
+   var group = function (fs) {    return form(A2(FGroup,$Transform2D.identity,fs));};
+   var groupTransform = F2(function (matrix,fs) {    return form(A2(FGroup,matrix,fs));});
    var text = function (t) {    return form(FText(t));};
-   var outlinedText = F2(function (ls,t) {
-      return form(A2(FOutlinedText,ls,t));
-   });
+   var outlinedText = F2(function (ls,t) {    return form(A2(FOutlinedText,ls,t));});
    var move = F2(function (_p7,_p6) {
       var _p8 = _p7;
       var _p9 = _p6;
       var _p10 = _p9._0;
-      return Form_elm_builtin(_U.update(_p10,
-      {x: _p10.x + _p8._0,y: _p10.y + _p8._1}));
+      return Form_elm_builtin(_U.update(_p10,{x: _p10.x + _p8._0,y: _p10.y + _p8._1}));
    });
-   var moveX = F2(function (x,_p11) {
-      var _p12 = _p11;
-      var _p13 = _p12._0;
-      return Form_elm_builtin(_U.update(_p13,{x: _p13.x + x}));
-   });
-   var moveY = F2(function (y,_p14) {
-      var _p15 = _p14;
-      var _p16 = _p15._0;
-      return Form_elm_builtin(_U.update(_p16,{y: _p16.y + y}));
-   });
-   var scale = F2(function (s,_p17) {
-      var _p18 = _p17;
-      var _p19 = _p18._0;
-      return Form_elm_builtin(_U.update(_p19,
-      {scale: _p19.scale * s}));
-   });
-   var rotate = F2(function (t,_p20) {
-      var _p21 = _p20;
-      var _p22 = _p21._0;
-      return Form_elm_builtin(_U.update(_p22,
-      {theta: _p22.theta + t}));
-   });
-   var alpha = F2(function (a,_p23) {
-      var _p24 = _p23;
-      return Form_elm_builtin(_U.update(_p24._0,{alpha: a}));
-   });
+   var moveX = F2(function (x,_p11) {    var _p12 = _p11;var _p13 = _p12._0;return Form_elm_builtin(_U.update(_p13,{x: _p13.x + x}));});
+   var moveY = F2(function (y,_p14) {    var _p15 = _p14;var _p16 = _p15._0;return Form_elm_builtin(_U.update(_p16,{y: _p16.y + y}));});
+   var scale = F2(function (s,_p17) {    var _p18 = _p17;var _p19 = _p18._0;return Form_elm_builtin(_U.update(_p19,{scale: _p19.scale * s}));});
+   var rotate = F2(function (t,_p20) {    var _p21 = _p20;var _p22 = _p21._0;return Form_elm_builtin(_U.update(_p22,{theta: _p22.theta + t}));});
+   var alpha = F2(function (a,_p23) {    var _p24 = _p23;return Form_elm_builtin(_U.update(_p24._0,{alpha: a}));});
    return _elm.Graphics.Collage.values = {_op: _op
                                          ,collage: collage
                                          ,toForm: toForm
@@ -4891,64 +4456,28 @@ Elm.Debug.make = function (_elm) {
    "use strict";
    _elm.Debug = _elm.Debug || {};
    if (_elm.Debug.values) return _elm.Debug.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
-   $Native$Debug = Elm.Native.Debug.make(_elm);
+   var _U = Elm.Native.Utils.make(_elm),$Graphics$Collage = Elm.Graphics.Collage.make(_elm),$Native$Debug = Elm.Native.Debug.make(_elm);
    var _op = {};
    var trace = $Native$Debug.tracePath;
    var watchSummary = $Native$Debug.watchSummary;
    var watch = $Native$Debug.watch;
    var crash = $Native$Debug.crash;
    var log = $Native$Debug.log;
-   return _elm.Debug.values = {_op: _op
-                              ,log: log
-                              ,crash: crash
-                              ,watch: watch
-                              ,watchSummary: watchSummary
-                              ,trace: trace};
+   return _elm.Debug.values = {_op: _op,log: log,crash: crash,watch: watch,watchSummary: watchSummary,trace: trace};
 };
 Elm.Result = Elm.Result || {};
 Elm.Result.make = function (_elm) {
    "use strict";
    _elm.Result = _elm.Result || {};
    if (_elm.Result.values) return _elm.Result.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm);
+   var _U = Elm.Native.Utils.make(_elm),$Maybe = Elm.Maybe.make(_elm);
    var _op = {};
-   var toMaybe = function (result) {
-      var _p0 = result;
-      if (_p0.ctor === "Ok") {
-            return $Maybe.Just(_p0._0);
-         } else {
-            return $Maybe.Nothing;
-         }
-   };
-   var withDefault = F2(function (def,result) {
-      var _p1 = result;
-      if (_p1.ctor === "Ok") {
-            return _p1._0;
-         } else {
-            return def;
-         }
-   });
+   var toMaybe = function (result) {    var _p0 = result;if (_p0.ctor === "Ok") {    return $Maybe.Just(_p0._0);} else {    return $Maybe.Nothing;}};
+   var withDefault = F2(function (def,result) {    var _p1 = result;if (_p1.ctor === "Ok") {    return _p1._0;} else {    return def;}});
    var Err = function (a) {    return {ctor: "Err",_0: a};};
-   var andThen = F2(function (result,callback) {
-      var _p2 = result;
-      if (_p2.ctor === "Ok") {
-            return callback(_p2._0);
-         } else {
-            return Err(_p2._0);
-         }
-   });
+   var andThen = F2(function (result,callback) {    var _p2 = result;if (_p2.ctor === "Ok") {    return callback(_p2._0);} else {    return Err(_p2._0);}});
    var Ok = function (a) {    return {ctor: "Ok",_0: a};};
-   var map = F2(function (func,ra) {
-      var _p3 = ra;
-      if (_p3.ctor === "Ok") {
-            return Ok(func(_p3._0));
-         } else {
-            return Err(_p3._0);
-         }
-   });
+   var map = F2(function (func,ra) {    var _p3 = ra;if (_p3.ctor === "Ok") {    return Ok(func(_p3._0));} else {    return Err(_p3._0);}});
    var map2 = F3(function (func,ra,rb) {
       var _p4 = {ctor: "_Tuple2",_0: ra,_1: rb};
       if (_p4._0.ctor === "Ok") {
@@ -4998,23 +4527,13 @@ Elm.Result.make = function (_elm) {
          }
    });
    var map5 = F6(function (func,ra,rb,rc,rd,re) {
-      var _p7 = {ctor: "_Tuple5"
-                ,_0: ra
-                ,_1: rb
-                ,_2: rc
-                ,_3: rd
-                ,_4: re};
+      var _p7 = {ctor: "_Tuple5",_0: ra,_1: rb,_2: rc,_3: rd,_4: re};
       if (_p7._0.ctor === "Ok") {
             if (_p7._1.ctor === "Ok") {
                   if (_p7._2.ctor === "Ok") {
                         if (_p7._3.ctor === "Ok") {
                               if (_p7._4.ctor === "Ok") {
-                                    return Ok(A5(func,
-                                    _p7._0._0,
-                                    _p7._1._0,
-                                    _p7._2._0,
-                                    _p7._3._0,
-                                    _p7._4._0));
+                                    return Ok(A5(func,_p7._0._0,_p7._1._0,_p7._2._0,_p7._3._0,_p7._4._0));
                                  } else {
                                     return Err(_p7._4._0);
                                  }
@@ -5031,22 +4550,8 @@ Elm.Result.make = function (_elm) {
             return Err(_p7._0._0);
          }
    });
-   var formatError = F2(function (f,result) {
-      var _p8 = result;
-      if (_p8.ctor === "Ok") {
-            return Ok(_p8._0);
-         } else {
-            return Err(f(_p8._0));
-         }
-   });
-   var fromMaybe = F2(function (err,maybe) {
-      var _p9 = maybe;
-      if (_p9.ctor === "Just") {
-            return Ok(_p9._0);
-         } else {
-            return Err(err);
-         }
-   });
+   var formatError = F2(function (f,result) {    var _p8 = result;if (_p8.ctor === "Ok") {    return Ok(_p8._0);} else {    return Err(f(_p8._0));}});
+   var fromMaybe = F2(function (err,maybe) {    var _p9 = maybe;if (_p9.ctor === "Just") {    return Ok(_p9._0);} else {    return Err(err);}});
    return _elm.Result.values = {_op: _op
                                ,withDefault: withDefault
                                ,map: map
@@ -5771,51 +5276,21 @@ Elm.Task.make = function (_elm) {
    var _op = {};
    var sleep = $Native$Task.sleep;
    var spawn = $Native$Task.spawn;
-   var ThreadID = function (a) {
-      return {ctor: "ThreadID",_0: a};
-   };
+   var ThreadID = function (a) {    return {ctor: "ThreadID",_0: a};};
    var onError = $Native$Task.catch_;
    var andThen = $Native$Task.andThen;
    var fail = $Native$Task.fail;
-   var mapError = F2(function (f,task) {
-      return A2(onError,
-      task,
-      function (err) {
-         return fail(f(err));
-      });
-   });
+   var mapError = F2(function (f,task) {    return A2(onError,task,function (err) {    return fail(f(err));});});
    var succeed = $Native$Task.succeed;
-   var map = F2(function (func,taskA) {
-      return A2(andThen,
-      taskA,
-      function (a) {
-         return succeed(func(a));
-      });
-   });
+   var map = F2(function (func,taskA) {    return A2(andThen,taskA,function (a) {    return succeed(func(a));});});
    var map2 = F3(function (func,taskA,taskB) {
-      return A2(andThen,
-      taskA,
-      function (a) {
-         return A2(andThen,
-         taskB,
-         function (b) {
-            return succeed(A2(func,a,b));
-         });
-      });
+      return A2(andThen,taskA,function (a) {    return A2(andThen,taskB,function (b) {    return succeed(A2(func,a,b));});});
    });
    var map3 = F4(function (func,taskA,taskB,taskC) {
       return A2(andThen,
       taskA,
       function (a) {
-         return A2(andThen,
-         taskB,
-         function (b) {
-            return A2(andThen,
-            taskC,
-            function (c) {
-               return succeed(A3(func,a,b,c));
-            });
-         });
+         return A2(andThen,taskB,function (b) {    return A2(andThen,taskC,function (c) {    return succeed(A3(func,a,b,c));});});
       });
    });
    var map4 = F5(function (func,taskA,taskB,taskC,taskD) {
@@ -5825,15 +5300,7 @@ Elm.Task.make = function (_elm) {
          return A2(andThen,
          taskB,
          function (b) {
-            return A2(andThen,
-            taskC,
-            function (c) {
-               return A2(andThen,
-               taskD,
-               function (d) {
-                  return succeed(A4(func,a,b,c,d));
-               });
-            });
+            return A2(andThen,taskC,function (c) {    return A2(andThen,taskD,function (d) {    return succeed(A4(func,a,b,c,d));});});
          });
       });
    });
@@ -5847,71 +5314,26 @@ Elm.Task.make = function (_elm) {
             return A2(andThen,
             taskC,
             function (c) {
-               return A2(andThen,
-               taskD,
-               function (d) {
-                  return A2(andThen,
-                  taskE,
-                  function (e) {
-                     return succeed(A5(func,a,b,c,d,e));
-                  });
-               });
+               return A2(andThen,taskD,function (d) {    return A2(andThen,taskE,function (e) {    return succeed(A5(func,a,b,c,d,e));});});
             });
          });
       });
    });
    var andMap = F2(function (taskFunc,taskValue) {
-      return A2(andThen,
-      taskFunc,
-      function (func) {
-         return A2(andThen,
-         taskValue,
-         function (value) {
-            return succeed(func(value));
-         });
-      });
+      return A2(andThen,taskFunc,function (func) {    return A2(andThen,taskValue,function (value) {    return succeed(func(value));});});
    });
    var sequence = function (tasks) {
       var _p0 = tasks;
       if (_p0.ctor === "[]") {
             return succeed(_U.list([]));
          } else {
-            return A3(map2,
-            F2(function (x,y) {    return A2($List._op["::"],x,y);}),
-            _p0._0,
-            sequence(_p0._1));
+            return A3(map2,F2(function (x,y) {    return A2($List._op["::"],x,y);}),_p0._0,sequence(_p0._1));
          }
    };
-   var toMaybe = function (task) {
-      return A2(onError,
-      A2(map,$Maybe.Just,task),
-      function (_p1) {
-         return succeed($Maybe.Nothing);
-      });
-   };
-   var fromMaybe = F2(function ($default,maybe) {
-      var _p2 = maybe;
-      if (_p2.ctor === "Just") {
-            return succeed(_p2._0);
-         } else {
-            return fail($default);
-         }
-   });
-   var toResult = function (task) {
-      return A2(onError,
-      A2(map,$Result.Ok,task),
-      function (msg) {
-         return succeed($Result.Err(msg));
-      });
-   };
-   var fromResult = function (result) {
-      var _p3 = result;
-      if (_p3.ctor === "Ok") {
-            return succeed(_p3._0);
-         } else {
-            return fail(_p3._0);
-         }
-   };
+   var toMaybe = function (task) {    return A2(onError,A2(map,$Maybe.Just,task),function (_p1) {    return succeed($Maybe.Nothing);});};
+   var fromMaybe = F2(function ($default,maybe) {    var _p2 = maybe;if (_p2.ctor === "Just") {    return succeed(_p2._0);} else {    return fail($default);}});
+   var toResult = function (task) {    return A2(onError,A2(map,$Result.Ok,task),function (msg) {    return succeed($Result.Err(msg));});};
+   var fromResult = function (result) {    var _p3 = result;if (_p3.ctor === "Ok") {    return succeed(_p3._0);} else {    return fail(_p3._0);}};
    var Task = {ctor: "Task"};
    return _elm.Task.values = {_op: _op
                              ,succeed: succeed
@@ -5948,53 +5370,25 @@ Elm.Signal.make = function (_elm) {
    var _op = {};
    var send = F2(function (_p0,value) {
       var _p1 = _p0;
-      return A2($Task.onError,
-      _p1._0(value),
-      function (_p2) {
-         return $Task.succeed({ctor: "_Tuple0"});
-      });
+      return A2($Task.onError,_p1._0(value),function (_p2) {    return $Task.succeed({ctor: "_Tuple0"});});
    });
-   var Message = function (a) {
-      return {ctor: "Message",_0: a};
-   };
-   var message = F2(function (_p3,value) {
-      var _p4 = _p3;
-      return Message(_p4._0(value));
-   });
+   var Message = function (a) {    return {ctor: "Message",_0: a};};
+   var message = F2(function (_p3,value) {    var _p4 = _p3;return Message(_p4._0(value));});
    var mailbox = $Native$Signal.mailbox;
-   var Address = function (a) {
-      return {ctor: "Address",_0: a};
-   };
-   var forwardTo = F2(function (_p5,f) {
-      var _p6 = _p5;
-      return Address(function (x) {    return _p6._0(f(x));});
-   });
-   var Mailbox = F2(function (a,b) {
-      return {address: a,signal: b};
-   });
+   var Address = function (a) {    return {ctor: "Address",_0: a};};
+   var forwardTo = F2(function (_p5,f) {    var _p6 = _p5;return Address(function (x) {    return _p6._0(f(x));});});
+   var Mailbox = F2(function (a,b) {    return {address: a,signal: b};});
    var sampleOn = $Native$Signal.sampleOn;
    var dropRepeats = $Native$Signal.dropRepeats;
    var filterMap = $Native$Signal.filterMap;
    var filter = F3(function (isOk,base,signal) {
-      return A3(filterMap,
-      function (value) {
-         return isOk(value) ? $Maybe.Just(value) : $Maybe.Nothing;
-      },
-      base,
-      signal);
+      return A3(filterMap,function (value) {    return isOk(value) ? $Maybe.Just(value) : $Maybe.Nothing;},base,signal);
    });
-   var merge = F2(function (left,right) {
-      return A3($Native$Signal.genericMerge,
-      $Basics.always,
-      left,
-      right);
-   });
+   var merge = F2(function (left,right) {    return A3($Native$Signal.genericMerge,$Basics.always,left,right);});
    var mergeMany = function (signalList) {
       var _p7 = $List.reverse(signalList);
       if (_p7.ctor === "[]") {
-            return _U.crashCase("Signal",
-            {start: {line: 184,column: 3},end: {line: 189,column: 40}},
-            _p7)("mergeMany was given an empty list!");
+            return _U.crashCase("Signal",{start: {line: 184,column: 3},end: {line: 189,column: 40}},_p7)("mergeMany was given an empty list!");
          } else {
             return A3($List.foldl,merge,_p7._0,_p7._1);
          }
@@ -7021,23 +6415,16 @@ Elm.Array.make = function (_elm) {
    var _op = {};
    var append = $Native$Array.append;
    var length = $Native$Array.length;
-   var isEmpty = function (array) {
-      return _U.eq(length(array),0);
-   };
+   var isEmpty = function (array) {    return _U.eq(length(array),0);};
    var slice = $Native$Array.slice;
    var set = $Native$Array.set;
    var get = F2(function (i,array) {
-      return _U.cmp(0,i) < 1 && _U.cmp(i,
-      $Native$Array.length(array)) < 0 ? $Maybe.Just(A2($Native$Array.get,
-      i,
-      array)) : $Maybe.Nothing;
+      return _U.cmp(0,i) < 1 && _U.cmp(i,$Native$Array.length(array)) < 0 ? $Maybe.Just(A2($Native$Array.get,i,array)) : $Maybe.Nothing;
    });
    var push = $Native$Array.push;
    var empty = $Native$Array.empty;
    var filter = F2(function (isOkay,arr) {
-      var update = F2(function (x,xs) {
-         return isOkay(x) ? A2($Native$Array.push,x,xs) : xs;
-      });
+      var update = F2(function (x,xs) {    return isOkay(x) ? A2($Native$Array.push,x,xs) : xs;});
       return A3($Native$Array.foldl,update,$Native$Array.empty,arr);
    });
    var foldr = $Native$Array.foldr;
@@ -7046,18 +6433,14 @@ Elm.Array.make = function (_elm) {
    var map = $Native$Array.map;
    var toIndexedList = function (array) {
       return A3($List.map2,
-      F2(function (v0,v1) {
-         return {ctor: "_Tuple2",_0: v0,_1: v1};
-      }),
+      F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),
       _U.range(0,$Native$Array.length(array) - 1),
       $Native$Array.toList(array));
    };
    var toList = $Native$Array.toList;
    var fromList = $Native$Array.fromList;
    var initialize = $Native$Array.initialize;
-   var repeat = F2(function (n,e) {
-      return A2(initialize,n,$Basics.always(e));
-   });
+   var repeat = F2(function (n,e) {    return A2(initialize,n,$Basics.always(e));});
    var Array = {ctor: "Array"};
    return _elm.Array.values = {_op: _op
                               ,empty: empty
@@ -7084,14 +6467,10 @@ Elm.Random.make = function (_elm) {
    "use strict";
    _elm.Random = _elm.Random || {};
    if (_elm.Random.values) return _elm.Random.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $List = Elm.List.make(_elm);
+   var _U = Elm.Native.Utils.make(_elm),$Basics = Elm.Basics.make(_elm),$List = Elm.List.make(_elm);
    var _op = {};
    var magicNum8 = 2147483562;
-   var range = function (_p0) {
-      return {ctor: "_Tuple2",_0: 0,_1: magicNum8};
-   };
+   var range = function (_p0) {    return {ctor: "_Tuple2",_0: 0,_1: magicNum8};};
    var magicNum7 = 2137383399;
    var magicNum6 = 2147483563;
    var magicNum5 = 3791;
@@ -7100,14 +6479,9 @@ Elm.Random.make = function (_elm) {
    var magicNum2 = 12211;
    var magicNum1 = 53668;
    var magicNum0 = 40014;
-   var generate = F2(function (_p1,seed) {
-      var _p2 = _p1;
-      return _p2._0(seed);
-   });
+   var generate = F2(function (_p1,seed) {    var _p2 = _p1;return _p2._0(seed);});
    var Seed = function (a) {    return {ctor: "Seed",_0: a};};
-   var State = F2(function (a,b) {
-      return {ctor: "State",_0: a,_1: b};
-   });
+   var State = F2(function (a,b) {    return {ctor: "State",_0: a,_1: b};});
    var initState = function (s$) {
       var s = A2($Basics.max,s$,0 - s$);
       var q = s / (magicNum6 - 1) | 0;
@@ -7138,19 +6512,10 @@ Elm.Random.make = function (_elm) {
       var t2 = _p9._1;
       var new_s2 = _U.eq(_p11,1) ? magicNum7 - 1 : _p11 - 1;
       var new_s1 = _U.eq(_p10,magicNum6 - 1) ? 1 : _p10 + 1;
-      return {ctor: "_Tuple2"
-             ,_0: A2(State,new_s1,t2)
-             ,_1: A2(State,t1,new_s2)};
+      return {ctor: "_Tuple2",_0: A2(State,new_s1,t2),_1: A2(State,t1,new_s2)};
    };
-   var initialSeed = function (n) {
-      return Seed({state: initState(n)
-                  ,next: next
-                  ,split: split
-                  ,range: range});
-   };
-   var Generator = function (a) {
-      return {ctor: "Generator",_0: a};
-   };
+   var initialSeed = function (n) {    return Seed({state: initState(n),next: next,split: split,range: range});};
+   var Generator = function (a) {    return {ctor: "Generator",_0: a};};
    var andThen = F2(function (_p12,callback) {
       var _p13 = _p12;
       return Generator(function (seed) {
@@ -7240,24 +6605,14 @@ Elm.Random.make = function (_elm) {
    });
    var map = F2(function (func,_p58) {
       var _p59 = _p58;
-      return Generator(function (seed0) {
-         var _p60 = _p59._0(seed0);
-         var a = _p60._0;
-         var seed1 = _p60._1;
-         return {ctor: "_Tuple2",_0: func(a),_1: seed1};
-      });
+      return Generator(function (seed0) {    var _p60 = _p59._0(seed0);var a = _p60._0;var seed1 = _p60._1;return {ctor: "_Tuple2",_0: func(a),_1: seed1};});
    });
    var listHelp = F4(function (list,n,generate,seed) {
-      listHelp: while (true) if (_U.cmp(n,1) < 0)
-      return {ctor: "_Tuple2",_0: $List.reverse(list),_1: seed};
-      else {
+      listHelp: while (true) if (_U.cmp(n,1) < 0) return {ctor: "_Tuple2",_0: $List.reverse(list),_1: seed}; else {
             var _p61 = generate(seed);
             var value = _p61._0;
             var newSeed = _p61._1;
-            var _v19 = A2($List._op["::"],value,list),
-            _v20 = n - 1,
-            _v21 = generate,
-            _v22 = newSeed;
+            var _v19 = A2($List._op["::"],value,list),_v20 = n - 1,_v21 = generate,_v22 = newSeed;
             list = _v19;
             n = _v20;
             generate = _v21;
@@ -7265,25 +6620,11 @@ Elm.Random.make = function (_elm) {
             continue listHelp;
          }
    });
-   var list = F2(function (n,_p62) {
-      var _p63 = _p62;
-      return Generator(function (seed) {
-         return A4(listHelp,_U.list([]),n,_p63._0,seed);
-      });
-   });
-   var pair = F2(function (genA,genB) {
-      return A3(map2,
-      F2(function (v0,v1) {
-         return {ctor: "_Tuple2",_0: v0,_1: v1};
-      }),
-      genA,
-      genB);
-   });
+   var list = F2(function (n,_p62) {    var _p63 = _p62;return Generator(function (seed) {    return A4(listHelp,_U.list([]),n,_p63._0,seed);});});
+   var pair = F2(function (genA,genB) {    return A3(map2,F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),genA,genB);});
    var minInt = -2147483648;
    var maxInt = 2147483647;
-   var iLogBase = F2(function (b,i) {
-      return _U.cmp(i,b) < 0 ? 1 : 1 + A2(iLogBase,b,i / b | 0);
-   });
+   var iLogBase = F2(function (b,i) {    return _U.cmp(i,b) < 0 ? 1 : 1 + A2(iLogBase,b,i / b | 0);});
    var $int = F2(function (a,b) {
       return Generator(function (_p64) {
          var _p65 = _p64;
@@ -7306,9 +6647,7 @@ Elm.Random.make = function (_elm) {
                   }
             }
          });
-         var _p68 = _U.cmp(a,b) < 0 ? {ctor: "_Tuple2"
-                                      ,_0: a
-                                      ,_1: b} : {ctor: "_Tuple2",_0: b,_1: a};
+         var _p68 = _U.cmp(a,b) < 0 ? {ctor: "_Tuple2",_0: a,_1: b} : {ctor: "_Tuple2",_0: b,_1: a};
          var lo = _p68._0;
          var hi = _p68._1;
          var k = hi - lo + 1;
@@ -7316,9 +6655,7 @@ Elm.Random.make = function (_elm) {
          var _p69 = A3(f,n,1,_p70.state);
          var v = _p69._0;
          var state$ = _p69._1;
-         return {ctor: "_Tuple2"
-                ,_0: lo + A2($Basics._op["%"],v,k)
-                ,_1: Seed(_U.update(_p70,{state: state$}))};
+         return {ctor: "_Tuple2",_0: lo + A2($Basics._op["%"],v,k),_1: Seed(_U.update(_p70,{state: state$}))};
       });
    });
    var $float = F2(function (a,b) {
@@ -7327,18 +6664,14 @@ Elm.Random.make = function (_elm) {
          var number = _p71._0;
          var newSeed = _p71._1;
          var negativeOneToOne = $Basics.toFloat(number) / $Basics.toFloat(maxInt - minInt);
-         var _p72 = _U.cmp(a,b) < 0 ? {ctor: "_Tuple2"
-                                      ,_0: a
-                                      ,_1: b} : {ctor: "_Tuple2",_0: b,_1: a};
+         var _p72 = _U.cmp(a,b) < 0 ? {ctor: "_Tuple2",_0: a,_1: b} : {ctor: "_Tuple2",_0: b,_1: a};
          var lo = _p72._0;
          var hi = _p72._1;
          var scaled = (lo + hi) / 2 + (hi - lo) * negativeOneToOne;
          return {ctor: "_Tuple2",_0: scaled,_1: newSeed};
       });
    });
-   var bool = A2(map,
-   F2(function (x,y) {    return _U.eq(x,y);})(1),
-   A2($int,0,1));
+   var bool = A2(map,F2(function (x,y) {    return _U.eq(x,y);})(1),A2($int,0,1));
    return _elm.Random.values = {_op: _op
                                ,bool: bool
                                ,$int: $int
@@ -7382,9 +6715,7 @@ Elm.Char.make = function (_elm) {
    "use strict";
    _elm.Char = _elm.Char || {};
    if (_elm.Char.values) return _elm.Char.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Native$Char = Elm.Native.Char.make(_elm);
+   var _U = Elm.Native.Utils.make(_elm),$Basics = Elm.Basics.make(_elm),$Native$Char = Elm.Native.Char.make(_elm);
    var _op = {};
    var fromCode = $Native$Char.fromCode;
    var toCode = $Native$Char.toCode;
@@ -7392,20 +6723,13 @@ Elm.Char.make = function (_elm) {
    var toLocaleUpper = $Native$Char.toLocaleUpper;
    var toLower = $Native$Char.toLower;
    var toUpper = $Native$Char.toUpper;
-   var isBetween = F3(function (low,high,$char) {
-      var code = toCode($char);
-      return _U.cmp(code,toCode(low)) > -1 && _U.cmp(code,
-      toCode(high)) < 1;
-   });
+   var isBetween = F3(function (low,high,$char) {    var code = toCode($char);return _U.cmp(code,toCode(low)) > -1 && _U.cmp(code,toCode(high)) < 1;});
    var isUpper = A2(isBetween,_U.chr("A"),_U.chr("Z"));
    var isLower = A2(isBetween,_U.chr("a"),_U.chr("z"));
    var isDigit = A2(isBetween,_U.chr("0"),_U.chr("9"));
    var isOctDigit = A2(isBetween,_U.chr("0"),_U.chr("7"));
    var isHexDigit = function ($char) {
-      return isDigit($char) || (A3(isBetween,
-      _U.chr("a"),
-      _U.chr("f"),
-      $char) || A3(isBetween,_U.chr("A"),_U.chr("F"),$char));
+      return isDigit($char) || (A3(isBetween,_U.chr("a"),_U.chr("f"),$char) || A3(isBetween,_U.chr("A"),_U.chr("F"),$char));
    };
    return _elm.Char.values = {_op: _op
                              ,isUpper: isUpper
@@ -7767,10 +7091,7 @@ Elm.String.make = function (_elm) {
    "use strict";
    _elm.String = _elm.String || {};
    if (_elm.String.values) return _elm.String.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Native$String = Elm.Native.String.make(_elm),
-   $Result = Elm.Result.make(_elm);
+   var _U = Elm.Native.Utils.make(_elm),$Maybe = Elm.Maybe.make(_elm),$Native$String = Elm.Native.String.make(_elm),$Result = Elm.Result.make(_elm);
    var _op = {};
    var fromList = $Native$String.fromList;
    var toList = $Native$String.toList;
@@ -7899,70 +7220,38 @@ Elm.Random.Extra.make = function (_elm) {
    $Utils = Elm.Utils.make(_elm);
    var _op = {};
    var mapConstraint = F2(function (constraint,generator) {
-      return A2($Random.map,
-      function (a) {
-         return {ctor: "_Tuple2",_0: a,_1: constraint(a)};
-      },
-      generator);
+      return A2($Random.map,function (a) {    return {ctor: "_Tuple2",_0: a,_1: constraint(a)};},generator);
    });
-   var quickGenerate = function (generator) {
-      return $Basics.fst(A2($Random.generate,
-      generator,
-      $Random.initialSeed(1)));
-   };
-   var cappedGenerateUntil = F4(function (maxGenerations,
-   predicate,
-   generator,
-   seed) {
+   var quickGenerate = function (generator) {    return $Basics.fst(A2($Random.generate,generator,$Random.initialSeed(1)));};
+   var cappedGenerateUntil = F4(function (maxGenerations,predicate,generator,seed) {
       if (_U.cmp(maxGenerations,0) < 1) return _U.list([]); else {
             var _p0 = A2($Random.generate,generator,seed);
             var value = _p0._0;
             var nextSeed = _p0._1;
-            return predicate(value) ? A2($List._op["::"],
-            value,
-            A4(cappedGenerateUntil,
-            maxGenerations - 1,
-            predicate,
-            generator,
-            nextSeed)) : _U.list([]);
+            return predicate(value) ? A2($List._op["::"],value,A4(cappedGenerateUntil,maxGenerations - 1,predicate,generator,nextSeed)) : _U.list([]);
          }
    });
    var generateUntil = F3(function (predicate,generator,seed) {
       var _p1 = A2($Random.generate,generator,seed);
       var value = _p1._0;
       var nextSeed = _p1._1;
-      return predicate(value) ? A2($List._op["::"],
-      value,
-      A3(generateUntil,predicate,generator,nextSeed)) : _U.list([]);
+      return predicate(value) ? A2($List._op["::"],value,A3(generateUntil,predicate,generator,nextSeed)) : _U.list([]);
    });
-   var generateIterativelyUntil = F4(function (maxLength,
-   predicate,
-   constructor,
-   seed) {
+   var generateIterativelyUntil = F4(function (maxLength,predicate,constructor,seed) {
       var iterate = function (index) {
-         return _U.cmp(index,
-         maxLength) > -1 ? _U.list([]) : A2($Basics._op["++"],
-         A3(generateUntil,predicate,constructor(index),seed),
-         iterate(index + 1));
+         return _U.cmp(index,maxLength) > -1 ? _U.list([]) : A2($Basics._op["++"],A3(generateUntil,predicate,constructor(index),seed),iterate(index + 1));
       };
       return iterate(0);
    });
-   var generateIterativelySuchThat = F2(function (maxLength,
-   predicate) {
-      return A2(generateIterativelyUntil,
-      maxLength,
-      function (a) {
-         return $Basics.not(predicate(a));
-      });
+   var generateIterativelySuchThat = F2(function (maxLength,predicate) {
+      return A2(generateIterativelyUntil,maxLength,function (a) {    return $Basics.not(predicate(a));});
    });
    var generateN = F3(function (n,generator,seed) {
       if (_U.cmp(n,0) < 1) return _U.list([]); else {
             var _p2 = A2($Random.generate,generator,seed);
             var value = _p2._0;
             var nextSeed = _p2._1;
-            return A2($List._op["::"],
-            value,
-            A3(generateN,n - 1,generator,nextSeed));
+            return A2($List._op["::"],value,A3(generateN,n - 1,generator,nextSeed));
          }
    });
    var map5 = $Random.map5;
@@ -7970,13 +7259,7 @@ Elm.Random.Extra.make = function (_elm) {
    var map3 = $Random.map3;
    var map2 = $Random.map2;
    var map = $Random.map;
-   var flatMap6 = F7(function (constructor,
-   generatorA,
-   generatorB,
-   generatorC,
-   generatorD,
-   generatorE,
-   generatorF) {
+   var flatMap6 = F7(function (constructor,generatorA,generatorB,generatorC,generatorD,generatorE,generatorF) {
       return A2($Random.andThen,
       generatorA,
       function (a) {
@@ -7992,23 +7275,14 @@ Elm.Random.Extra.make = function (_elm) {
                   return A2($Random.andThen,
                   generatorE,
                   function (e) {
-                     return A2($Random.andThen,
-                     generatorF,
-                     function (f) {
-                        return A6(constructor,a,b,c,d,e,f);
-                     });
+                     return A2($Random.andThen,generatorF,function (f) {    return A6(constructor,a,b,c,d,e,f);});
                   });
                });
             });
          });
       });
    });
-   var flatMap5 = F6(function (constructor,
-   generatorA,
-   generatorB,
-   generatorC,
-   generatorD,
-   generatorE) {
+   var flatMap5 = F6(function (constructor,generatorA,generatorB,generatorC,generatorD,generatorE) {
       return A2($Random.andThen,
       generatorA,
       function (a) {
@@ -8021,197 +7295,78 @@ Elm.Random.Extra.make = function (_elm) {
                return A2($Random.andThen,
                generatorD,
                function (d) {
-                  return A2($Random.andThen,
-                  generatorE,
-                  function (e) {
-                     return A5(constructor,a,b,c,d,e);
-                  });
+                  return A2($Random.andThen,generatorE,function (e) {    return A5(constructor,a,b,c,d,e);});
                });
             });
          });
       });
    });
-   var flatMap4 = F5(function (constructor,
-   generatorA,
-   generatorB,
-   generatorC,
-   generatorD) {
+   var flatMap4 = F5(function (constructor,generatorA,generatorB,generatorC,generatorD) {
       return A2($Random.andThen,
       generatorA,
       function (a) {
          return A2($Random.andThen,
          generatorB,
          function (b) {
-            return A2($Random.andThen,
-            generatorC,
-            function (c) {
-               return A2($Random.andThen,
-               generatorD,
-               function (d) {
-                  return A4(constructor,a,b,c,d);
-               });
-            });
+            return A2($Random.andThen,generatorC,function (c) {    return A2($Random.andThen,generatorD,function (d) {    return A4(constructor,a,b,c,d);});});
          });
       });
    });
-   var flatMap3 = F4(function (constructor,
-   generatorA,
-   generatorB,
-   generatorC) {
+   var flatMap3 = F4(function (constructor,generatorA,generatorB,generatorC) {
       return A2($Random.andThen,
       generatorA,
       function (a) {
-         return A2($Random.andThen,
-         generatorB,
-         function (b) {
-            return A2($Random.andThen,
-            generatorC,
-            function (c) {
-               return A3(constructor,a,b,c);
-            });
-         });
+         return A2($Random.andThen,generatorB,function (b) {    return A2($Random.andThen,generatorC,function (c) {    return A3(constructor,a,b,c);});});
       });
    });
    var flatMap2 = F3(function (constructor,generatorA,generatorB) {
-      return A2($Random.andThen,
-      generatorA,
-      function (a) {
-         return A2($Random.andThen,
-         generatorB,
-         function (b) {
-            return A2(constructor,a,b);
-         });
-      });
+      return A2($Random.andThen,generatorA,function (a) {    return A2($Random.andThen,generatorB,function (b) {    return A2(constructor,a,b);});});
    });
    var flatMap = $Basics.flip($Random.andThen);
    var andThen = $Random.andThen;
-   var zip5 = map5(F5(function (v0,v1,v2,v3,v4) {
-      return {ctor: "_Tuple5",_0: v0,_1: v1,_2: v2,_3: v3,_4: v4};
-   }));
-   var zip4 = map4(F4(function (v0,v1,v2,v3) {
-      return {ctor: "_Tuple4",_0: v0,_1: v1,_2: v2,_3: v3};
-   }));
-   var zip3 = map3(F3(function (v0,v1,v2) {
-      return {ctor: "_Tuple3",_0: v0,_1: v1,_2: v2};
-   }));
-   var zip = map2(F2(function (v0,v1) {
-      return {ctor: "_Tuple2",_0: v0,_1: v1};
-   }));
-   var reduce = F3(function (reducer,initial,generator) {
-      return A2($Random.map,
-      function (a) {
-         return A2(reducer,a,initial);
-      },
-      generator);
-   });
+   var zip5 = map5(F5(function (v0,v1,v2,v3,v4) {    return {ctor: "_Tuple5",_0: v0,_1: v1,_2: v2,_3: v3,_4: v4};}));
+   var zip4 = map4(F4(function (v0,v1,v2,v3) {    return {ctor: "_Tuple4",_0: v0,_1: v1,_2: v2,_3: v3};}));
+   var zip3 = map3(F3(function (v0,v1,v2) {    return {ctor: "_Tuple3",_0: v0,_1: v1,_2: v2};}));
+   var zip = map2(F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}));
+   var reduce = F3(function (reducer,initial,generator) {    return A2($Random.map,function (a) {    return A2(reducer,a,initial);},generator);});
    var fold = reduce;
-   var andMap = F2(function (funcGenerator,generator) {
-      return A3($Random.map2,
-      F2(function (x,y) {    return x(y);}),
-      funcGenerator,
-      generator);
+   var andMap = F2(function (funcGenerator,generator) {    return A3($Random.map2,F2(function (x,y) {    return x(y);}),funcGenerator,generator);});
+   var map6 = F7(function (f,generatorA,generatorB,generatorC,generatorD,generatorE,generatorF) {
+      return A2(andMap,A6($Random.map5,f,generatorA,generatorB,generatorC,generatorD,generatorE),generatorF);
    });
-   var map6 = F7(function (f,
-   generatorA,
-   generatorB,
-   generatorC,
-   generatorD,
-   generatorE,
-   generatorF) {
-      return A2(andMap,
-      A6($Random.map5,
-      f,
-      generatorA,
-      generatorB,
-      generatorC,
-      generatorD,
-      generatorE),
-      generatorF);
-   });
-   var zip6 = map6(F6(function (v0,v1,v2,v3,v4,v5) {
-      return {ctor: "_Tuple6"
-             ,_0: v0
-             ,_1: v1
-             ,_2: v2
-             ,_3: v3
-             ,_4: v4
-             ,_5: v5};
-   }));
-   var constant = function (value) {
-      return A2($Random.map,
-      function (_p3) {
-         return value;
-      },
-      $Random.bool);
-   };
+   var zip6 = map6(F6(function (v0,v1,v2,v3,v4,v5) {    return {ctor: "_Tuple6",_0: v0,_1: v1,_2: v2,_3: v3,_4: v4,_5: v5};}));
+   var constant = function (value) {    return A2($Random.map,function (_p3) {    return value;},$Random.bool);};
    var select = function (list) {
-      return A2($Random.map,
-      function (index) {
-         return A2($Utils.get,index,list);
-      },
-      A2($Random.$int,0,$List.length(list) - 1));
+      return A2($Random.map,function (index) {    return A2($Utils.get,index,list);},A2($Random.$int,0,$List.length(list) - 1));
    };
-   var selectWithDefault = F2(function (defaultValue,list) {
-      return A2(map,$Maybe.withDefault(defaultValue),select(list));
-   });
+   var selectWithDefault = F2(function (defaultValue,list) {    return A2(map,$Maybe.withDefault(defaultValue),select(list));});
    var flattenList = function (generators) {
       var _p4 = generators;
       if (_p4.ctor === "[]") {
             return constant(_U.list([]));
          } else {
-            return A3(map2,
-            F2(function (x,y) {    return A2($List._op["::"],x,y);}),
-            _p4._0,
-            flattenList(_p4._1));
+            return A3(map2,F2(function (x,y) {    return A2($List._op["::"],x,y);}),_p4._0,flattenList(_p4._1));
          }
    };
    var keepIf = F2(function (predicate,generator) {
-      return A2($Random.andThen,
-      generator,
-      function (a) {
-         return predicate(a) ? constant(a) : A2(keepIf,
-         predicate,
-         generator);
-      });
+      return A2($Random.andThen,generator,function (a) {    return predicate(a) ? constant(a) : A2(keepIf,predicate,generator);});
    });
-   var dropIf = function (predicate) {
-      return keepIf(function (a) {
-         return $Basics.not(predicate(a));
-      });
-   };
-   var generateSuchThat = F3(function (predicate,generator,seed) {
-      return A2($Random.generate,
-      A2(keepIf,predicate,generator),
-      seed);
-   });
+   var dropIf = function (predicate) {    return keepIf(function (a) {    return $Basics.not(predicate(a));});};
+   var generateSuchThat = F3(function (predicate,generator,seed) {    return A2($Random.generate,A2(keepIf,predicate,generator),seed);});
    var frequency = F2(function (pairs,defaultGenerator) {
-      var frequencies = A2($List.map,
-      function (_p5) {
-         return $Basics.abs($Basics.fst(_p5));
-      },
-      pairs);
+      var frequencies = A2($List.map,function (_p5) {    return $Basics.abs($Basics.fst(_p5));},pairs);
       var total = $List.sum(frequencies) * $Basics.toFloat($List.length(frequencies));
       return _U.eq(total,0) ? defaultGenerator : A2($Random.andThen,
       A2($Random.$float,0,total),
       function (randIndex) {
          var index = $Basics.floor(randIndex);
          var maybePair = A2($Utils.get,index,pairs);
-         var generator = function () {
-            var _p6 = maybePair;
-            if (_p6.ctor === "Nothing") {
-                  return defaultGenerator;
-               } else {
-                  return _p6._0._1;
-               }
-         }();
+         var generator = function () {    var _p6 = maybePair;if (_p6.ctor === "Nothing") {    return defaultGenerator;} else {    return _p6._0._1;}}();
          return generator;
       });
    });
    var merge = F2(function (generator1,generator2) {
-      return A2(frequency,
-      _U.list([{ctor: "_Tuple2",_0: 1,_1: generator1}
-              ,{ctor: "_Tuple2",_0: 1,_1: generator2}]),
-      generator1);
+      return A2(frequency,_U.list([{ctor: "_Tuple2",_0: 1,_1: generator1},{ctor: "_Tuple2",_0: 1,_1: generator2}]),generator1);
    });
    return _elm.Random.Extra.values = {_op: _op
                                      ,frequency: frequency
@@ -8271,33 +7426,20 @@ Elm.Random.Array.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
    var choose = function (arr) {
-      if ($Array.isEmpty(arr))
-      return $Random$Extra.constant({ctor: "_Tuple2"
-                                    ,_0: $Maybe.Nothing
-                                    ,_1: arr}); else {
-            var front = function (i) {
-               return A3($Array.slice,0,i,arr);
-            };
+      if ($Array.isEmpty(arr)) return $Random$Extra.constant({ctor: "_Tuple2",_0: $Maybe.Nothing,_1: arr}); else {
+            var front = function (i) {    return A3($Array.slice,0,i,arr);};
             var lastIndex = $Array.length(arr) - 1;
-            var back = function (i) {
-               return _U.eq(i,lastIndex) ? $Array.empty : A3($Array.slice,
-               i + 1,
-               lastIndex + 1,
-               arr);
-            };
+            var back = function (i) {    return _U.eq(i,lastIndex) ? $Array.empty : A3($Array.slice,i + 1,lastIndex + 1,arr);};
             var gen = A2($Random.$int,0,lastIndex);
             return A2($Random.map,
             function (index) {
-               return {ctor: "_Tuple2"
-                      ,_0: A2($Array.get,index,arr)
-                      ,_1: A2($Array.append,front(index),back(index))};
+               return {ctor: "_Tuple2",_0: A2($Array.get,index,arr),_1: A2($Array.append,front(index),back(index))};
             },
             gen);
          }
    };
    var shuffle = function (arr) {
-      if ($Array.isEmpty(arr)) return $Random$Extra.constant(arr);
-      else {
+      if ($Array.isEmpty(arr)) return $Random$Extra.constant(arr); else {
             var helper = function (_p0) {
                var _p1 = _p0;
                var _p6 = _p1._0;
@@ -8308,45 +7450,23 @@ Elm.Random.Array.make = function (_elm) {
                   var _p5 = _p3._1;
                   var _p4 = _p3._0;
                   if (_p4.ctor === "Nothing") {
-                        return $Random$Extra.constant({ctor: "_Tuple2"
-                                                      ,_0: _p6
-                                                      ,_1: _p5});
+                        return $Random$Extra.constant({ctor: "_Tuple2",_0: _p6,_1: _p5});
                      } else {
-                        return helper({ctor: "_Tuple2"
-                                      ,_0: A2($List._op["::"],_p4._0,_p6)
-                                      ,_1: _p5});
+                        return helper({ctor: "_Tuple2",_0: A2($List._op["::"],_p4._0,_p6),_1: _p5});
                      }
                });
             };
-            return A2($Random.map,
-            function (_p7) {
-               return $Array.fromList($Basics.fst(_p7));
-            },
-            helper({ctor: "_Tuple2",_0: _U.list([]),_1: arr}));
+            return A2($Random.map,function (_p7) {    return $Array.fromList($Basics.fst(_p7));},helper({ctor: "_Tuple2",_0: _U.list([]),_1: arr}));
          }
    };
    var sample = function (arr) {
       var gen = A2($Random.$int,0,$Array.length(arr) - 1);
-      return A2($Random.map,
-      function (index) {
-         return A2($Array.get,index,arr);
-      },
-      gen);
+      return A2($Random.map,function (index) {    return A2($Array.get,index,arr);},gen);
    };
    var emptyArray = $Random$Extra.constant($Array.empty);
-   var array = F2(function (arrayLength,generator) {
-      return A2($Random$Extra.map,
-      $Array.fromList,
-      A2($Random.list,arrayLength,generator));
-   });
-   var rangeLengthArray = F3(function (minLength,
-   maxLength,
-   generator) {
-      return A2($Random$Extra.flatMap,
-      function (len) {
-         return A2(array,len,generator);
-      },
-      A2($Random.$int,minLength,maxLength));
+   var array = F2(function (arrayLength,generator) {    return A2($Random$Extra.map,$Array.fromList,A2($Random.list,arrayLength,generator));});
+   var rangeLengthArray = F3(function (minLength,maxLength,generator) {
+      return A2($Random$Extra.flatMap,function (len) {    return A2(array,len,generator);},A2($Random.$int,minLength,maxLength));
    });
    return _elm.Random.Array.values = {_op: _op
                                      ,array: array
@@ -8374,9 +7494,7 @@ Elm.Dict.make = function (_elm) {
          if (_p0.ctor === "RBEmpty_elm_builtin") {
                return acc;
             } else {
-               var _v1 = f,
-               _v2 = A3(f,_p0._1,_p0._2,A3(foldr,f,acc,_p0._4)),
-               _v3 = _p0._3;
+               var _v1 = f,_v2 = A3(f,_p0._1,_p0._2,A3(foldr,f,acc,_p0._4)),_v3 = _p0._3;
                f = _v1;
                acc = _v2;
                t = _v3;
@@ -8384,31 +7502,10 @@ Elm.Dict.make = function (_elm) {
             }
       }
    });
-   var keys = function (dict) {
-      return A3(foldr,
-      F3(function (key,value,keyList) {
-         return A2($List._op["::"],key,keyList);
-      }),
-      _U.list([]),
-      dict);
-   };
-   var values = function (dict) {
-      return A3(foldr,
-      F3(function (key,value,valueList) {
-         return A2($List._op["::"],value,valueList);
-      }),
-      _U.list([]),
-      dict);
-   };
+   var keys = function (dict) {    return A3(foldr,F3(function (key,value,keyList) {    return A2($List._op["::"],key,keyList);}),_U.list([]),dict);};
+   var values = function (dict) {    return A3(foldr,F3(function (key,value,valueList) {    return A2($List._op["::"],value,valueList);}),_U.list([]),dict);};
    var toList = function (dict) {
-      return A3(foldr,
-      F3(function (key,value,list) {
-         return A2($List._op["::"],
-         {ctor: "_Tuple2",_0: key,_1: value},
-         list);
-      }),
-      _U.list([]),
-      dict);
+      return A3(foldr,F3(function (key,value,list) {    return A2($List._op["::"],{ctor: "_Tuple2",_0: key,_1: value},list);}),_U.list([]),dict);
    };
    var foldl = F3(function (f,acc,dict) {
       foldl: while (true) {
@@ -8416,9 +7513,7 @@ Elm.Dict.make = function (_elm) {
          if (_p1.ctor === "RBEmpty_elm_builtin") {
                return acc;
             } else {
-               var _v5 = f,
-               _v6 = A3(f,_p1._1,_p1._2,A3(foldl,f,acc,_p1._3)),
-               _v7 = _p1._4;
+               var _v5 = f,_v6 = A3(f,_p1._1,_p1._2,A3(foldl,f,acc,_p1._3)),_v7 = _p1._4;
                f = _v5;
                acc = _v6;
                dict = _v7;
@@ -8493,14 +7588,7 @@ Elm.Dict.make = function (_elm) {
             }
       }
    });
-   var member = F2(function (key,dict) {
-      var _p6 = A2(get,key,dict);
-      if (_p6.ctor === "Just") {
-            return true;
-         } else {
-            return false;
-         }
-   });
+   var member = F2(function (key,dict) {    var _p6 = A2(get,key,dict);if (_p6.ctor === "Just") {    return true;} else {    return false;}});
    var maxWithDefault = F3(function (k,v,r) {
       maxWithDefault: while (true) {
          var _p7 = r;
@@ -8515,17 +7603,8 @@ Elm.Dict.make = function (_elm) {
             }
       }
    });
-   var RBEmpty_elm_builtin = function (a) {
-      return {ctor: "RBEmpty_elm_builtin",_0: a};
-   };
-   var RBNode_elm_builtin = F5(function (a,b,c,d,e) {
-      return {ctor: "RBNode_elm_builtin"
-             ,_0: a
-             ,_1: b
-             ,_2: c
-             ,_3: d
-             ,_4: e};
-   });
+   var RBEmpty_elm_builtin = function (a) {    return {ctor: "RBEmpty_elm_builtin",_0: a};};
+   var RBNode_elm_builtin = F5(function (a,b,c,d,e) {    return {ctor: "RBNode_elm_builtin",_0: a,_1: b,_2: c,_3: d,_4: e};});
    var LBBlack = {ctor: "LBBlack"};
    var LBlack = {ctor: "LBlack"};
    var empty = RBEmpty_elm_builtin(LBlack);
@@ -8536,12 +7615,7 @@ Elm.Dict.make = function (_elm) {
             return RBEmpty_elm_builtin(LBlack);
          } else {
             var _p9 = _p8._1;
-            return A5(RBNode_elm_builtin,
-            _p8._0,
-            _p9,
-            A2(f,_p9,_p8._2),
-            A2(map,f,_p8._3),
-            A2(map,f,_p8._4));
+            return A5(RBNode_elm_builtin,_p8._0,_p9,A2(f,_p9,_p8._2),A2(map,f,_p8._3),A2(map,f,_p8._4));
          }
    });
    var NBlack = {ctor: "NBlack"};
@@ -8549,14 +7623,8 @@ Elm.Dict.make = function (_elm) {
    var Black = {ctor: "Black"};
    var ensureBlackRoot = function (dict) {
       var _p10 = dict;
-      if (_p10.ctor === "RBNode_elm_builtin" && _p10._0.ctor === "Red")
-      {
-            return A5(RBNode_elm_builtin,
-            Black,
-            _p10._1,
-            _p10._2,
-            _p10._3,
-            _p10._4);
+      if (_p10.ctor === "RBNode_elm_builtin" && _p10._0.ctor === "Red") {
+            return A5(RBNode_elm_builtin,Black,_p10._1,_p10._2,_p10._3,_p10._4);
          } else {
             return dict;
          }
@@ -8575,12 +7643,7 @@ Elm.Dict.make = function (_elm) {
       if (_p13.ctor === "RBEmpty_elm_builtin") {
             return RBEmpty_elm_builtin(LBlack);
          } else {
-            return A5(RBNode_elm_builtin,
-            Black,
-            _p13._1,
-            _p13._2,
-            _p13._3,
-            _p13._4);
+            return A5(RBNode_elm_builtin,Black,_p13._1,_p13._2,_p13._3,_p13._4);
          }
    };
    var Red = {ctor: "Red"};
@@ -8590,8 +7653,7 @@ Elm.Dict.make = function (_elm) {
       {case "Black": return BBlack;
          case "Red": return Black;
          case "NBlack": return Red;
-         default:
-         return $Native$Debug.crash("Can\'t make a double black node more black!");}
+         default: return $Native$Debug.crash("Can\'t make a double black node more black!");}
    };
    var lessBlack = function (color) {
       var _p15 = color;
@@ -8599,18 +7661,12 @@ Elm.Dict.make = function (_elm) {
       {case "BBlack": return Black;
          case "Black": return Red;
          case "Red": return NBlack;
-         default:
-         return $Native$Debug.crash("Can\'t make a negative black node less black!");}
+         default: return $Native$Debug.crash("Can\'t make a negative black node less black!");}
    };
    var lessBlackTree = function (dict) {
       var _p16 = dict;
       if (_p16.ctor === "RBNode_elm_builtin") {
-            return A5(RBNode_elm_builtin,
-            lessBlack(_p16._0),
-            _p16._1,
-            _p16._2,
-            _p16._3,
-            _p16._4);
+            return A5(RBNode_elm_builtin,lessBlack(_p16._0),_p16._1,_p16._2,_p16._3,_p16._4);
          } else {
             return RBEmpty_elm_builtin(LBlack);
          }
@@ -8648,12 +7704,7 @@ Elm.Dict.make = function (_elm) {
       if (_p17.ctor === "RBEmpty_elm_builtin") {
             return $Native$Debug.crash("can\'t make a Leaf red");
          } else {
-            return A5(RBNode_elm_builtin,
-            Red,
-            _p17._1,
-            _p17._2,
-            _p17._3,
-            _p17._4);
+            return A5(RBNode_elm_builtin,Red,_p17._1,_p17._2,_p17._3,_p17._4);
          }
    };
    var balanceHelp = function (tree) {
@@ -8670,21 +7721,16 @@ Elm.Dict.make = function (_elm) {
                                        if (_p18._4.ctor === "RBNode_elm_builtin") {
                                              switch (_p18._3._0.ctor)
                                              {case "Red": switch (_p18._4._0.ctor)
-                                                  {case "Red":
-                                                     if (_p18._3._3.ctor === "RBNode_elm_builtin" && _p18._3._3._0.ctor === "Red")
-                                                       {
+                                                  {case "Red": if (_p18._3._3.ctor === "RBNode_elm_builtin" && _p18._3._3._0.ctor === "Red") {
                                                              break _v31_0;
                                                           } else {
-                                                             if (_p18._3._4.ctor === "RBNode_elm_builtin" && _p18._3._4._0.ctor === "Red")
-                                                             {
+                                                             if (_p18._3._4.ctor === "RBNode_elm_builtin" && _p18._3._4._0.ctor === "Red") {
                                                                    break _v31_1;
                                                                 } else {
-                                                                   if (_p18._4._3.ctor === "RBNode_elm_builtin" && _p18._4._3._0.ctor === "Red")
-                                                                   {
+                                                                   if (_p18._4._3.ctor === "RBNode_elm_builtin" && _p18._4._3._0.ctor === "Red") {
                                                                          break _v31_2;
                                                                       } else {
-                                                                         if (_p18._4._4.ctor === "RBNode_elm_builtin" && _p18._4._4._0.ctor === "Red")
-                                                                         {
+                                                                         if (_p18._4._4.ctor === "RBNode_elm_builtin" && _p18._4._4._0.ctor === "Red") {
                                                                                break _v31_3;
                                                                             } else {
                                                                                break _v31_6;
@@ -8692,13 +7738,10 @@ Elm.Dict.make = function (_elm) {
                                                                       }
                                                                 }
                                                           }
-                                                     case "NBlack":
-                                                     if (_p18._3._3.ctor === "RBNode_elm_builtin" && _p18._3._3._0.ctor === "Red")
-                                                       {
+                                                     case "NBlack": if (_p18._3._3.ctor === "RBNode_elm_builtin" && _p18._3._3._0.ctor === "Red") {
                                                              break _v31_0;
                                                           } else {
-                                                             if (_p18._3._4.ctor === "RBNode_elm_builtin" && _p18._3._4._0.ctor === "Red")
-                                                             {
+                                                             if (_p18._3._4.ctor === "RBNode_elm_builtin" && _p18._3._4._0.ctor === "Red") {
                                                                    break _v31_1;
                                                                 } else {
                                                                    if (_p18._0.ctor === "BBlack" && _p18._4._3.ctor === "RBNode_elm_builtin" && _p18._4._3._0.ctor === "Black" && _p18._4._4.ctor === "RBNode_elm_builtin" && _p18._4._4._0.ctor === "Black")
@@ -8709,26 +7752,20 @@ Elm.Dict.make = function (_elm) {
                                                                       }
                                                                 }
                                                           }
-                                                     default:
-                                                     if (_p18._3._3.ctor === "RBNode_elm_builtin" && _p18._3._3._0.ctor === "Red")
-                                                       {
+                                                     default: if (_p18._3._3.ctor === "RBNode_elm_builtin" && _p18._3._3._0.ctor === "Red") {
                                                              break _v31_0;
                                                           } else {
-                                                             if (_p18._3._4.ctor === "RBNode_elm_builtin" && _p18._3._4._0.ctor === "Red")
-                                                             {
+                                                             if (_p18._3._4.ctor === "RBNode_elm_builtin" && _p18._3._4._0.ctor === "Red") {
                                                                    break _v31_1;
                                                                 } else {
                                                                    break _v31_6;
                                                                 }
                                                           }}
                                                 case "NBlack": switch (_p18._4._0.ctor)
-                                                  {case "Red":
-                                                     if (_p18._4._3.ctor === "RBNode_elm_builtin" && _p18._4._3._0.ctor === "Red")
-                                                       {
+                                                  {case "Red": if (_p18._4._3.ctor === "RBNode_elm_builtin" && _p18._4._3._0.ctor === "Red") {
                                                              break _v31_2;
                                                           } else {
-                                                             if (_p18._4._4.ctor === "RBNode_elm_builtin" && _p18._4._4._0.ctor === "Red")
-                                                             {
+                                                             if (_p18._4._4.ctor === "RBNode_elm_builtin" && _p18._4._4._0.ctor === "Red") {
                                                                    break _v31_3;
                                                                 } else {
                                                                    if (_p18._0.ctor === "BBlack" && _p18._3._3.ctor === "RBNode_elm_builtin" && _p18._3._3._0.ctor === "Black" && _p18._3._4.ctor === "RBNode_elm_builtin" && _p18._3._4._0.ctor === "Black")
@@ -8762,13 +7799,10 @@ Elm.Dict.make = function (_elm) {
                                                              break _v31_6;
                                                           }}
                                                 default: switch (_p18._4._0.ctor)
-                                                  {case "Red":
-                                                     if (_p18._4._3.ctor === "RBNode_elm_builtin" && _p18._4._3._0.ctor === "Red")
-                                                       {
+                                                  {case "Red": if (_p18._4._3.ctor === "RBNode_elm_builtin" && _p18._4._3._0.ctor === "Red") {
                                                              break _v31_2;
                                                           } else {
-                                                             if (_p18._4._4.ctor === "RBNode_elm_builtin" && _p18._4._4._0.ctor === "Red")
-                                                             {
+                                                             if (_p18._4._4.ctor === "RBNode_elm_builtin" && _p18._4._4._0.ctor === "Red") {
                                                                    break _v31_3;
                                                                 } else {
                                                                    break _v31_6;
@@ -8784,13 +7818,10 @@ Elm.Dict.make = function (_elm) {
                                                      default: break _v31_6;}}
                                           } else {
                                              switch (_p18._3._0.ctor)
-                                             {case "Red":
-                                                if (_p18._3._3.ctor === "RBNode_elm_builtin" && _p18._3._3._0.ctor === "Red")
-                                                  {
+                                             {case "Red": if (_p18._3._3.ctor === "RBNode_elm_builtin" && _p18._3._3._0.ctor === "Red") {
                                                         break _v31_0;
                                                      } else {
-                                                        if (_p18._3._4.ctor === "RBNode_elm_builtin" && _p18._3._4._0.ctor === "Red")
-                                                        {
+                                                        if (_p18._3._4.ctor === "RBNode_elm_builtin" && _p18._3._4._0.ctor === "Red") {
                                                               break _v31_1;
                                                            } else {
                                                               break _v31_6;
@@ -8808,13 +7839,10 @@ Elm.Dict.make = function (_elm) {
                                     } else {
                                        if (_p18._4.ctor === "RBNode_elm_builtin") {
                                              switch (_p18._4._0.ctor)
-                                             {case "Red":
-                                                if (_p18._4._3.ctor === "RBNode_elm_builtin" && _p18._4._3._0.ctor === "Red")
-                                                  {
+                                             {case "Red": if (_p18._4._3.ctor === "RBNode_elm_builtin" && _p18._4._3._0.ctor === "Red") {
                                                         break _v31_2;
                                                      } else {
-                                                        if (_p18._4._4.ctor === "RBNode_elm_builtin" && _p18._4._4._0.ctor === "Red")
-                                                        {
+                                                        if (_p18._4._4.ctor === "RBNode_elm_builtin" && _p18._4._4._0.ctor === "Red") {
                                                               break _v31_3;
                                                            } else {
                                                               break _v31_6;
@@ -8848,61 +7876,28 @@ Elm.Dict.make = function (_elm) {
             Black,
             _p18._4._3._1,
             _p18._4._3._2,
-            A5(RBNode_elm_builtin,
-            Black,
-            _p18._1,
-            _p18._2,
-            _p18._3,
-            _p18._4._3._3),
-            A5(balance,
-            Black,
-            _p18._4._1,
-            _p18._4._2,
-            _p18._4._3._4,
-            redden(_p18._4._4)));
+            A5(RBNode_elm_builtin,Black,_p18._1,_p18._2,_p18._3,_p18._4._3._3),
+            A5(balance,Black,_p18._4._1,_p18._4._2,_p18._4._3._4,redden(_p18._4._4)));
          } while (false);
          return A5(RBNode_elm_builtin,
          Black,
          _p18._3._4._1,
          _p18._3._4._2,
-         A5(balance,
-         Black,
-         _p18._3._1,
-         _p18._3._2,
-         redden(_p18._3._3),
-         _p18._3._4._3),
-         A5(RBNode_elm_builtin,
-         Black,
-         _p18._1,
-         _p18._2,
-         _p18._3._4._4,
-         _p18._4));
+         A5(balance,Black,_p18._3._1,_p18._3._2,redden(_p18._3._3),_p18._3._4._3),
+         A5(RBNode_elm_builtin,Black,_p18._1,_p18._2,_p18._3._4._4,_p18._4));
       } while (false);
       return tree;
    };
-   var balance = F5(function (c,k,v,l,r) {
-      var tree = A5(RBNode_elm_builtin,c,k,v,l,r);
-      return blackish(tree) ? balanceHelp(tree) : tree;
-   });
+   var balance = F5(function (c,k,v,l,r) {    var tree = A5(RBNode_elm_builtin,c,k,v,l,r);return blackish(tree) ? balanceHelp(tree) : tree;});
    var bubble = F5(function (c,k,v,l,r) {
-      return isBBlack(l) || isBBlack(r) ? A5(balance,
-      moreBlack(c),
-      k,
-      v,
-      lessBlackTree(l),
-      lessBlackTree(r)) : A5(RBNode_elm_builtin,c,k,v,l,r);
+      return isBBlack(l) || isBBlack(r) ? A5(balance,moreBlack(c),k,v,lessBlackTree(l),lessBlackTree(r)) : A5(RBNode_elm_builtin,c,k,v,l,r);
    });
    var removeMax = F5(function (c,k,v,l,r) {
       var _p19 = r;
       if (_p19.ctor === "RBEmpty_elm_builtin") {
             return A3(rem,c,l,r);
          } else {
-            return A5(bubble,
-            c,
-            k,
-            v,
-            l,
-            A5(removeMax,_p19._0,_p19._1,_p19._2,_p19._3,_p19._4));
+            return A5(bubble,c,k,v,l,A5(removeMax,_p19._0,_p19._1,_p19._2,_p19._3,_p19._4));
          }
    });
    var rem = F3(function (c,l,r) {
@@ -8913,26 +7908,15 @@ Elm.Dict.make = function (_elm) {
                   switch (_p21.ctor)
                   {case "Red": return RBEmpty_elm_builtin(LBlack);
                      case "Black": return RBEmpty_elm_builtin(LBBlack);
-                     default:
-                     return $Native$Debug.crash("cannot have bblack or nblack nodes at this point");}
+                     default: return $Native$Debug.crash("cannot have bblack or nblack nodes at this point");}
                } else {
                   var _p24 = _p20._1._0;
                   var _p23 = _p20._0._0;
                   var _p22 = {ctor: "_Tuple3",_0: c,_1: _p23,_2: _p24};
-                  if (_p22.ctor === "_Tuple3" && _p22._0.ctor === "Black" && _p22._1.ctor === "LBlack" && _p22._2.ctor === "Red")
-                  {
-                        return A5(RBNode_elm_builtin,
-                        Black,
-                        _p20._1._1,
-                        _p20._1._2,
-                        _p20._1._3,
-                        _p20._1._4);
+                  if (_p22.ctor === "_Tuple3" && _p22._0.ctor === "Black" && _p22._1.ctor === "LBlack" && _p22._2.ctor === "Red") {
+                        return A5(RBNode_elm_builtin,Black,_p20._1._1,_p20._1._2,_p20._1._3,_p20._1._4);
                      } else {
-                        return A4(reportRemBug,
-                        "Black/LBlack/Red",
-                        c,
-                        $Basics.toString(_p23),
-                        $Basics.toString(_p24));
+                        return A4(reportRemBug,"Black/LBlack/Red",c,$Basics.toString(_p23),$Basics.toString(_p24));
                      }
                }
          } else {
@@ -8940,20 +7924,10 @@ Elm.Dict.make = function (_elm) {
                   var _p27 = _p20._1._0;
                   var _p26 = _p20._0._0;
                   var _p25 = {ctor: "_Tuple3",_0: c,_1: _p26,_2: _p27};
-                  if (_p25.ctor === "_Tuple3" && _p25._0.ctor === "Black" && _p25._1.ctor === "Red" && _p25._2.ctor === "LBlack")
-                  {
-                        return A5(RBNode_elm_builtin,
-                        Black,
-                        _p20._0._1,
-                        _p20._0._2,
-                        _p20._0._3,
-                        _p20._0._4);
+                  if (_p25.ctor === "_Tuple3" && _p25._0.ctor === "Black" && _p25._1.ctor === "Red" && _p25._2.ctor === "LBlack") {
+                        return A5(RBNode_elm_builtin,Black,_p20._0._1,_p20._0._2,_p20._0._3,_p20._0._4);
                      } else {
-                        return A4(reportRemBug,
-                        "Black/Red/LBlack",
-                        c,
-                        $Basics.toString(_p26),
-                        $Basics.toString(_p27));
+                        return A4(reportRemBug,"Black/Red/LBlack",c,$Basics.toString(_p26),$Basics.toString(_p27));
                      }
                } else {
                   var _p31 = _p20._0._2;
@@ -8975,9 +7949,7 @@ Elm.Dict.make = function (_elm) {
                if (_p33.ctor === "Nothing") {
                      return {ctor: "_Tuple2",_0: Same,_1: empty};
                   } else {
-                     return {ctor: "_Tuple2"
-                            ,_0: Insert
-                            ,_1: A5(RBNode_elm_builtin,Red,k,_p33._0,empty,empty)};
+                     return {ctor: "_Tuple2",_0: Insert,_1: A5(RBNode_elm_builtin,Red,k,_p33._0,empty,empty)};
                   }
             } else {
                var _p44 = _p32._2;
@@ -8989,42 +7961,26 @@ Elm.Dict.make = function (_elm) {
                switch (_p34.ctor)
                {case "EQ": var _p35 = alter($Maybe.Just(_p44));
                     if (_p35.ctor === "Nothing") {
-                          return {ctor: "_Tuple2"
-                                 ,_0: Remove
-                                 ,_1: A3(rem,_p40,_p42,_p43)};
+                          return {ctor: "_Tuple2",_0: Remove,_1: A3(rem,_p40,_p42,_p43)};
                        } else {
-                          return {ctor: "_Tuple2"
-                                 ,_0: Same
-                                 ,_1: A5(RBNode_elm_builtin,_p40,_p41,_p35._0,_p42,_p43)};
+                          return {ctor: "_Tuple2",_0: Same,_1: A5(RBNode_elm_builtin,_p40,_p41,_p35._0,_p42,_p43)};
                        }
                   case "LT": var _p36 = up(_p42);
                     var flag = _p36._0;
                     var newLeft = _p36._1;
                     var _p37 = flag;
                     switch (_p37.ctor)
-                    {case "Same": return {ctor: "_Tuple2"
-                                         ,_0: Same
-                                         ,_1: A5(RBNode_elm_builtin,_p40,_p41,_p44,newLeft,_p43)};
-                       case "Insert": return {ctor: "_Tuple2"
-                                             ,_0: Insert
-                                             ,_1: A5(balance,_p40,_p41,_p44,newLeft,_p43)};
-                       default: return {ctor: "_Tuple2"
-                                       ,_0: Remove
-                                       ,_1: A5(bubble,_p40,_p41,_p44,newLeft,_p43)};}
+                    {case "Same": return {ctor: "_Tuple2",_0: Same,_1: A5(RBNode_elm_builtin,_p40,_p41,_p44,newLeft,_p43)};
+                       case "Insert": return {ctor: "_Tuple2",_0: Insert,_1: A5(balance,_p40,_p41,_p44,newLeft,_p43)};
+                       default: return {ctor: "_Tuple2",_0: Remove,_1: A5(bubble,_p40,_p41,_p44,newLeft,_p43)};}
                   default: var _p38 = up(_p43);
                     var flag = _p38._0;
                     var newRight = _p38._1;
                     var _p39 = flag;
                     switch (_p39.ctor)
-                    {case "Same": return {ctor: "_Tuple2"
-                                         ,_0: Same
-                                         ,_1: A5(RBNode_elm_builtin,_p40,_p41,_p44,_p42,newRight)};
-                       case "Insert": return {ctor: "_Tuple2"
-                                             ,_0: Insert
-                                             ,_1: A5(balance,_p40,_p41,_p44,_p42,newRight)};
-                       default: return {ctor: "_Tuple2"
-                                       ,_0: Remove
-                                       ,_1: A5(bubble,_p40,_p41,_p44,_p42,newRight)};}}
+                    {case "Same": return {ctor: "_Tuple2",_0: Same,_1: A5(RBNode_elm_builtin,_p40,_p41,_p44,_p42,newRight)};
+                       case "Insert": return {ctor: "_Tuple2",_0: Insert,_1: A5(balance,_p40,_p41,_p44,_p42,newRight)};
+                       default: return {ctor: "_Tuple2",_0: Remove,_1: A5(bubble,_p40,_p41,_p44,_p42,newRight)};}}
             }
       };
       var _p45 = up(dict);
@@ -9036,63 +7992,28 @@ Elm.Dict.make = function (_elm) {
          case "Insert": return ensureBlackRoot(updatedDict);
          default: return blacken(updatedDict);}
    });
-   var insert = F3(function (key,value,dict) {
-      return A3(update,
-      key,
-      $Basics.always($Maybe.Just(value)),
-      dict);
-   });
-   var singleton = F2(function (key,value) {
-      return A3(insert,key,value,empty);
-   });
-   var union = F2(function (t1,t2) {
-      return A3(foldl,insert,t2,t1);
-   });
+   var insert = F3(function (key,value,dict) {    return A3(update,key,$Basics.always($Maybe.Just(value)),dict);});
+   var singleton = F2(function (key,value) {    return A3(insert,key,value,empty);});
+   var union = F2(function (t1,t2) {    return A3(foldl,insert,t2,t1);});
    var fromList = function (assocs) {
-      return A3($List.foldl,
-      F2(function (_p47,dict) {
-         var _p48 = _p47;
-         return A3(insert,_p48._0,_p48._1,dict);
-      }),
-      empty,
-      assocs);
+      return A3($List.foldl,F2(function (_p47,dict) {    var _p48 = _p47;return A3(insert,_p48._0,_p48._1,dict);}),empty,assocs);
    };
    var filter = F2(function (predicate,dictionary) {
-      var add = F3(function (key,value,dict) {
-         return A2(predicate,key,value) ? A3(insert,
-         key,
-         value,
-         dict) : dict;
-      });
+      var add = F3(function (key,value,dict) {    return A2(predicate,key,value) ? A3(insert,key,value,dict) : dict;});
       return A3(foldl,add,empty,dictionary);
    });
-   var intersect = F2(function (t1,t2) {
-      return A2(filter,
-      F2(function (k,_p49) {    return A2(member,k,t2);}),
-      t1);
-   });
+   var intersect = F2(function (t1,t2) {    return A2(filter,F2(function (k,_p49) {    return A2(member,k,t2);}),t1);});
    var partition = F2(function (predicate,dict) {
       var add = F3(function (key,value,_p50) {
          var _p51 = _p50;
          var _p53 = _p51._1;
          var _p52 = _p51._0;
-         return A2(predicate,key,value) ? {ctor: "_Tuple2"
-                                          ,_0: A3(insert,key,value,_p52)
-                                          ,_1: _p53} : {ctor: "_Tuple2"
-                                                       ,_0: _p52
-                                                       ,_1: A3(insert,key,value,_p53)};
+         return A2(predicate,key,value) ? {ctor: "_Tuple2",_0: A3(insert,key,value,_p52),_1: _p53} : {ctor: "_Tuple2",_0: _p52,_1: A3(insert,key,value,_p53)};
       });
       return A3(foldl,add,{ctor: "_Tuple2",_0: empty,_1: empty},dict);
    });
-   var remove = F2(function (key,dict) {
-      return A3(update,key,$Basics.always($Maybe.Nothing),dict);
-   });
-   var diff = F2(function (t1,t2) {
-      return A3(foldl,
-      F3(function (k,v,t) {    return A2(remove,k,t);}),
-      t1,
-      t2);
-   });
+   var remove = F2(function (key,dict) {    return A3(update,key,$Basics.always($Maybe.Nothing),dict);});
+   var diff = F2(function (t1,t2) {    return A3(foldl,F3(function (k,v,t) {    return A2(remove,k,t);}),t1,t2);});
    return _elm.Dict.values = {_op: _op
                              ,empty: empty
                              ,singleton: singleton
@@ -9619,9 +8540,7 @@ Elm.Json.Encode.make = function (_elm) {
    _elm.Json = _elm.Json || {};
    _elm.Json.Encode = _elm.Json.Encode || {};
    if (_elm.Json.Encode.values) return _elm.Json.Encode.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Array = Elm.Array.make(_elm),
-   $Native$Json = Elm.Native.Json.make(_elm);
+   var _U = Elm.Native.Utils.make(_elm),$Array = Elm.Array.make(_elm),$Native$Json = Elm.Native.Json.make(_elm);
    var _op = {};
    var list = $Native$Json.encodeList;
    var array = $Native$Json.encodeArray;
@@ -9693,17 +8612,10 @@ Elm.Json.Decode.make = function (_elm) {
    var object2 = $Native$Json.decodeObject2;
    var object1 = $Native$Json.decodeObject1;
    _op[":="] = $Native$Json.decodeField;
-   var at = F2(function (fields,decoder) {
-      return A3($List.foldr,
-      F2(function (x,y) {    return A2(_op[":="],x,y);}),
-      decoder,
-      fields);
-   });
+   var at = F2(function (fields,decoder) {    return A3($List.foldr,F2(function (x,y) {    return A2(_op[":="],x,y);}),decoder,fields);});
    var decodeString = $Native$Json.runDecoderString;
    var map = $Native$Json.decodeObject1;
-   var dict = function (decoder) {
-      return A2(map,$Dict.fromList,keyValuePairs(decoder));
-   };
+   var dict = function (decoder) {    return A2(map,$Dict.fromList,keyValuePairs(decoder));};
    var Decoder = {ctor: "Decoder"};
    return _elm.Json.Decode.values = {_op: _op
                                     ,decodeString: decodeString
@@ -9866,24 +8778,15 @@ Elm.Time.make = function (_elm) {
    var _op = {};
    var delay = $Native$Signal.delay;
    var since = F2(function (time,signal) {
-      var stop = A2($Signal.map,
-      $Basics.always(-1),
-      A2(delay,time,signal));
+      var stop = A2($Signal.map,$Basics.always(-1),A2(delay,time,signal));
       var start = A2($Signal.map,$Basics.always(1),signal);
-      var delaydiff = A3($Signal.foldp,
-      F2(function (x,y) {    return x + y;}),
-      0,
-      A2($Signal.merge,start,stop));
-      return A2($Signal.map,
-      F2(function (x,y) {    return !_U.eq(x,y);})(0),
-      delaydiff);
+      var delaydiff = A3($Signal.foldp,F2(function (x,y) {    return x + y;}),0,A2($Signal.merge,start,stop));
+      return A2($Signal.map,F2(function (x,y) {    return !_U.eq(x,y);})(0),delaydiff);
    });
    var timestamp = $Native$Signal.timestamp;
    var every = $Native$Time.every;
    var fpsWhen = $Native$Time.fpsWhen;
-   var fps = function (targetFrames) {
-      return A2(fpsWhen,targetFrames,$Signal.constant(true));
-   };
+   var fps = function (targetFrames) {    return A2(fpsWhen,targetFrames,$Signal.constant(true));};
    var inMilliseconds = function (t) {    return t;};
    var millisecond = 1;
    var second = 1000 * millisecond;
@@ -9913,98 +8816,31 @@ Elm.Set.make = function (_elm) {
    "use strict";
    _elm.Set = _elm.Set || {};
    if (_elm.Set.values) return _elm.Set.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $List = Elm.List.make(_elm);
+   var _U = Elm.Native.Utils.make(_elm),$Basics = Elm.Basics.make(_elm),$Dict = Elm.Dict.make(_elm),$List = Elm.List.make(_elm);
    var _op = {};
-   var foldr = F3(function (f,b,_p0) {
-      var _p1 = _p0;
-      return A3($Dict.foldr,
-      F3(function (k,_p2,b) {    return A2(f,k,b);}),
-      b,
-      _p1._0);
-   });
-   var foldl = F3(function (f,b,_p3) {
-      var _p4 = _p3;
-      return A3($Dict.foldl,
-      F3(function (k,_p5,b) {    return A2(f,k,b);}),
-      b,
-      _p4._0);
-   });
-   var toList = function (_p6) {
-      var _p7 = _p6;
-      return $Dict.keys(_p7._0);
-   };
-   var size = function (_p8) {
-      var _p9 = _p8;
-      return $Dict.size(_p9._0);
-   };
-   var member = F2(function (k,_p10) {
-      var _p11 = _p10;
-      return A2($Dict.member,k,_p11._0);
-   });
-   var isEmpty = function (_p12) {
-      var _p13 = _p12;
-      return $Dict.isEmpty(_p13._0);
-   };
-   var Set_elm_builtin = function (a) {
-      return {ctor: "Set_elm_builtin",_0: a};
-   };
+   var foldr = F3(function (f,b,_p0) {    var _p1 = _p0;return A3($Dict.foldr,F3(function (k,_p2,b) {    return A2(f,k,b);}),b,_p1._0);});
+   var foldl = F3(function (f,b,_p3) {    var _p4 = _p3;return A3($Dict.foldl,F3(function (k,_p5,b) {    return A2(f,k,b);}),b,_p4._0);});
+   var toList = function (_p6) {    var _p7 = _p6;return $Dict.keys(_p7._0);};
+   var size = function (_p8) {    var _p9 = _p8;return $Dict.size(_p9._0);};
+   var member = F2(function (k,_p10) {    var _p11 = _p10;return A2($Dict.member,k,_p11._0);});
+   var isEmpty = function (_p12) {    var _p13 = _p12;return $Dict.isEmpty(_p13._0);};
+   var Set_elm_builtin = function (a) {    return {ctor: "Set_elm_builtin",_0: a};};
    var empty = Set_elm_builtin($Dict.empty);
-   var singleton = function (k) {
-      return Set_elm_builtin(A2($Dict.singleton,
-      k,
-      {ctor: "_Tuple0"}));
-   };
-   var insert = F2(function (k,_p14) {
-      var _p15 = _p14;
-      return Set_elm_builtin(A3($Dict.insert,
-      k,
-      {ctor: "_Tuple0"},
-      _p15._0));
-   });
-   var fromList = function (xs) {
-      return A3($List.foldl,insert,empty,xs);
-   };
-   var map = F2(function (f,s) {
-      return fromList(A2($List.map,f,toList(s)));
-   });
-   var remove = F2(function (k,_p16) {
-      var _p17 = _p16;
-      return Set_elm_builtin(A2($Dict.remove,k,_p17._0));
-   });
-   var union = F2(function (_p19,_p18) {
-      var _p20 = _p19;
-      var _p21 = _p18;
-      return Set_elm_builtin(A2($Dict.union,_p20._0,_p21._0));
-   });
-   var intersect = F2(function (_p23,_p22) {
-      var _p24 = _p23;
-      var _p25 = _p22;
-      return Set_elm_builtin(A2($Dict.intersect,_p24._0,_p25._0));
-   });
-   var diff = F2(function (_p27,_p26) {
-      var _p28 = _p27;
-      var _p29 = _p26;
-      return Set_elm_builtin(A2($Dict.diff,_p28._0,_p29._0));
-   });
-   var filter = F2(function (p,_p30) {
-      var _p31 = _p30;
-      return Set_elm_builtin(A2($Dict.filter,
-      F2(function (k,_p32) {    return p(k);}),
-      _p31._0));
-   });
+   var singleton = function (k) {    return Set_elm_builtin(A2($Dict.singleton,k,{ctor: "_Tuple0"}));};
+   var insert = F2(function (k,_p14) {    var _p15 = _p14;return Set_elm_builtin(A3($Dict.insert,k,{ctor: "_Tuple0"},_p15._0));});
+   var fromList = function (xs) {    return A3($List.foldl,insert,empty,xs);};
+   var map = F2(function (f,s) {    return fromList(A2($List.map,f,toList(s)));});
+   var remove = F2(function (k,_p16) {    var _p17 = _p16;return Set_elm_builtin(A2($Dict.remove,k,_p17._0));});
+   var union = F2(function (_p19,_p18) {    var _p20 = _p19;var _p21 = _p18;return Set_elm_builtin(A2($Dict.union,_p20._0,_p21._0));});
+   var intersect = F2(function (_p23,_p22) {    var _p24 = _p23;var _p25 = _p22;return Set_elm_builtin(A2($Dict.intersect,_p24._0,_p25._0));});
+   var diff = F2(function (_p27,_p26) {    var _p28 = _p27;var _p29 = _p26;return Set_elm_builtin(A2($Dict.diff,_p28._0,_p29._0));});
+   var filter = F2(function (p,_p30) {    var _p31 = _p30;return Set_elm_builtin(A2($Dict.filter,F2(function (k,_p32) {    return p(k);}),_p31._0));});
    var partition = F2(function (p,_p33) {
       var _p34 = _p33;
-      var _p35 = A2($Dict.partition,
-      F2(function (k,_p36) {    return p(k);}),
-      _p34._0);
+      var _p35 = A2($Dict.partition,F2(function (k,_p36) {    return p(k);}),_p34._0);
       var p1 = _p35._0;
       var p2 = _p35._1;
-      return {ctor: "_Tuple2"
-             ,_0: Set_elm_builtin(p1)
-             ,_1: Set_elm_builtin(p2)};
+      return {ctor: "_Tuple2",_0: Set_elm_builtin(p1),_1: Set_elm_builtin(p2)};
    });
    return _elm.Set.values = {_op: _op
                             ,empty: empty
@@ -10041,33 +8877,16 @@ Elm.List.Extra.make = function (_elm) {
    $Set = Elm.Set.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var zip5 = $List.map5(F5(function (v0,v1,v2,v3,v4) {
-      return {ctor: "_Tuple5",_0: v0,_1: v1,_2: v2,_3: v3,_4: v4};
-   }));
-   var zip4 = $List.map4(F4(function (v0,v1,v2,v3) {
-      return {ctor: "_Tuple4",_0: v0,_1: v1,_2: v2,_3: v3};
-   }));
-   var zip3 = $List.map3(F3(function (v0,v1,v2) {
-      return {ctor: "_Tuple3",_0: v0,_1: v1,_2: v2};
-   }));
-   var zip = $List.map2(F2(function (v0,v1) {
-      return {ctor: "_Tuple2",_0: v0,_1: v1};
-   }));
+   var zip5 = $List.map5(F5(function (v0,v1,v2,v3,v4) {    return {ctor: "_Tuple5",_0: v0,_1: v1,_2: v2,_3: v3,_4: v4};}));
+   var zip4 = $List.map4(F4(function (v0,v1,v2,v3) {    return {ctor: "_Tuple4",_0: v0,_1: v1,_2: v2,_3: v3};}));
+   var zip3 = $List.map3(F3(function (v0,v1,v2) {    return {ctor: "_Tuple3",_0: v0,_1: v1,_2: v2};}));
+   var zip = $List.map2(F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}));
    var isPrefixOf = function (prefix) {
       return function (_p0) {
-         return A2($List.all,
-         $Basics.identity,
-         A3($List.map2,
-         F2(function (x,y) {    return _U.eq(x,y);}),
-         prefix,
-         _p0));
+         return A2($List.all,$Basics.identity,A3($List.map2,F2(function (x,y) {    return _U.eq(x,y);}),prefix,_p0));
       };
    };
-   var isSuffixOf = F2(function (suffix,xs) {
-      return A2(isPrefixOf,
-      $List.reverse(suffix),
-      $List.reverse(xs));
-   });
+   var isSuffixOf = F2(function (suffix,xs) {    return A2(isPrefixOf,$List.reverse(suffix),$List.reverse(xs));});
    var selectSplit = function (xs) {
       var _p1 = xs;
       if (_p1.ctor === "[]") {
@@ -10080,10 +8899,7 @@ Elm.List.Extra.make = function (_elm) {
             A2($List.map,
             function (_p2) {
                var _p3 = _p2;
-               return {ctor: "_Tuple3"
-                      ,_0: A2($List._op["::"],_p4,_p3._0)
-                      ,_1: _p3._1
-                      ,_2: _p3._2};
+               return {ctor: "_Tuple3",_0: A2($List._op["::"],_p4,_p3._0),_1: _p3._1,_2: _p3._2};
             },
             selectSplit(_p5)));
          }
@@ -10097,39 +8913,22 @@ Elm.List.Extra.make = function (_elm) {
             var _p9 = _p6._0;
             return A2($List._op["::"],
             {ctor: "_Tuple2",_0: _p9,_1: _p10},
-            A2($List.map,
-            function (_p7) {
-               var _p8 = _p7;
-               return {ctor: "_Tuple2"
-                      ,_0: _p8._0
-                      ,_1: A2($List._op["::"],_p9,_p8._1)};
-            },
-            select(_p10)));
+            A2($List.map,function (_p7) {    var _p8 = _p7;return {ctor: "_Tuple2",_0: _p8._0,_1: A2($List._op["::"],_p9,_p8._1)};},select(_p10)));
          }
    };
    var tailsHelp = F2(function (e,list) {
       var _p11 = list;
       if (_p11.ctor === "::") {
             var _p12 = _p11._0;
-            return A2($List._op["::"],
-            A2($List._op["::"],e,_p12),
-            A2($List._op["::"],_p12,_p11._1));
+            return A2($List._op["::"],A2($List._op["::"],e,_p12),A2($List._op["::"],_p12,_p11._1));
          } else {
             return _U.list([]);
          }
    });
    var tails = A2($List.foldr,tailsHelp,_U.list([_U.list([])]));
-   var isInfixOf = F2(function (infix,xs) {
-      return A2($List.any,isPrefixOf(infix),tails(xs));
-   });
+   var isInfixOf = F2(function (infix,xs) {    return A2($List.any,isPrefixOf(infix),tails(xs));});
    var inits = A2($List.foldr,
-   F2(function (e,acc) {
-      return A2($List._op["::"],
-      _U.list([]),
-      A2($List.map,
-      F2(function (x,y) {    return A2($List._op["::"],x,y);})(e),
-      acc));
-   }),
+   F2(function (e,acc) {    return A2($List._op["::"],_U.list([]),A2($List.map,F2(function (x,y) {    return A2($List._op["::"],x,y);})(e),acc));}),
    _U.list([_U.list([])]));
    var groupByTransitive = F2(function (cmp,xs$) {
       var _p13 = xs$;
@@ -10142,9 +8941,9 @@ Elm.List.Extra.make = function (_elm) {
                   var _p15 = _p13._0;
                   var _p14 = A2(groupByTransitive,cmp,_p13._1);
                   if (_p14.ctor === "::") {
-                        return A2(cmp,_p15,_p13._1._0) ? A2($List._op["::"],
-                        A2($List._op["::"],_p15,_p14._0),
-                        _p14._1) : A2($List._op["::"],_U.list([_p15]),_p14);
+                        return A2(cmp,_p15,_p13._1._0) ? A2($List._op["::"],A2($List._op["::"],_p15,_p14._0),_p14._1) : A2($List._op["::"],
+                        _U.list([_p15]),
+                        _p14);
                      } else {
                         return _U.list([]);
                      }
@@ -10160,50 +8959,32 @@ Elm.List.Extra.make = function (_elm) {
                if (_p16._0.ctor === "[]") {
                      return $Maybe.Nothing;
                   } else {
-                     return _U.eq(e,
-                     _p16._0._0) ? $Maybe.Just(_p16._0._1) : $Maybe.Nothing;
+                     return _U.eq(e,_p16._0._0) ? $Maybe.Just(_p16._0._1) : $Maybe.Nothing;
                   }
             }
       });
       return A3($List.foldl,step,$Maybe.Just(xs),prefix);
    });
    var dropWhileEnd = function (p) {
-      return A2($List.foldr,
-      F2(function (x,xs) {
-         return p(x) && $List.isEmpty(xs) ? _U.list([]) : A2($List._op["::"],
-         x,
-         xs);
-      }),
-      _U.list([]));
+      return A2($List.foldr,F2(function (x,xs) {    return p(x) && $List.isEmpty(xs) ? _U.list([]) : A2($List._op["::"],x,xs);}),_U.list([]));
    };
    var takeWhileEnd = function (p) {
       var step = F2(function (x,_p17) {
          var _p18 = _p17;
          var _p19 = _p18._0;
-         return p(x) && _p18._1 ? {ctor: "_Tuple2"
-                                  ,_0: A2($List._op["::"],x,_p19)
-                                  ,_1: true} : {ctor: "_Tuple2",_0: _p19,_1: false};
+         return p(x) && _p18._1 ? {ctor: "_Tuple2",_0: A2($List._op["::"],x,_p19),_1: true} : {ctor: "_Tuple2",_0: _p19,_1: false};
       });
       return function (_p20) {
-         return $Basics.fst(A3($List.foldr,
-         step,
-         {ctor: "_Tuple2",_0: _U.list([]),_1: true},
-         _p20));
+         return $Basics.fst(A3($List.foldr,step,{ctor: "_Tuple2",_0: _U.list([]),_1: true},_p20));
       };
    };
-   var splitAt = F2(function (n,xs) {
-      return {ctor: "_Tuple2"
-             ,_0: A2($List.take,n,xs)
-             ,_1: A2($List.drop,n,xs)};
-   });
+   var splitAt = F2(function (n,xs) {    return {ctor: "_Tuple2",_0: A2($List.take,n,xs),_1: A2($List.drop,n,xs)};});
    var unfoldr = F2(function (f,seed) {
       var _p21 = f(seed);
       if (_p21.ctor === "Nothing") {
             return _U.list([]);
          } else {
-            return A2($List._op["::"],
-            _p21._0._0,
-            A2(unfoldr,f,_p21._0._1));
+            return A2($List._op["::"],_p21._0._0,A2(unfoldr,f,_p21._0._1));
          }
    });
    var scanr1 = F2(function (f,xs$) {
@@ -10246,27 +9027,13 @@ Elm.List.Extra.make = function (_elm) {
    });
    var foldr1 = F2(function (f,xs) {
       var mf = F2(function (x,m) {
-         return $Maybe.Just(function () {
-            var _p27 = m;
-            if (_p27.ctor === "Nothing") {
-                  return x;
-               } else {
-                  return A2(f,x,_p27._0);
-               }
-         }());
+         return $Maybe.Just(function () {    var _p27 = m;if (_p27.ctor === "Nothing") {    return x;} else {    return A2(f,x,_p27._0);}}());
       });
       return A3($List.foldr,mf,$Maybe.Nothing,xs);
    });
    var foldl1 = F2(function (f,xs) {
       var mf = F2(function (x,m) {
-         return $Maybe.Just(function () {
-            var _p28 = m;
-            if (_p28.ctor === "Nothing") {
-                  return x;
-               } else {
-                  return A2(f,_p28._0,x);
-               }
-         }());
+         return $Maybe.Just(function () {    var _p28 = m;if (_p28.ctor === "Nothing") {    return x;} else {    return A2(f,_p28._0,x);}}());
       });
       return A3($List.foldl,mf,$Maybe.Nothing,xs);
    });
@@ -10283,26 +9050,18 @@ Elm.List.Extra.make = function (_elm) {
                      existing = _v18;
                      remaining = _v19;
                      continue uniqueHelp;
-                  } else return A2($List._op["::"],
-                  _p30,
-                  A2(uniqueHelp,A2($Set.insert,_p30,existing),_p31));
+                  } else return A2($List._op["::"],_p30,A2(uniqueHelp,A2($Set.insert,_p30,existing),_p31));
             }
       }
    });
-   var unique = function (list) {
-      return A2(uniqueHelp,$Set.empty,list);
-   };
+   var unique = function (list) {    return A2(uniqueHelp,$Set.empty,list);};
    var interweaveHelp = F3(function (l1,l2,acc) {
       interweaveHelp: while (true) {
          var _p32 = {ctor: "_Tuple2",_0: l1,_1: l2};
          _v20_1: do {
             if (_p32._0.ctor === "::") {
                   if (_p32._1.ctor === "::") {
-                        var _v21 = _p32._0._1,
-                        _v22 = _p32._1._1,
-                        _v23 = A2($Basics._op["++"],
-                        acc,
-                        _U.list([_p32._0._0,_p32._1._0]));
+                        var _v21 = _p32._0._1,_v22 = _p32._1._1,_v23 = A2($Basics._op["++"],acc,_U.list([_p32._0._0,_p32._1._0]));
                         l1 = _v21;
                         l2 = _v22;
                         acc = _v23;
@@ -10321,9 +9080,7 @@ Elm.List.Extra.make = function (_elm) {
          return A2($Basics._op["++"],acc,_p32._0);
       }
    });
-   var interweave = F2(function (l1,l2) {
-      return A3(interweaveHelp,l1,l2,_U.list([]));
-   });
+   var interweave = F2(function (l1,l2) {    return A3(interweaveHelp,l1,l2,_U.list([]));});
    var permutations = function (xs$) {
       var _p33 = xs$;
       if (_p33.ctor === "[]") {
@@ -10331,42 +9088,24 @@ Elm.List.Extra.make = function (_elm) {
          } else {
             var f = function (_p34) {
                var _p35 = _p34;
-               return A2($List.map,
-               F2(function (x,y) {
-                  return A2($List._op["::"],x,y);
-               })(_p35._0),
-               permutations(_p35._1));
+               return A2($List.map,F2(function (x,y) {    return A2($List._op["::"],x,y);})(_p35._0),permutations(_p35._1));
             };
             return A2($List.concatMap,f,select(_p33));
          }
    };
-   var isPermutationOf = F2(function (permut,xs) {
-      return A2($List.member,permut,permutations(xs));
-   });
+   var isPermutationOf = F2(function (permut,xs) {    return A2($List.member,permut,permutations(xs));});
    var subsequencesNonEmpty = function (xs) {
       var _p36 = xs;
       if (_p36.ctor === "[]") {
             return _U.list([]);
          } else {
             var _p37 = _p36._0;
-            var f = F2(function (ys,r) {
-               return A2($List._op["::"],
-               ys,
-               A2($List._op["::"],A2($List._op["::"],_p37,ys),r));
-            });
-            return A2($List._op["::"],
-            _U.list([_p37]),
-            A3($List.foldr,f,_U.list([]),subsequencesNonEmpty(_p36._1)));
+            var f = F2(function (ys,r) {    return A2($List._op["::"],ys,A2($List._op["::"],A2($List._op["::"],_p37,ys),r));});
+            return A2($List._op["::"],_U.list([_p37]),A3($List.foldr,f,_U.list([]),subsequencesNonEmpty(_p36._1)));
          }
    };
-   var subsequences = function (xs) {
-      return A2($List._op["::"],
-      _U.list([]),
-      subsequencesNonEmpty(xs));
-   };
-   var isSubsequenceOf = F2(function (subseq,xs) {
-      return A2($List.member,subseq,subsequences(xs));
-   });
+   var subsequences = function (xs) {    return A2($List._op["::"],_U.list([]),subsequencesNonEmpty(xs));};
+   var isSubsequenceOf = F2(function (subseq,xs) {    return A2($List.member,subseq,subsequences(xs));});
    var transpose = function (ll) {
       transpose: while (true) {
          var _p38 = ll;
@@ -10381,32 +9120,16 @@ Elm.List.Extra.make = function (_elm) {
                      var _p39 = _p38._1;
                      var tails = A2($List.filterMap,$List.tail,_p39);
                      var heads = A2($List.filterMap,$List.head,_p39);
-                     return A2($List._op["::"],
-                     A2($List._op["::"],_p38._0._0,heads),
-                     transpose(A2($List._op["::"],_p38._0._1,tails)));
+                     return A2($List._op["::"],A2($List._op["::"],_p38._0._0,heads),transpose(A2($List._op["::"],_p38._0._1,tails)));
                   }
             }
       }
    };
-   var intercalate = function (xs) {
-      return function (_p40) {
-         return $List.concat(A2($List.intersperse,xs,_p40));
-      };
-   };
-   var removeWhen = F2(function (pred,list) {
-      return A2($List.filter,
-      function (_p41) {
-         return $Basics.not(pred(_p41));
-      },
-      list);
-   });
+   var intercalate = function (xs) {    return function (_p40) {    return $List.concat(A2($List.intersperse,xs,_p40));};};
+   var removeWhen = F2(function (pred,list) {    return A2($List.filter,function (_p41) {    return $Basics.not(pred(_p41));},list);});
    var singleton = function (x) {    return _U.list([x]);};
    var replaceIf = F3(function (predicate,replacement,list) {
-      return A2($List.map,
-      function (item) {
-         return predicate(item) ? replacement : item;
-      },
-      list);
+      return A2($List.map,function (item) {    return predicate(item) ? replacement : item;},list);
    });
    var findIndices = function (p) {
       return function (_p42) {
@@ -10417,28 +9140,12 @@ Elm.List.Extra.make = function (_elm) {
             var _p44 = _p43;
             return p(_p44._1);
          },
-         A2($List.indexedMap,
-         F2(function (v0,v1) {
-            return {ctor: "_Tuple2",_0: v0,_1: v1};
-         }),
-         _p42)));
+         A2($List.indexedMap,F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),_p42)));
       };
    };
-   var findIndex = function (p) {
-      return function (_p45) {
-         return $List.head(A2(findIndices,p,_p45));
-      };
-   };
-   var elemIndices = function (x) {
-      return findIndices(F2(function (x,y) {
-         return _U.eq(x,y);
-      })(x));
-   };
-   var elemIndex = function (x) {
-      return findIndex(F2(function (x,y) {
-         return _U.eq(x,y);
-      })(x));
-   };
+   var findIndex = function (p) {    return function (_p45) {    return $List.head(A2(findIndices,p,_p45));};};
+   var elemIndices = function (x) {    return findIndices(F2(function (x,y) {    return _U.eq(x,y);})(x));};
+   var elemIndex = function (x) {    return findIndex(F2(function (x,y) {    return _U.eq(x,y);})(x));};
    var find = F2(function (predicate,list) {
       find: while (true) {
          var _p46 = list;
@@ -10455,36 +9162,14 @@ Elm.List.Extra.make = function (_elm) {
             }
       }
    });
-   var notMember = function (x) {
-      return function (_p48) {
-         return $Basics.not(A2($List.member,x,_p48));
-      };
-   };
+   var notMember = function (x) {    return function (_p48) {    return $Basics.not(A2($List.member,x,_p48));};};
    var andThen = $Basics.flip($List.concatMap);
-   var lift2 = F3(function (f,la,lb) {
-      return A2(andThen,
-      la,
-      function (a) {
-         return A2(andThen,
-         lb,
-         function (b) {
-            return _U.list([A2(f,a,b)]);
-         });
-      });
-   });
+   var lift2 = F3(function (f,la,lb) {    return A2(andThen,la,function (a) {    return A2(andThen,lb,function (b) {    return _U.list([A2(f,a,b)]);});});});
    var lift3 = F4(function (f,la,lb,lc) {
       return A2(andThen,
       la,
       function (a) {
-         return A2(andThen,
-         lb,
-         function (b) {
-            return A2(andThen,
-            lc,
-            function (c) {
-               return _U.list([A3(f,a,b,c)]);
-            });
-         });
+         return A2(andThen,lb,function (b) {    return A2(andThen,lc,function (c) {    return _U.list([A3(f,a,b,c)]);});});
       });
    });
    var lift4 = F5(function (f,la,lb,lc,ld) {
@@ -10494,39 +9179,21 @@ Elm.List.Extra.make = function (_elm) {
          return A2(andThen,
          lb,
          function (b) {
-            return A2(andThen,
-            lc,
-            function (c) {
-               return A2(andThen,
-               ld,
-               function (d) {
-                  return _U.list([A4(f,a,b,c,d)]);
-               });
-            });
+            return A2(andThen,lc,function (c) {    return A2(andThen,ld,function (d) {    return _U.list([A4(f,a,b,c,d)]);});});
          });
       });
    });
-   var andMap = F2(function (fl,l) {
-      return A3($List.map2,
-      F2(function (x,y) {    return x(y);}),
-      fl,
-      l);
-   });
+   var andMap = F2(function (fl,l) {    return A3($List.map2,F2(function (x,y) {    return x(y);}),fl,l);});
    var dropDuplicates = function (list) {
       var step = F2(function (next,_p49) {
          var _p50 = _p49;
          var _p52 = _p50._0;
          var _p51 = _p50._1;
-         return A2($Set.member,next,_p52) ? {ctor: "_Tuple2"
-                                            ,_0: _p52
-                                            ,_1: _p51} : {ctor: "_Tuple2"
-                                                         ,_0: A2($Set.insert,next,_p52)
-                                                         ,_1: A2($List._op["::"],next,_p51)};
+         return A2($Set.member,next,_p52) ? {ctor: "_Tuple2",_0: _p52,_1: _p51} : {ctor: "_Tuple2"
+                                                                                  ,_0: A2($Set.insert,next,_p52)
+                                                                                  ,_1: A2($List._op["::"],next,_p51)};
       });
-      return $List.reverse($Basics.snd(A3($List.foldl,
-      step,
-      {ctor: "_Tuple2",_0: $Set.empty,_1: _U.list([])},
-      list)));
+      return $List.reverse($Basics.snd(A3($List.foldl,step,{ctor: "_Tuple2",_0: $Set.empty,_1: _U.list([])},list)));
    };
    var dropWhile = F2(function (predicate,list) {
       dropWhile: while (true) {
@@ -10549,21 +9216,11 @@ Elm.List.Extra.make = function (_elm) {
             return _U.list([]);
          } else {
             var _p55 = _p54._0;
-            return predicate(_p55) ? A2($List._op["::"],
-            _p55,
-            A2(takeWhile,predicate,_p54._1)) : _U.list([]);
+            return predicate(_p55) ? A2($List._op["::"],_p55,A2(takeWhile,predicate,_p54._1)) : _U.list([]);
          }
    });
-   var span = F2(function (p,xs) {
-      return {ctor: "_Tuple2"
-             ,_0: A2(takeWhile,p,xs)
-             ,_1: A2(dropWhile,p,xs)};
-   });
-   var $break = function (p) {
-      return span(function (_p56) {
-         return $Basics.not(p(_p56));
-      });
-   };
+   var span = F2(function (p,xs) {    return {ctor: "_Tuple2",_0: A2(takeWhile,p,xs),_1: A2(dropWhile,p,xs)};});
+   var $break = function (p) {    return span(function (_p56) {    return $Basics.not(p(_p56));});};
    var groupBy = F2(function (eq,xs$) {
       var _p57 = xs$;
       if (_p57.ctor === "[]") {
@@ -10573,22 +9230,16 @@ Elm.List.Extra.make = function (_elm) {
             var _p58 = A2(span,eq(_p59),_p57._1);
             var ys = _p58._0;
             var zs = _p58._1;
-            return A2($List._op["::"],
-            A2($List._op["::"],_p59,ys),
-            A2(groupBy,eq,zs));
+            return A2($List._op["::"],A2($List._op["::"],_p59,ys),A2(groupBy,eq,zs));
          }
    });
-   var group = groupBy(F2(function (x,y) {
-      return _U.eq(x,y);
-   }));
+   var group = groupBy(F2(function (x,y) {    return _U.eq(x,y);}));
    var minimumBy = F2(function (f,ls) {
       var minBy = F2(function (x,_p60) {
          var _p61 = _p60;
          var _p62 = _p61._1;
          var fx = f(x);
-         return _U.cmp(fx,_p62) < 0 ? {ctor: "_Tuple2"
-                                      ,_0: x
-                                      ,_1: fx} : {ctor: "_Tuple2",_0: _p61._0,_1: _p62};
+         return _U.cmp(fx,_p62) < 0 ? {ctor: "_Tuple2",_0: x,_1: fx} : {ctor: "_Tuple2",_0: _p61._0,_1: _p62};
       });
       var _p63 = ls;
       if (_p63.ctor === "::") {
@@ -10596,10 +9247,7 @@ Elm.List.Extra.make = function (_elm) {
                   return $Maybe.Just(_p63._0);
                } else {
                   var _p64 = _p63._0;
-                  return $Maybe.Just($Basics.fst(A3($List.foldl,
-                  minBy,
-                  {ctor: "_Tuple2",_0: _p64,_1: f(_p64)},
-                  _p63._1)));
+                  return $Maybe.Just($Basics.fst(A3($List.foldl,minBy,{ctor: "_Tuple2",_0: _p64,_1: f(_p64)},_p63._1)));
                }
          } else {
             return $Maybe.Nothing;
@@ -10610,9 +9258,7 @@ Elm.List.Extra.make = function (_elm) {
          var _p66 = _p65;
          var _p67 = _p66._1;
          var fx = f(x);
-         return _U.cmp(fx,_p67) > 0 ? {ctor: "_Tuple2"
-                                      ,_0: x
-                                      ,_1: fx} : {ctor: "_Tuple2",_0: _p66._0,_1: _p67};
+         return _U.cmp(fx,_p67) > 0 ? {ctor: "_Tuple2",_0: x,_1: fx} : {ctor: "_Tuple2",_0: _p66._0,_1: _p67};
       });
       var _p68 = ls;
       if (_p68.ctor === "::") {
@@ -10620,10 +9266,7 @@ Elm.List.Extra.make = function (_elm) {
                   return $Maybe.Just(_p68._0);
                } else {
                   var _p69 = _p68._0;
-                  return $Maybe.Just($Basics.fst(A3($List.foldl,
-                  maxBy,
-                  {ctor: "_Tuple2",_0: _p69,_1: f(_p69)},
-                  _p68._1)));
+                  return $Maybe.Just($Basics.fst(A3($List.foldl,maxBy,{ctor: "_Tuple2",_0: _p69,_1: f(_p69)},_p68._1)));
                }
          } else {
             return $Maybe.Nothing;
@@ -10634,9 +9277,7 @@ Elm.List.Extra.make = function (_elm) {
       if (_p70.ctor === "[]") {
             return $Maybe.Nothing;
          } else {
-            return $Maybe.Just({ctor: "_Tuple2"
-                               ,_0: _p70._0
-                               ,_1: _p70._1});
+            return $Maybe.Just({ctor: "_Tuple2",_0: _p70._0,_1: _p70._1});
          }
    };
    var iterate = F2(function (f,x) {
@@ -10647,29 +9288,15 @@ Elm.List.Extra.make = function (_elm) {
             return _U.list([x]);
          }
    });
-   var getAt = F2(function (xs,idx) {
-      return $List.head(A2($List.drop,idx,xs));
-   });
+   var getAt = F2(function (xs,idx) {    return $List.head(A2($List.drop,idx,xs));});
    _op["!!"] = getAt;
    var init = function () {
-      var maybe = F2(function (d,f) {
-         return function (_p72) {
-            return A2($Maybe.withDefault,d,A2($Maybe.map,f,_p72));
-         };
-      });
+      var maybe = F2(function (d,f) {    return function (_p72) {    return A2($Maybe.withDefault,d,A2($Maybe.map,f,_p72));};});
       return A2($List.foldr,
       function (_p73) {
-         return A2(F2(function (x,y) {
-            return function (_p74) {
-               return x(y(_p74));
-            };
-         }),
+         return A2(F2(function (x,y) {    return function (_p74) {    return x(y(_p74));};}),
          $Maybe.Just,
-         A2(maybe,
-         _U.list([]),
-         F2(function (x,y) {
-            return A2($List._op["::"],x,y);
-         })(_p73)));
+         A2(maybe,_U.list([]),F2(function (x,y) {    return A2($List._op["::"],x,y);})(_p73)));
       },
       $Maybe.Nothing);
    }();
@@ -10891,9 +9518,7 @@ Elm.Effects.make = function (_elm) {
    $Task = Elm.Task.make(_elm),
    $Time = Elm.Time.make(_elm);
    var _op = {};
-   var ignore = function (task) {
-      return A2($Task.map,$Basics.always({ctor: "_Tuple0"}),task);
-   };
+   var ignore = function (task) {    return A2($Task.map,$Basics.always({ctor: "_Tuple0"}),task);};
    var requestTickSending = $Native$Effects.requestTickSending;
    var toTaskHelp = F3(function (address,effect,_p0) {
       var _p1 = _p0;
@@ -10902,34 +9527,17 @@ Elm.Effects.make = function (_elm) {
       var _p3 = _p1._0;
       var _p2 = effect;
       switch (_p2.ctor)
-      {case "Task": var reporter = A2($Task.andThen,
-           _p2._0,
-           function (answer) {
-              return A2($Signal.send,address,_U.list([answer]));
-           });
-           return {ctor: "_Tuple2"
-                  ,_0: A2($Task.andThen,
-                  _p3,
-                  $Basics.always(ignore($Task.spawn(reporter))))
-                  ,_1: _p5};
-         case "Tick": return {ctor: "_Tuple2"
-                             ,_0: _p3
-                             ,_1: A2($List._op["::"],_p2._0,_p5)};
+      {case "Task": var reporter = A2($Task.andThen,_p2._0,function (answer) {    return A2($Signal.send,address,_U.list([answer]));});
+           return {ctor: "_Tuple2",_0: A2($Task.andThen,_p3,$Basics.always(ignore($Task.spawn(reporter)))),_1: _p5};
+         case "Tick": return {ctor: "_Tuple2",_0: _p3,_1: A2($List._op["::"],_p2._0,_p5)};
          case "None": return _p4;
          default: return A3($List.foldl,toTaskHelp(address),_p4,_p2._0);}
    });
    var toTask = F2(function (address,effect) {
-      var _p6 = A3(toTaskHelp,
-      address,
-      effect,
-      {ctor: "_Tuple2"
-      ,_0: $Task.succeed({ctor: "_Tuple0"})
-      ,_1: _U.list([])});
+      var _p6 = A3(toTaskHelp,address,effect,{ctor: "_Tuple2",_0: $Task.succeed({ctor: "_Tuple0"}),_1: _U.list([])});
       var combinedTask = _p6._0;
       var tickMessages = _p6._1;
-      return $List.isEmpty(tickMessages) ? combinedTask : A2($Task.andThen,
-      combinedTask,
-      $Basics.always(A2(requestTickSending,address,tickMessages)));
+      return $List.isEmpty(tickMessages) ? combinedTask : A2($Task.andThen,combinedTask,$Basics.always(A2(requestTickSending,address,tickMessages)));
    });
    var Never = function (a) {    return {ctor: "Never",_0: a};};
    var Batch = function (a) {    return {ctor: "Batch",_0: a};};
@@ -10944,19 +9552,11 @@ Elm.Effects.make = function (_elm) {
       var _p7 = effect;
       switch (_p7.ctor)
       {case "Task": return Task(A2($Task.map,func,_p7._0));
-         case "Tick": return Tick(function (_p8) {
-              return func(_p7._0(_p8));
-           });
+         case "Tick": return Tick(function (_p8) {    return func(_p7._0(_p8));});
          case "None": return None;
          default: return Batch(A2($List.map,map(func),_p7._0));}
    });
-   return _elm.Effects.values = {_op: _op
-                                ,none: none
-                                ,task: task
-                                ,tick: tick
-                                ,map: map
-                                ,batch: batch
-                                ,toTask: toTask};
+   return _elm.Effects.values = {_op: _op,none: none,task: task,tick: tick,map: map,batch: batch,toTask: toTask};
 };
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
@@ -12572,19 +11172,10 @@ Elm.VirtualDom.make = function (_elm) {
    var lazy3 = $Native$VirtualDom.lazy3;
    var lazy2 = $Native$VirtualDom.lazy2;
    var lazy = $Native$VirtualDom.lazy;
-   var defaultOptions = {stopPropagation: false
-                        ,preventDefault: false};
-   var Options = F2(function (a,b) {
-      return {stopPropagation: a,preventDefault: b};
-   });
+   var defaultOptions = {stopPropagation: false,preventDefault: false};
+   var Options = F2(function (a,b) {    return {stopPropagation: a,preventDefault: b};});
    var onWithOptions = $Native$VirtualDom.on;
-   var on = F3(function (eventName,decoder,toMessage) {
-      return A4($Native$VirtualDom.on,
-      eventName,
-      defaultOptions,
-      decoder,
-      toMessage);
-   });
+   var on = F3(function (eventName,decoder,toMessage) {    return A4($Native$VirtualDom.on,eventName,defaultOptions,decoder,toMessage);});
    var attributeNS = $Native$VirtualDom.attributeNS;
    var attribute = $Native$VirtualDom.attribute;
    var property = $Native$VirtualDom.property;
@@ -12839,8 +11430,7 @@ Elm.Html.Attributes.make = function (_elm) {
    "use strict";
    _elm.Html = _elm.Html || {};
    _elm.Html.Attributes = _elm.Html.Attributes || {};
-   if (_elm.Html.Attributes.values)
-   return _elm.Html.Attributes.values;
+   if (_elm.Html.Attributes.values) return _elm.Html.Attributes.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -12854,313 +11444,108 @@ Elm.Html.Attributes.make = function (_elm) {
    $VirtualDom = Elm.VirtualDom.make(_elm);
    var _op = {};
    var attribute = $VirtualDom.attribute;
-   var contextmenu = function (value) {
-      return A2(attribute,"contextmenu",value);
-   };
+   var contextmenu = function (value) {    return A2(attribute,"contextmenu",value);};
    var property = $VirtualDom.property;
-   var stringProperty = F2(function (name,string) {
-      return A2(property,name,$Json$Encode.string(string));
-   });
-   var $class = function (name) {
-      return A2(stringProperty,"className",name);
-   };
-   var id = function (name) {
-      return A2(stringProperty,"id",name);
-   };
-   var title = function (name) {
-      return A2(stringProperty,"title",name);
-   };
-   var accesskey = function ($char) {
-      return A2(stringProperty,
-      "accessKey",
-      $String.fromChar($char));
-   };
-   var dir = function (value) {
-      return A2(stringProperty,"dir",value);
-   };
-   var draggable = function (value) {
-      return A2(stringProperty,"draggable",value);
-   };
-   var dropzone = function (value) {
-      return A2(stringProperty,"dropzone",value);
-   };
-   var itemprop = function (value) {
-      return A2(stringProperty,"itemprop",value);
-   };
-   var lang = function (value) {
-      return A2(stringProperty,"lang",value);
-   };
-   var tabindex = function (n) {
-      return A2(stringProperty,"tabIndex",$Basics.toString(n));
-   };
-   var charset = function (value) {
-      return A2(stringProperty,"charset",value);
-   };
-   var content = function (value) {
-      return A2(stringProperty,"content",value);
-   };
-   var httpEquiv = function (value) {
-      return A2(stringProperty,"httpEquiv",value);
-   };
-   var language = function (value) {
-      return A2(stringProperty,"language",value);
-   };
-   var src = function (value) {
-      return A2(stringProperty,"src",value);
-   };
-   var height = function (value) {
-      return A2(stringProperty,"height",$Basics.toString(value));
-   };
-   var width = function (value) {
-      return A2(stringProperty,"width",$Basics.toString(value));
-   };
-   var alt = function (value) {
-      return A2(stringProperty,"alt",value);
-   };
-   var preload = function (value) {
-      return A2(stringProperty,"preload",value);
-   };
-   var poster = function (value) {
-      return A2(stringProperty,"poster",value);
-   };
-   var kind = function (value) {
-      return A2(stringProperty,"kind",value);
-   };
-   var srclang = function (value) {
-      return A2(stringProperty,"srclang",value);
-   };
-   var sandbox = function (value) {
-      return A2(stringProperty,"sandbox",value);
-   };
-   var srcdoc = function (value) {
-      return A2(stringProperty,"srcdoc",value);
-   };
-   var type$ = function (value) {
-      return A2(stringProperty,"type",value);
-   };
-   var value = function (value) {
-      return A2(stringProperty,"value",value);
-   };
-   var placeholder = function (value) {
-      return A2(stringProperty,"placeholder",value);
-   };
-   var accept = function (value) {
-      return A2(stringProperty,"accept",value);
-   };
-   var acceptCharset = function (value) {
-      return A2(stringProperty,"acceptCharset",value);
-   };
-   var action = function (value) {
-      return A2(stringProperty,"action",value);
-   };
-   var autocomplete = function (bool) {
-      return A2(stringProperty,"autocomplete",bool ? "on" : "off");
-   };
-   var autosave = function (value) {
-      return A2(stringProperty,"autosave",value);
-   };
-   var enctype = function (value) {
-      return A2(stringProperty,"enctype",value);
-   };
-   var formaction = function (value) {
-      return A2(stringProperty,"formAction",value);
-   };
-   var list = function (value) {
-      return A2(stringProperty,"list",value);
-   };
-   var minlength = function (n) {
-      return A2(stringProperty,"minLength",$Basics.toString(n));
-   };
-   var maxlength = function (n) {
-      return A2(stringProperty,"maxLength",$Basics.toString(n));
-   };
-   var method = function (value) {
-      return A2(stringProperty,"method",value);
-   };
-   var name = function (value) {
-      return A2(stringProperty,"name",value);
-   };
-   var pattern = function (value) {
-      return A2(stringProperty,"pattern",value);
-   };
-   var size = function (n) {
-      return A2(stringProperty,"size",$Basics.toString(n));
-   };
-   var $for = function (value) {
-      return A2(stringProperty,"htmlFor",value);
-   };
-   var form = function (value) {
-      return A2(stringProperty,"form",value);
-   };
-   var max = function (value) {
-      return A2(stringProperty,"max",value);
-   };
-   var min = function (value) {
-      return A2(stringProperty,"min",value);
-   };
-   var step = function (n) {
-      return A2(stringProperty,"step",n);
-   };
-   var cols = function (n) {
-      return A2(stringProperty,"cols",$Basics.toString(n));
-   };
-   var rows = function (n) {
-      return A2(stringProperty,"rows",$Basics.toString(n));
-   };
-   var wrap = function (value) {
-      return A2(stringProperty,"wrap",value);
-   };
-   var usemap = function (value) {
-      return A2(stringProperty,"useMap",value);
-   };
-   var shape = function (value) {
-      return A2(stringProperty,"shape",value);
-   };
-   var coords = function (value) {
-      return A2(stringProperty,"coords",value);
-   };
-   var challenge = function (value) {
-      return A2(stringProperty,"challenge",value);
-   };
-   var keytype = function (value) {
-      return A2(stringProperty,"keytype",value);
-   };
-   var align = function (value) {
-      return A2(stringProperty,"align",value);
-   };
-   var cite = function (value) {
-      return A2(stringProperty,"cite",value);
-   };
-   var href = function (value) {
-      return A2(stringProperty,"href",value);
-   };
-   var target = function (value) {
-      return A2(stringProperty,"target",value);
-   };
-   var downloadAs = function (value) {
-      return A2(stringProperty,"download",value);
-   };
-   var hreflang = function (value) {
-      return A2(stringProperty,"hreflang",value);
-   };
-   var media = function (value) {
-      return A2(stringProperty,"media",value);
-   };
-   var ping = function (value) {
-      return A2(stringProperty,"ping",value);
-   };
-   var rel = function (value) {
-      return A2(stringProperty,"rel",value);
-   };
-   var datetime = function (value) {
-      return A2(stringProperty,"datetime",value);
-   };
-   var pubdate = function (value) {
-      return A2(stringProperty,"pubdate",value);
-   };
-   var start = function (n) {
-      return A2(stringProperty,"start",$Basics.toString(n));
-   };
-   var colspan = function (n) {
-      return A2(stringProperty,"colSpan",$Basics.toString(n));
-   };
-   var headers = function (value) {
-      return A2(stringProperty,"headers",value);
-   };
-   var rowspan = function (n) {
-      return A2(stringProperty,"rowSpan",$Basics.toString(n));
-   };
-   var scope = function (value) {
-      return A2(stringProperty,"scope",value);
-   };
-   var manifest = function (value) {
-      return A2(stringProperty,"manifest",value);
-   };
-   var boolProperty = F2(function (name,bool) {
-      return A2(property,name,$Json$Encode.bool(bool));
-   });
-   var hidden = function (bool) {
-      return A2(boolProperty,"hidden",bool);
-   };
-   var contenteditable = function (bool) {
-      return A2(boolProperty,"contentEditable",bool);
-   };
-   var spellcheck = function (bool) {
-      return A2(boolProperty,"spellcheck",bool);
-   };
-   var async = function (bool) {
-      return A2(boolProperty,"async",bool);
-   };
-   var defer = function (bool) {
-      return A2(boolProperty,"defer",bool);
-   };
-   var scoped = function (bool) {
-      return A2(boolProperty,"scoped",bool);
-   };
-   var autoplay = function (bool) {
-      return A2(boolProperty,"autoplay",bool);
-   };
-   var controls = function (bool) {
-      return A2(boolProperty,"controls",bool);
-   };
-   var loop = function (bool) {
-      return A2(boolProperty,"loop",bool);
-   };
-   var $default = function (bool) {
-      return A2(boolProperty,"default",bool);
-   };
-   var seamless = function (bool) {
-      return A2(boolProperty,"seamless",bool);
-   };
-   var checked = function (bool) {
-      return A2(boolProperty,"checked",bool);
-   };
-   var selected = function (bool) {
-      return A2(boolProperty,"selected",bool);
-   };
-   var autofocus = function (bool) {
-      return A2(boolProperty,"autofocus",bool);
-   };
-   var disabled = function (bool) {
-      return A2(boolProperty,"disabled",bool);
-   };
-   var multiple = function (bool) {
-      return A2(boolProperty,"multiple",bool);
-   };
-   var novalidate = function (bool) {
-      return A2(boolProperty,"noValidate",bool);
-   };
-   var readonly = function (bool) {
-      return A2(boolProperty,"readOnly",bool);
-   };
-   var required = function (bool) {
-      return A2(boolProperty,"required",bool);
-   };
-   var ismap = function (value) {
-      return A2(boolProperty,"isMap",value);
-   };
-   var download = function (bool) {
-      return A2(boolProperty,"download",bool);
-   };
-   var reversed = function (bool) {
-      return A2(boolProperty,"reversed",bool);
-   };
-   var classList = function (list) {
-      return $class(A2($String.join,
-      " ",
-      A2($List.map,$Basics.fst,A2($List.filter,$Basics.snd,list))));
-   };
+   var stringProperty = F2(function (name,string) {    return A2(property,name,$Json$Encode.string(string));});
+   var $class = function (name) {    return A2(stringProperty,"className",name);};
+   var id = function (name) {    return A2(stringProperty,"id",name);};
+   var title = function (name) {    return A2(stringProperty,"title",name);};
+   var accesskey = function ($char) {    return A2(stringProperty,"accessKey",$String.fromChar($char));};
+   var dir = function (value) {    return A2(stringProperty,"dir",value);};
+   var draggable = function (value) {    return A2(stringProperty,"draggable",value);};
+   var dropzone = function (value) {    return A2(stringProperty,"dropzone",value);};
+   var itemprop = function (value) {    return A2(stringProperty,"itemprop",value);};
+   var lang = function (value) {    return A2(stringProperty,"lang",value);};
+   var tabindex = function (n) {    return A2(stringProperty,"tabIndex",$Basics.toString(n));};
+   var charset = function (value) {    return A2(stringProperty,"charset",value);};
+   var content = function (value) {    return A2(stringProperty,"content",value);};
+   var httpEquiv = function (value) {    return A2(stringProperty,"httpEquiv",value);};
+   var language = function (value) {    return A2(stringProperty,"language",value);};
+   var src = function (value) {    return A2(stringProperty,"src",value);};
+   var height = function (value) {    return A2(stringProperty,"height",$Basics.toString(value));};
+   var width = function (value) {    return A2(stringProperty,"width",$Basics.toString(value));};
+   var alt = function (value) {    return A2(stringProperty,"alt",value);};
+   var preload = function (value) {    return A2(stringProperty,"preload",value);};
+   var poster = function (value) {    return A2(stringProperty,"poster",value);};
+   var kind = function (value) {    return A2(stringProperty,"kind",value);};
+   var srclang = function (value) {    return A2(stringProperty,"srclang",value);};
+   var sandbox = function (value) {    return A2(stringProperty,"sandbox",value);};
+   var srcdoc = function (value) {    return A2(stringProperty,"srcdoc",value);};
+   var type$ = function (value) {    return A2(stringProperty,"type",value);};
+   var value = function (value) {    return A2(stringProperty,"value",value);};
+   var placeholder = function (value) {    return A2(stringProperty,"placeholder",value);};
+   var accept = function (value) {    return A2(stringProperty,"accept",value);};
+   var acceptCharset = function (value) {    return A2(stringProperty,"acceptCharset",value);};
+   var action = function (value) {    return A2(stringProperty,"action",value);};
+   var autocomplete = function (bool) {    return A2(stringProperty,"autocomplete",bool ? "on" : "off");};
+   var autosave = function (value) {    return A2(stringProperty,"autosave",value);};
+   var enctype = function (value) {    return A2(stringProperty,"enctype",value);};
+   var formaction = function (value) {    return A2(stringProperty,"formAction",value);};
+   var list = function (value) {    return A2(stringProperty,"list",value);};
+   var minlength = function (n) {    return A2(stringProperty,"minLength",$Basics.toString(n));};
+   var maxlength = function (n) {    return A2(stringProperty,"maxLength",$Basics.toString(n));};
+   var method = function (value) {    return A2(stringProperty,"method",value);};
+   var name = function (value) {    return A2(stringProperty,"name",value);};
+   var pattern = function (value) {    return A2(stringProperty,"pattern",value);};
+   var size = function (n) {    return A2(stringProperty,"size",$Basics.toString(n));};
+   var $for = function (value) {    return A2(stringProperty,"htmlFor",value);};
+   var form = function (value) {    return A2(stringProperty,"form",value);};
+   var max = function (value) {    return A2(stringProperty,"max",value);};
+   var min = function (value) {    return A2(stringProperty,"min",value);};
+   var step = function (n) {    return A2(stringProperty,"step",n);};
+   var cols = function (n) {    return A2(stringProperty,"cols",$Basics.toString(n));};
+   var rows = function (n) {    return A2(stringProperty,"rows",$Basics.toString(n));};
+   var wrap = function (value) {    return A2(stringProperty,"wrap",value);};
+   var usemap = function (value) {    return A2(stringProperty,"useMap",value);};
+   var shape = function (value) {    return A2(stringProperty,"shape",value);};
+   var coords = function (value) {    return A2(stringProperty,"coords",value);};
+   var challenge = function (value) {    return A2(stringProperty,"challenge",value);};
+   var keytype = function (value) {    return A2(stringProperty,"keytype",value);};
+   var align = function (value) {    return A2(stringProperty,"align",value);};
+   var cite = function (value) {    return A2(stringProperty,"cite",value);};
+   var href = function (value) {    return A2(stringProperty,"href",value);};
+   var target = function (value) {    return A2(stringProperty,"target",value);};
+   var downloadAs = function (value) {    return A2(stringProperty,"download",value);};
+   var hreflang = function (value) {    return A2(stringProperty,"hreflang",value);};
+   var media = function (value) {    return A2(stringProperty,"media",value);};
+   var ping = function (value) {    return A2(stringProperty,"ping",value);};
+   var rel = function (value) {    return A2(stringProperty,"rel",value);};
+   var datetime = function (value) {    return A2(stringProperty,"datetime",value);};
+   var pubdate = function (value) {    return A2(stringProperty,"pubdate",value);};
+   var start = function (n) {    return A2(stringProperty,"start",$Basics.toString(n));};
+   var colspan = function (n) {    return A2(stringProperty,"colSpan",$Basics.toString(n));};
+   var headers = function (value) {    return A2(stringProperty,"headers",value);};
+   var rowspan = function (n) {    return A2(stringProperty,"rowSpan",$Basics.toString(n));};
+   var scope = function (value) {    return A2(stringProperty,"scope",value);};
+   var manifest = function (value) {    return A2(stringProperty,"manifest",value);};
+   var boolProperty = F2(function (name,bool) {    return A2(property,name,$Json$Encode.bool(bool));});
+   var hidden = function (bool) {    return A2(boolProperty,"hidden",bool);};
+   var contenteditable = function (bool) {    return A2(boolProperty,"contentEditable",bool);};
+   var spellcheck = function (bool) {    return A2(boolProperty,"spellcheck",bool);};
+   var async = function (bool) {    return A2(boolProperty,"async",bool);};
+   var defer = function (bool) {    return A2(boolProperty,"defer",bool);};
+   var scoped = function (bool) {    return A2(boolProperty,"scoped",bool);};
+   var autoplay = function (bool) {    return A2(boolProperty,"autoplay",bool);};
+   var controls = function (bool) {    return A2(boolProperty,"controls",bool);};
+   var loop = function (bool) {    return A2(boolProperty,"loop",bool);};
+   var $default = function (bool) {    return A2(boolProperty,"default",bool);};
+   var seamless = function (bool) {    return A2(boolProperty,"seamless",bool);};
+   var checked = function (bool) {    return A2(boolProperty,"checked",bool);};
+   var selected = function (bool) {    return A2(boolProperty,"selected",bool);};
+   var autofocus = function (bool) {    return A2(boolProperty,"autofocus",bool);};
+   var disabled = function (bool) {    return A2(boolProperty,"disabled",bool);};
+   var multiple = function (bool) {    return A2(boolProperty,"multiple",bool);};
+   var novalidate = function (bool) {    return A2(boolProperty,"noValidate",bool);};
+   var readonly = function (bool) {    return A2(boolProperty,"readOnly",bool);};
+   var required = function (bool) {    return A2(boolProperty,"required",bool);};
+   var ismap = function (value) {    return A2(boolProperty,"isMap",value);};
+   var download = function (bool) {    return A2(boolProperty,"download",bool);};
+   var reversed = function (bool) {    return A2(boolProperty,"reversed",bool);};
+   var classList = function (list) {    return $class(A2($String.join," ",A2($List.map,$Basics.fst,A2($List.filter,$Basics.snd,list))));};
    var style = function (props) {
       return A2(property,
       "style",
-      $Json$Encode.object(A2($List.map,
-      function (_p0) {
-         var _p1 = _p0;
-         return {ctor: "_Tuple2"
-                ,_0: _p1._0
-                ,_1: $Json$Encode.string(_p1._1)};
-      },
-      props)));
+      $Json$Encode.object(A2($List.map,function (_p0) {    var _p1 = _p0;return {ctor: "_Tuple2",_0: _p1._0,_1: $Json$Encode.string(_p1._1)};},props)));
    };
    var key = function (k) {    return A2(stringProperty,"key",k);};
    return _elm.Html.Attributes.values = {_op: _op
@@ -13282,29 +11667,14 @@ Elm.Html.Events.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $VirtualDom = Elm.VirtualDom.make(_elm);
    var _op = {};
-   var keyCode = A2($Json$Decode._op[":="],
-   "keyCode",
-   $Json$Decode.$int);
-   var targetChecked = A2($Json$Decode.at,
-   _U.list(["target","checked"]),
-   $Json$Decode.bool);
-   var targetValue = A2($Json$Decode.at,
-   _U.list(["target","value"]),
-   $Json$Decode.string);
+   var keyCode = A2($Json$Decode._op[":="],"keyCode",$Json$Decode.$int);
+   var targetChecked = A2($Json$Decode.at,_U.list(["target","checked"]),$Json$Decode.bool);
+   var targetValue = A2($Json$Decode.at,_U.list(["target","value"]),$Json$Decode.string);
    var defaultOptions = $VirtualDom.defaultOptions;
-   var Options = F2(function (a,b) {
-      return {stopPropagation: a,preventDefault: b};
-   });
+   var Options = F2(function (a,b) {    return {stopPropagation: a,preventDefault: b};});
    var onWithOptions = $VirtualDom.onWithOptions;
    var on = $VirtualDom.on;
-   var messageOn = F3(function (name,addr,msg) {
-      return A3(on,
-      name,
-      $Json$Decode.value,
-      function (_p0) {
-         return A2($Signal.message,addr,msg);
-      });
-   });
+   var messageOn = F3(function (name,addr,msg) {    return A3(on,name,$Json$Decode.value,function (_p0) {    return A2($Signal.message,addr,msg);});});
    var onClick = messageOn("click");
    var onDoubleClick = messageOn("dblclick");
    var onMouseMove = messageOn("mousemove");
@@ -13317,14 +11687,7 @@ Elm.Html.Events.make = function (_elm) {
    var onBlur = messageOn("blur");
    var onFocus = messageOn("focus");
    var onSubmit = messageOn("submit");
-   var onKey = F3(function (name,addr,handler) {
-      return A3(on,
-      name,
-      keyCode,
-      function (code) {
-         return A2($Signal.message,addr,handler(code));
-      });
-   });
+   var onKey = F3(function (name,addr,handler) {    return A3(on,name,keyCode,function (code) {    return A2($Signal.message,addr,handler(code));});});
    var onKeyUp = onKey("keyup");
    var onKeyDown = onKey("keydown");
    var onKeyPress = onKey("keypress");
@@ -13374,48 +11737,22 @@ Elm.StartApp.make = function (_elm) {
          var _p2 = A2(config.update,action,_p1._0);
          var newModel = _p2._0;
          var additionalEffects = _p2._1;
-         return {ctor: "_Tuple2"
-                ,_0: newModel
-                ,_1: $Effects.batch(_U.list([_p1._1,additionalEffects]))};
+         return {ctor: "_Tuple2",_0: newModel,_1: $Effects.batch(_U.list([_p1._1,additionalEffects]))};
       });
-      var update = F2(function (actions,_p3) {
-         var _p4 = _p3;
-         return A3($List.foldl,
-         updateStep,
-         {ctor: "_Tuple2",_0: _p4._0,_1: $Effects.none},
-         actions);
-      });
+      var update = F2(function (actions,_p3) {    var _p4 = _p3;return A3($List.foldl,updateStep,{ctor: "_Tuple2",_0: _p4._0,_1: $Effects.none},actions);});
       var messages = $Signal.mailbox(_U.list([]));
-      var singleton = function (action) {
-         return _U.list([action]);
-      };
+      var singleton = function (action) {    return _U.list([action]);};
       var address = A2($Signal.forwardTo,messages.address,singleton);
-      var inputs = $Signal.mergeMany(A2($List._op["::"],
-      messages.signal,
-      A2($List.map,$Signal.map(singleton),config.inputs)));
-      var effectsAndModel = A3($Signal.foldp,
-      update,
-      config.init,
-      inputs);
+      var inputs = $Signal.mergeMany(A2($List._op["::"],messages.signal,A2($List.map,$Signal.map(singleton),config.inputs)));
+      var effectsAndModel = A3($Signal.foldp,update,config.init,inputs);
       var model = A2($Signal.map,$Basics.fst,effectsAndModel);
       return {html: A2($Signal.map,config.view(address),model)
              ,model: model
-             ,tasks: A2($Signal.map,
-             function (_p5) {
-                return A2($Effects.toTask,messages.address,$Basics.snd(_p5));
-             },
-             effectsAndModel)};
+             ,tasks: A2($Signal.map,function (_p5) {    return A2($Effects.toTask,messages.address,$Basics.snd(_p5));},effectsAndModel)};
    };
-   var App = F3(function (a,b,c) {
-      return {html: a,model: b,tasks: c};
-   });
-   var Config = F4(function (a,b,c,d) {
-      return {init: a,update: b,view: c,inputs: d};
-   });
-   return _elm.StartApp.values = {_op: _op
-                                 ,start: start
-                                 ,Config: Config
-                                 ,App: App};
+   var App = F3(function (a,b,c) {    return {html: a,model: b,tasks: c};});
+   var Config = F4(function (a,b,c,d) {    return {init: a,update: b,view: c,inputs: d};});
+   return _elm.StartApp.values = {_op: _op,start: start,Config: Config,App: App};
 };
 Elm.Card = Elm.Card || {};
 Elm.Card.make = function (_elm) {
@@ -13449,11 +11786,7 @@ Elm.Card.make = function (_elm) {
          case "Three": return 3;
          default: return 2;}
    };
-   var rankDescending = F2(function (card1,card2) {
-      return A2($Basics.compare,
-      numericalRank(card2.rank),
-      numericalRank(card1.rank));
-   });
+   var rankDescending = F2(function (card1,card2) {    return A2($Basics.compare,numericalRank(card2.rank),numericalRank(card1.rank));});
    var Two = {ctor: "Two"};
    var Three = {ctor: "Three"};
    var Four = {ctor: "Four"};
@@ -13467,56 +11800,27 @@ Elm.Card.make = function (_elm) {
    var Queen = {ctor: "Queen"};
    var King = {ctor: "King"};
    var Ace = {ctor: "Ace"};
-   var ranks = $Array.fromList(_U.list([Ace
-                                       ,King
-                                       ,Queen
-                                       ,Jack
-                                       ,Ten
-                                       ,Nine
-                                       ,Eight
-                                       ,Seven
-                                       ,Six
-                                       ,Five
-                                       ,Four
-                                       ,Three
-                                       ,Two]));
+   var ranks = $Array.fromList(_U.list([Ace,King,Queen,Jack,Ten,Nine,Eight,Seven,Six,Five,Four,Three,Two]));
    var Clubs = {ctor: "Clubs"};
    var Diamonds = {ctor: "Diamonds"};
    var Hearts = {ctor: "Hearts"};
    var Spades = {ctor: "Spades"};
-   var suits = $Array.fromList(_U.list([Spades
-                                       ,Hearts
-                                       ,Diamonds
-                                       ,Clubs]));
+   var suits = $Array.fromList(_U.list([Spades,Hearts,Diamonds,Clubs]));
    var deck = function () {
-      var toCard = F2(function (suit,rank) {
-         return {suit: suit,rank: rank};
-      });
-      var addRanks = function (suit) {
-         return A2($List.map,toCard(suit),$Array.toList(ranks));
-      };
-      return $Array.fromList(A2($List.concatMap,
-      addRanks,
-      $Array.toList(suits)));
+      var toCard = F2(function (suit,rank) {    return {suit: suit,rank: rank};});
+      var addRanks = function (suit) {    return A2($List.map,toCard(suit),$Array.toList(ranks));};
+      return $Array.fromList(A2($List.concatMap,addRanks,$Array.toList(suits)));
    }();
    var fromSuits = function (sample) {
-      var addSuit = F2(function (suit,rank) {
-         return {suit: suit,rank: rank};
-      });
-      var cards = $List.concat(_U.list([A2($List.map,
-                                       addSuit(Spades),
-                                       sample.spades)
+      var addSuit = F2(function (suit,rank) {    return {suit: suit,rank: rank};});
+      var cards = $List.concat(_U.list([A2($List.map,addSuit(Spades),sample.spades)
                                        ,A2($List.map,addSuit(Hearts),sample.hearts)
                                        ,A2($List.map,addSuit(Diamonds),sample.diamonds)
                                        ,A2($List.map,addSuit(Clubs),sample.clubs)]));
       var length = $List.length(cards);
-      return _U.eq(length,13) ? cards : _U.crash("Card",
-      {start: {line: 135,column: 12}
-      ,end: {line: 135,column: 23}})(A2($Basics._op["++"],
+      return _U.eq(length,13) ? cards : _U.crash("Card",{start: {line: 135,column: 12},end: {line: 135,column: 23}})(A2($Basics._op["++"],
       "sanity check: sample hand has ",
-      A2($Basics._op["++"],
-      $Basics.toString(length),
-      " cards, not 13")));
+      A2($Basics._op["++"],$Basics.toString(length)," cards, not 13")));
    };
    return _elm.Card.values = {_op: _op
                              ,suits: suits
@@ -13567,14 +11871,7 @@ Elm.Auction.make = function (_elm) {
          default: return _p0._0;}
    };
    var latestContractualBid = function () {
-      var isContractualBid = function (bid) {
-         var _p1 = bid;
-         if (_p1.ctor === "Bid") {
-               return true;
-            } else {
-               return false;
-            }
-      };
+      var isContractualBid = function (bid) {    var _p1 = bid;if (_p1.ctor === "Bid") {    return true;} else {    return false;}};
       return function (_p2) {
          return $List.head(A2($List.filter,isContractualBid,_p2));
       };
@@ -13585,9 +11882,7 @@ Elm.Auction.make = function (_elm) {
          if (_p3.ctor === "::") {
                switch (_p3._0.ctor)
                {case "Double": return true;
-                  case "Pass":
-                  if (_p3._1.ctor === "::" && _p3._1._0.ctor === "Pass" && _p3._1._1.ctor === "::" && _p3._1._1._0.ctor === "Double")
-                    {
+                  case "Pass": if (_p3._1.ctor === "::" && _p3._1._0.ctor === "Pass" && _p3._1._1.ctor === "::" && _p3._1._1._0.ctor === "Double") {
                           return true;
                        } else {
                           break _v2_2;
@@ -13605,9 +11900,7 @@ Elm.Auction.make = function (_elm) {
          if (_p4.ctor === "::") {
                switch (_p4._0.ctor)
                {case "Bid": return true;
-                  case "Pass":
-                  if (_p4._1.ctor === "::" && _p4._1._0.ctor === "Pass" && _p4._1._1.ctor === "::" && _p4._1._1._0.ctor === "Bid")
-                    {
+                  case "Pass": if (_p4._1.ctor === "::" && _p4._1._0.ctor === "Pass" && _p4._1._1.ctor === "::" && _p4._1._1._0.ctor === "Bid") {
                           return true;
                        } else {
                           break _v3_2;
@@ -13628,18 +11921,12 @@ Elm.Auction.make = function (_elm) {
             return true;
          }
    };
-   var Bid = F2(function (a,b) {
-      return {ctor: "Bid",_0: a,_1: b};
-   });
+   var Bid = F2(function (a,b) {    return {ctor: "Bid",_0: a,_1: b};});
    var contractualBids = function () {
       var bidsAtLevel = function (level) {
          return A2($List.map,
          Bid(level),
-         _U.list([$Maybe.Just($Card.Clubs)
-                 ,$Maybe.Just($Card.Diamonds)
-                 ,$Maybe.Just($Card.Hearts)
-                 ,$Maybe.Just($Card.Spades)
-                 ,$Maybe.Nothing]));
+         _U.list([$Maybe.Just($Card.Clubs),$Maybe.Just($Card.Diamonds),$Maybe.Just($Card.Hearts),$Maybe.Just($Card.Spades),$Maybe.Nothing]));
       };
       return A2($List.concatMap,bidsAtLevel,_U.range(1,7));
    }();
@@ -13648,9 +11935,7 @@ Elm.Auction.make = function (_elm) {
       if (_p6.ctor === "Just") {
             return A2($Maybe.withDefault,
             _U.list([]),
-            $List.tail(A2($List$Extra.dropWhile,
-            F2(function (x,y) {    return !_U.eq(x,y);})(_p6._0),
-            contractualBids)));
+            $List.tail(A2($List$Extra.dropWhile,F2(function (x,y) {    return !_U.eq(x,y);})(_p6._0),contractualBids)));
          } else {
             return contractualBids;
          }
@@ -13661,22 +11946,9 @@ Elm.Auction.make = function (_elm) {
    var legalBids = function (auction) {
       var redouble = canRedouble(auction) ? _U.list([Redouble]) : _U.list([]);
       var $double = canDouble(auction) ? _U.list([Double]) : _U.list([]);
-      return A2($List._op["::"],
-      Pass,
-      A2($Basics._op["++"],
-      $double,
-      A2($Basics._op["++"],
-      redouble,
-      legalContractualBids(latestContractualBid(auction)))));
+      return A2($List._op["::"],Pass,A2($Basics._op["++"],$double,A2($Basics._op["++"],redouble,legalContractualBids(latestContractualBid(auction)))));
    };
-   return _elm.Auction.values = {_op: _op
-                                ,isOpen: isOpen
-                                ,legalBids: legalBids
-                                ,level: level
-                                ,Pass: Pass
-                                ,Double: Double
-                                ,Redouble: Redouble
-                                ,Bid: Bid};
+   return _elm.Auction.values = {_op: _op,isOpen: isOpen,legalBids: legalBids,level: level,Pass: Pass,Double: Double,Redouble: Redouble,Bid: Bid};
 };
 Elm.Evaluation = Elm.Evaluation || {};
 Elm.Evaluation.make = function (_elm) {
@@ -13694,19 +11966,24 @@ Elm.Evaluation.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var suits = _U.list([$Card.Spades
-                       ,$Card.Hearts
-                       ,$Card.Diamonds
-                       ,$Card.Clubs]);
+   var quickLosers = F2(function (suit,cards) {
+      var ranks = A2($List.filterMap,function (card) {    return _U.eq(card.suit,suit) ? $Maybe.Just(card.rank) : $Maybe.Nothing;},cards);
+      var winners = A2($List.indexedMap,
+      F2(function (v0,v1) {    return {ctor: "_Tuple2",_0: v0,_1: v1};}),
+      A2($List.take,$List.length(ranks),_U.list([$Card.Ace,$Card.King,$Card.Queen,$Card.Jack])));
+      var heldWinners = A2($List.filter,function (pair) {    return A2($List.member,$Basics.snd(pair),ranks);},winners);
+      var _p0 = $List.head(heldWinners);
+      if (_p0.ctor === "Just") {
+            return _p0._0._0;
+         } else {
+            return $List.length(ranks);
+         }
+   });
+   var suits = _U.list([$Card.Spades,$Card.Hearts,$Card.Diamonds,$Card.Clubs]);
    var playingTricks = F2(function (trump,cards) {
       var offTrumpTricks = function (ranks) {
          var matches = function (goals) {
-            return $List.length(A2($List$Extra.takeWhile,
-            $Basics.identity,
-            A3($List.map2,
-            F2(function (x,y) {    return _U.eq(x,y);}),
-            ranks,
-            goals)));
+            return $List.length(A2($List$Extra.takeWhile,$Basics.identity,A3($List.map2,F2(function (x,y) {    return _U.eq(x,y);}),ranks,goals)));
          };
          var ranksFromKing = _U.list([$Card.King
                                      ,$Card.Queen
@@ -13727,9 +12004,7 @@ Elm.Evaluation.make = function (_elm) {
       };
       var trumpTricks = function (ranks) {
          var lengthTricks = A2($Basics.max,$List.length(ranks) - 3,0);
-         var rankTrick = function (rank) {
-            return A2($List.member,rank,ranks) ? 1 : 0;
-         };
+         var rankTrick = function (rank) {    return A2($List.member,rank,ranks) ? 1 : 0;};
          return rankTrick($Card.Ace) + rankTrick($Card.King) + rankTrick($Card.Queen) + lengthTricks;
       };
       var suitTricks = function (suit) {
@@ -13737,15 +12012,8 @@ Elm.Evaluation.make = function (_elm) {
          function (_) {
             return _.rank;
          },
-         A2($List.sortWith,
-         $Card.rankDescending,
-         A2($List.filter,
-         function (card) {
-            return _U.eq(card.suit,suit);
-         },
-         cards)));
-         return _U.eq(trump,
-         $Maybe.Just(suit)) ? trumpTricks(ranks) : offTrumpTricks(ranks);
+         A2($List.sortWith,$Card.rankDescending,A2($List.filter,function (card) {    return _U.eq(card.suit,suit);},cards)));
+         return _U.eq(trump,$Maybe.Just(suit)) ? trumpTricks(ranks) : offTrumpTricks(ranks);
       };
       return $List.sum(A2($List.map,suitTricks,suits));
    });
@@ -13756,104 +12024,77 @@ Elm.Evaluation.make = function (_elm) {
       function (suit) {
          return A2(playingTricks,$Maybe.Just(suit),cards);
       },
-      _U.list([$Card.Spades
-              ,$Card.Hearts
-              ,$Card.Diamonds
-              ,$Card.Clubs]))));
+      _U.list([$Card.Spades,$Card.Hearts,$Card.Diamonds,$Card.Clubs]))));
    };
    var balanced = function (dist) {
-      var _p0 = dist;
-      _v0_3: do {
-         if (_p0.ctor === "::" && _p0._1.ctor === "::" && _p0._1._1.ctor === "::" && _p0._1._1._0 === 3 && _p0._1._1._1.ctor === "::" && _p0._1._1._1._1.ctor === "[]")
+      var _p1 = dist;
+      _v1_3: do {
+         if (_p1.ctor === "::" && _p1._1.ctor === "::" && _p1._1._1.ctor === "::" && _p1._1._1._0 === 3 && _p1._1._1._1.ctor === "::" && _p1._1._1._1._1.ctor === "[]")
          {
-               switch (_p0._0)
-               {case 4: switch (_p0._1._0)
-                    {case 4: if (_p0._1._1._1._0 === 2) {
+               switch (_p1._0)
+               {case 4: switch (_p1._1._0)
+                    {case 4: if (_p1._1._1._1._0 === 2) {
                                return true;
                             } else {
-                               break _v0_3;
+                               break _v1_3;
                             }
-                       case 3: if (_p0._1._1._1._0 === 3) {
+                       case 3: if (_p1._1._1._1._0 === 3) {
                                return true;
                             } else {
-                               break _v0_3;
+                               break _v1_3;
                             }
-                       default: break _v0_3;}
-                  case 5: if (_p0._1._0 === 3 && _p0._1._1._1._0 === 2) {
+                       default: break _v1_3;}
+                  case 5: if (_p1._1._0 === 3 && _p1._1._1._1._0 === 2) {
                           return true;
                        } else {
-                          break _v0_3;
+                          break _v1_3;
                        }
-                  default: break _v0_3;}
+                  default: break _v1_3;}
             } else {
-               break _v0_3;
+               break _v1_3;
             }
       } while (false);
       return false;
    };
-   var length = F2(function (suit,cards) {
-      return $List.length(A2($List.filter,
-      function (card) {
-         return _U.eq(card.suit,suit);
-      },
-      cards));
-   });
-   var distribution = function (cards) {
-      return A2($List.sortBy,
-      $Basics.negate,
-      A2($List.map,A2($Basics.flip,length,cards),suits));
-   };
+   var length = F2(function (suit,cards) {    return $List.length(A2($List.filter,function (card) {    return _U.eq(card.suit,suit);},cards));});
+   var distribution = function (cards) {    return A2($List.sortBy,$Basics.negate,A2($List.map,A2($Basics.flip,length,cards),suits));};
    var shortnessPoints = F2(function (trump,cards) {
       return $List.sum(A2($List.filter,
       function (pts) {
          return _U.cmp(pts,0) > 0;
       },
-      A2($List.map,
-      function (suit) {
-         return 3 - A2(length,suit,cards);
-      },
-      A2($List.filter,
-      function (suit) {
-         return !_U.eq(suit,trump);
-      },
-      suits))));
+      A2($List.map,function (suit) {    return 3 - A2(length,suit,cards);},A2($List.filter,function (suit) {    return !_U.eq(suit,trump);},suits))));
    });
    var lengthPoints = function (cards) {
       return $List.sum(A2($List.filter,
       function (pts) {
          return _U.cmp(pts,0) > 0;
       },
-      A2($List.map,
-      function (suit) {
-         return A2(length,suit,cards) - 4;
-      },
-      suits)));
+      A2($List.map,function (suit) {    return A2(length,suit,cards) - 4;},suits)));
    };
    var highCardPoints = function () {
       var pointsForCard = function (card) {
-         var _p1 = card.rank;
-         switch (_p1.ctor)
+         var _p2 = card.rank;
+         switch (_p2.ctor)
          {case "Ace": return 4;
             case "King": return 3;
             case "Queen": return 2;
             case "Jack": return 1;
             default: return 0;}
       };
-      return function (_p2) {
-         return $List.sum(A2($List.map,pointsForCard,_p2));
+      return function (_p3) {
+         return $List.sum(A2($List.map,pointsForCard,_p3));
       };
    }();
    var points = F2(function (trump,cards) {
-      var _p3 = trump;
-      if (_p3.ctor === "Nothing") {
+      var _p4 = trump;
+      if (_p4.ctor === "Nothing") {
             return highCardPoints(cards) + lengthPoints(cards);
          } else {
-            if (_p3._0.ctor === "Nothing") {
+            if (_p4._0.ctor === "Nothing") {
                   return highCardPoints(cards);
                } else {
-                  return highCardPoints(cards) + A2(shortnessPoints,
-                  _p3._0._0,
-                  cards);
+                  return highCardPoints(cards) + A2(shortnessPoints,_p4._0._0,cards);
                }
          }
    });
@@ -13866,7 +12107,8 @@ Elm.Evaluation.make = function (_elm) {
                                    ,distribution: distribution
                                    ,balanced: balanced
                                    ,playingTricks: playingTricks
-                                   ,playingTricksAny: playingTricksAny};
+                                   ,playingTricksAny: playingTricksAny
+                                   ,quickLosers: quickLosers};
 };
 Elm.Seat = Elm.Seat || {};
 Elm.Seat.make = function (_elm) {
@@ -13890,9 +12132,7 @@ Elm.Seat.make = function (_elm) {
          case "East": return each.east;
          default: return each.south;}
    });
-   var Each = F4(function (a,b,c,d) {
-      return {west: a,north: b,east: c,south: d};
-   });
+   var Each = F4(function (a,b,c,d) {    return {west: a,north: b,east: c,south: d};});
    var South = {ctor: "South"};
    var East = {ctor: "East"};
    var North = {ctor: "North"};
@@ -13906,15 +12146,7 @@ Elm.Seat.make = function (_elm) {
          case "East": return South;
          default: return West;}
    };
-   return _elm.Seat.values = {_op: _op
-                             ,seats: seats
-                             ,next: next
-                             ,lookup: lookup
-                             ,Each: Each
-                             ,West: West
-                             ,North: North
-                             ,East: East
-                             ,South: South};
+   return _elm.Seat.values = {_op: _op,seats: seats,next: next,lookup: lookup,Each: Each,West: West,North: North,East: East,South: South};
 };
 Elm.Vulnerability = Elm.Vulnerability || {};
 Elm.Vulnerability.make = function (_elm) {
@@ -13950,9 +12182,7 @@ Elm.Vulnerability.make = function (_elm) {
    });
    var favorability = F2(function (seat,vuln) {
       var opponent = $Seat.next(seat);
-      var _p2 = {ctor: "_Tuple2"
-                ,_0: A2(vulnerable,seat,vuln)
-                ,_1: A2(vulnerable,opponent,vuln)};
+      var _p2 = {ctor: "_Tuple2",_0: A2(vulnerable,seat,vuln),_1: A2(vulnerable,opponent,vuln)};
       if (_p2._0 === false) {
             if (_p2._1 === false) {
                   return Equal;
@@ -13968,9 +12198,7 @@ Elm.Vulnerability.make = function (_elm) {
          }
    });
    var next = function (vuln) {
-      var _p3 = {ctor: "_Tuple2"
-                ,_0: vuln.northSouth
-                ,_1: vuln.eastWest};
+      var _p3 = {ctor: "_Tuple2",_0: vuln.northSouth,_1: vuln.eastWest};
       if (_p3._0 === false) {
             if (_p3._1 === false) {
                   return {northSouth: false,eastWest: true};
@@ -13986,9 +12214,7 @@ Elm.Vulnerability.make = function (_elm) {
          }
    };
    var initial = {northSouth: false,eastWest: false};
-   var Vulnerability = F2(function (a,b) {
-      return {northSouth: a,eastWest: b};
-   });
+   var Vulnerability = F2(function (a,b) {    return {northSouth: a,eastWest: b};});
    return _elm.Vulnerability.values = {_op: _op
                                       ,initial: initial
                                       ,next: next
@@ -14025,32 +12251,18 @@ Elm.Bidding.make = function (_elm) {
    var Opener = {ctor: "Opener"};
    var Openable = {ctor: "Openable"};
    var role$ = function (history) {
-      var bidsFromOpening = $List.length(A2($List$Extra.dropWhile,
-      function (bid) {
-         return _U.eq(bid,$Auction.Pass);
-      },
-      $List.reverse(history)));
+      var bidsFromOpening = $List.length(A2($List$Extra.dropWhile,function (bid) {    return _U.eq(bid,$Auction.Pass);},$List.reverse(history)));
       var _p0 = A2($Basics._op["%"],bidsFromOpening,4);
       switch (_p0)
       {case 0: return _U.eq(bidsFromOpening,0) ? Openable : Opener;
          case 1: return Defender;
          case 2: return Responder;
          case 3: return Defender;
-         default: return _U.crashCase("Bidding",
-           {start: {line: 178,column: 5},end: {line: 183,column: 106}},
-           _p0)(A2($Basics._op["++"],
+         default: return _U.crashCase("Bidding",{start: {line: 180,column: 5},end: {line: 185,column: 106}},_p0)(A2($Basics._op["++"],
            "bidsFromOpening % 4 wound up being ",
-           A2($Basics._op["++"],
-           $Basics.toString(bidsFromOpening),
-           " somehow!")));}
+           A2($Basics._op["++"],$Basics.toString(bidsFromOpening)," somehow!")));}
    };
-   var role = function (_p2) {
-      return role$(A2($List.map,
-      function (_) {
-         return _.bid;
-      },
-      _p2));
-   };
+   var role = function (_p2) {    return role$(A2($List.map,function (_) {    return _.bid;},_p2));};
    var $eval = F2(function (metric,hand) {
       var _p3 = metric;
       switch (_p3.ctor)
@@ -14058,84 +12270,55 @@ Elm.Bidding.make = function (_elm) {
          case "HighCardPoints": return $Evaluation.highCardPoints(hand);
          case "Points": return A2($Evaluation.points,_p3._0,hand);
          case "Length": return A2($Evaluation.length,_p3._0,hand);
-         default: return $Evaluation.playingTricksAny(hand);}
+         case "PlayingTricks": return $Evaluation.playingTricksAny(hand);
+         default: return A2($Evaluation.quickLosers,_p3._0,hand);}
    });
    var satisfiedBy = F2(function (hand,bid) {
       var satisfies = function (meaning) {
          var _p4 = meaning;
          switch (_p4.ctor)
          {case "OutOfSystem": return true;
-            case "Equal": return _U.eq(A2($eval,_p4._0,hand),
-              A2($eval,_p4._1,hand));
+            case "Equal": return _U.eq(A2($eval,_p4._0,hand),A2($eval,_p4._1,hand));
             case "InRange": var value = A2($eval,_p4._0,hand);
               return _U.cmp(_p4._1,value) < 1 && _U.cmp(value,_p4._2) < 1;
-            case "Minimum": return _U.cmp(A2($eval,_p4._1,hand),
-              A2($eval,_p4._0,hand)) < 1;
-            case "Maximum": return _U.cmp(A2($eval,_p4._0,hand),
-              A2($eval,_p4._1,hand)) < 1;
-            case "GreaterThan": return _U.cmp(A2($eval,_p4._1,hand),
-              A2($eval,_p4._0,hand)) < 0;
-            case "LessThan": return _U.cmp(A2($eval,_p4._0,hand),
-              A2($eval,_p4._1,hand)) < 0;
-            case "Balanced":
-            return $Evaluation.balanced($Evaluation.distribution(hand));
+            case "Minimum": return _U.cmp(A2($eval,_p4._1,hand),A2($eval,_p4._0,hand)) < 1;
+            case "Maximum": return _U.cmp(A2($eval,_p4._0,hand),A2($eval,_p4._1,hand)) < 1;
+            case "GreaterThan": return _U.cmp(A2($eval,_p4._1,hand),A2($eval,_p4._0,hand)) < 0;
+            case "LessThan": return _U.cmp(A2($eval,_p4._0,hand),A2($eval,_p4._1,hand)) < 0;
+            case "Balanced": return $Evaluation.balanced($Evaluation.distribution(hand));
             case "Or": return A2($List.any,satisfies,_p4._0);
             case "And": return A2($List.all,satisfies,_p4._0);
             default: return $Basics.not(satisfies(_p4._0));}
       };
       return satisfies(bid.meaning);
    });
-   var viableChoices = F4(function (system,
-   favorability,
-   history,
-   hand) {
-      return A2($List.filter,
-      satisfiedBy(hand),
-      A2(system.suggestions,favorability,history));
+   var viableChoices = F4(function (system,favorability,history,hand) {
+      return A2($List.filter,satisfiedBy(hand),A2(system.suggestions,favorability,history));
    });
    var lookup = function (bid) {
       return function (_p5) {
-         return $List.head(A2($List.filter,
-         function (choice) {
-            return _U.eq(choice.bid,bid);
-         },
-         _p5));
+         return $List.head(A2($List.filter,function (choice) {    return _U.eq(choice.bid,bid);},_p5));
       };
    };
+   var QuickLosers = function (a) {    return {ctor: "QuickLosers",_0: a};};
    var PlayingTricks = {ctor: "PlayingTricks"};
    var Length = function (a) {    return {ctor: "Length",_0: a};};
    var Points = function (a) {    return {ctor: "Points",_0: a};};
    var HighCardPoints = {ctor: "HighCardPoints"};
-   var Constant = function (a) {
-      return {ctor: "Constant",_0: a};
-   };
+   var Constant = function (a) {    return {ctor: "Constant",_0: a};};
    var Deny = function (a) {    return {ctor: "Deny",_0: a};};
    var And = function (a) {    return {ctor: "And",_0: a};};
    var Or = function (a) {    return {ctor: "Or",_0: a};};
    var Balanced = {ctor: "Balanced"};
-   var LessThan = F2(function (a,b) {
-      return {ctor: "LessThan",_0: a,_1: b};
-   });
-   var GreaterThan = F2(function (a,b) {
-      return {ctor: "GreaterThan",_0: a,_1: b};
-   });
-   var Maximum = F2(function (a,b) {
-      return {ctor: "Maximum",_0: a,_1: b};
-   });
-   var Minimum = F2(function (a,b) {
-      return {ctor: "Minimum",_0: a,_1: b};
-   });
-   var Equal = F2(function (a,b) {
-      return {ctor: "Equal",_0: a,_1: b};
-   });
-   var InRange = F3(function (a,b,c) {
-      return {ctor: "InRange",_0: a,_1: b,_2: c};
-   });
+   var LessThan = F2(function (a,b) {    return {ctor: "LessThan",_0: a,_1: b};});
+   var GreaterThan = F2(function (a,b) {    return {ctor: "GreaterThan",_0: a,_1: b};});
+   var Maximum = F2(function (a,b) {    return {ctor: "Maximum",_0: a,_1: b};});
+   var Minimum = F2(function (a,b) {    return {ctor: "Minimum",_0: a,_1: b};});
+   var Equal = F2(function (a,b) {    return {ctor: "Equal",_0: a,_1: b};});
+   var InRange = F3(function (a,b,c) {    return {ctor: "InRange",_0: a,_1: b,_2: c};});
    var OutOfSystem = {ctor: "OutOfSystem"};
    var annotate = F4(function (system,favorability,history,bid) {
-      var _p6 = A2(lookup,
-      bid,
-      A2(system.suggestions,favorability,history));
+      var _p6 = A2(lookup,bid,A2(system.suggestions,favorability,history));
       if (_p6.ctor === "Just") {
             return _p6._0;
          } else {
@@ -14144,16 +12327,10 @@ Elm.Bidding.make = function (_elm) {
    });
    var choose = F4(function (system,favorability,history,hand) {
       var fallback = {bid: $Auction.Pass,meaning: OutOfSystem};
-      return $Random.generate(A2($Random$Extra.selectWithDefault,
-      fallback,
-      A4(viableChoices,system,favorability,history,hand)));
+      return $Random.generate(A2($Random$Extra.selectWithDefault,fallback,A4(viableChoices,system,favorability,history,hand)));
    });
-   var AnnotatedBid = F2(function (a,b) {
-      return {bid: a,meaning: b};
-   });
-   var System = F2(function (a,b) {
-      return {name: a,suggestions: b};
-   });
+   var AnnotatedBid = F2(function (a,b) {    return {bid: a,meaning: b};});
+   var System = F2(function (a,b) {    return {name: a,suggestions: b};});
    return _elm.Bidding.values = {_op: _op
                                 ,annotate: annotate
                                 ,choose: choose
@@ -14178,6 +12355,7 @@ Elm.Bidding.make = function (_elm) {
                                 ,Points: Points
                                 ,Length: Length
                                 ,PlayingTricks: PlayingTricks
+                                ,QuickLosers: QuickLosers
                                 ,Openable: Openable
                                 ,Opener: Opener
                                 ,Responder: Responder
@@ -14189,8 +12367,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
    "use strict";
    _elm.Bidding = _elm.Bidding || {};
    _elm.Bidding.StandardAmerican = _elm.Bidding.StandardAmerican || {};
-   if (_elm.Bidding.StandardAmerican.values)
-   return _elm.Bidding.StandardAmerican.values;
+   if (_elm.Bidding.StandardAmerican.values) return _elm.Bidding.StandardAmerican.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Auction = Elm.Auction.make(_elm),
    $Basics = Elm.Basics.make(_elm),
@@ -14203,13 +12380,9 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Vulnerability = Elm.Vulnerability.make(_elm);
    var _op = {};
+   var suits = _U.list([$Card.Spades,$Card.Hearts,$Card.Diamonds,$Card.Clubs]);
    var prioritized = function () {
-      var downgrade = F2(function (denials,bid) {
-         return _U.update(bid,
-         {meaning: $Bidding.And(A2($List._op["::"],
-         bid.meaning,
-         denials))});
-      });
+      var downgrade = F2(function (denials,bid) {    return _U.update(bid,{meaning: $Bidding.And(A2($List._op["::"],bid.meaning,denials))});});
       var prioritized$ = F2(function (denials,prefs) {
          var _p0 = prefs;
          if (_p0.ctor === "[]") {
@@ -14218,107 +12391,137 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                var _p2 = _p0._0;
                var denials$ = A2($Basics._op["++"],
                denials,
-               A2($List.map,
-               function (_p1) {
-                  return $Bidding.Deny(function (_) {
-                     return _.meaning;
-                  }(_p1));
-               },
-               _p2));
+               A2($List.map,function (_p1) {    return $Bidding.Deny(function (_) {    return _.meaning;}(_p1));},_p2));
                var downgraded = A2($List.map,downgrade(denials),_p2);
-               return A2($Basics._op["++"],
-               downgraded,
-               A2(prioritized$,denials$,_p0._1));
+               return A2($Basics._op["++"],downgraded,A2(prioritized$,denials$,_p0._1));
             }
       });
       return prioritized$(_U.list([]));
    }();
+   var responsesToOneNoTrump = function () {
+      var noTwoQuickLosers = function () {
+         var noTwoQuickLosersIn = function (suit) {    return A2($Bidding.LessThan,$Bidding.QuickLosers(suit),$Bidding.Constant(2));};
+         return A2($List.map,noTwoQuickLosersIn,suits);
+      }();
+      var noVoids = function () {
+         var noVoidIn = function (suit) {    return A2($Bidding.GreaterThan,$Bidding.Length(suit),$Bidding.Constant(0));};
+         return A2($List.map,noVoidIn,suits);
+      }();
+      var bidGame = {bid: A2($Auction.Bid,3,$Maybe.Nothing),meaning: A3($Bidding.InRange,$Bidding.HighCardPoints,10,13)};
+      var inviteGameWithLongMinor = function (suit) {
+         return {bid: A2($Auction.Bid,3,$Maybe.Just(suit))
+                ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
+                                               ,A3($Bidding.InRange,$Bidding.HighCardPoints,7,8)]))};
+      };
+      var minorTransfer = {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Spades))
+                          ,meaning: $Bidding.And(_U.list([$Bidding.Or(_U.list([A2($Bidding.Minimum,$Bidding.Length($Card.Clubs),$Bidding.Constant(6))
+                                                                              ,A2($Bidding.Minimum,$Bidding.Length($Card.Diamonds),$Bidding.Constant(6))]))
+                                                         ,A2($Bidding.LessThan,$Bidding.HighCardPoints,$Bidding.Constant(7))]))};
+      var pass = {bid: $Auction.Pass
+                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Maximum,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(7))
+                                                ,A2($Bidding.LessThan,$Bidding.Length($Card.Spades),$Bidding.Constant(5))
+                                                ,A2($Bidding.LessThan,$Bidding.Length($Card.Hearts),$Bidding.Constant(5))
+                                                ,A2($Bidding.LessThan,$Bidding.Length($Card.Diamonds),$Bidding.Constant(6))
+                                                ,A2($Bidding.LessThan,$Bidding.Length($Card.Clubs),$Bidding.Constant(6))]))};
+      var notFourThreeThreeThree = $Bidding.Or(A2($List.map,
+      function (suit) {
+         return A2($Bidding.Maximum,$Bidding.Length(suit),$Bidding.Constant(2));
+      },
+      suits));
+      var stayman = {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Clubs))
+                    ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(8))
+                                                   ,$Bidding.Or(_U.list([A2($Bidding.Equal,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))
+                                                                        ,A2($Bidding.Equal,$Bidding.Length($Card.Spades),$Bidding.Constant(4))]))
+                                                   ,notFourThreeThreeThree]))};
+      var fourThreeThreeThree = $Bidding.And(A2($List.map,function (suit) {    return A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(3));},suits));
+      var noFourCardMajor = $Bidding.And(_U.list([A2($Bidding.Maximum,$Bidding.Length($Card.Spades),$Bidding.Constant(3))
+                                                 ,A2($Bidding.Maximum,$Bidding.Length($Card.Hearts),$Bidding.Constant(3))]));
+      var inviteGame = {bid: A2($Auction.Bid,2,$Maybe.Nothing)
+                       ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,8,9)
+                                                      ,$Bidding.Balanced
+                                                      ,$Bidding.Or(_U.list([noFourCardMajor,fourThreeThreeThree]))]))};
+      var inviteSlamPoints = $Bidding.Constant(33 - 16);
+      var inviteSlam = function (suit) {
+         return {bid: A2($Auction.Bid,3,$Maybe.Just(suit))
+                ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
+                                               ,A2($Bidding.Minimum,$Bidding.Points($Maybe.Just($Maybe.Just(suit))),inviteSlamPoints)]))};
+      };
+      var jacobyTransfer = F2(function (target,via) {
+         return {bid: A2($Auction.Bid,2,$Maybe.Just(via))
+                ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(target),$Bidding.Constant(5)),$Bidding.Deny(inviteSlam(target).meaning)]))};
+      });
+      var priority3 = _U.list([pass
+                              ,A2(jacobyTransfer,$Card.Hearts,$Card.Diamonds)
+                              ,A2(jacobyTransfer,$Card.Spades,$Card.Hearts)
+                              ,minorTransfer
+                              ,stayman
+                              ,inviteGame
+                              ,bidGame]);
+      var priority2 = _U.list([inviteGameWithLongMinor($Card.Clubs),inviteGameWithLongMinor($Card.Diamonds),inviteSlam($Card.Hearts),inviteSlam($Card.Spades)]);
+      var inviteSlamNoTrump = {bid: A2($Auction.Bid,4,$Maybe.Nothing)
+                              ,meaning: $Bidding.And(_U.list([A2($Bidding.Equal,$Bidding.HighCardPoints,inviteSlamPoints),$Bidding.Balanced]))};
+      var gerber = {bid: A2($Auction.Bid,4,$Maybe.Just($Card.Clubs))
+                   ,meaning: $Bidding.And(A2($List._op["::"],
+                   A2($Bidding.GreaterThan,$Bidding.Points($Maybe.Nothing),inviteSlamPoints),
+                   A2($Basics._op["++"],noVoids,noTwoQuickLosers)))};
+      var priority1 = _U.list([inviteSlamNoTrump,gerber]);
+      return prioritized(_U.list([priority1,priority2,priority3]));
+   }();
+   var responseBids = function (history) {
+      var justOpenedOneNoTrump = function () {
+         var _p3 = A2($List.map,function (_) {    return _.bid;},history);
+         if (_p3.ctor === "::" && _p3._0.ctor === "Pass" && _p3._1.ctor === "::" && _p3._1._0.ctor === "Bid" && _p3._1._0._0 === 1 && _p3._1._0._1.ctor === "Nothing")
+         {
+               return A2($List.all,function (bid) {    return _U.eq(bid,$Auction.Pass);},_p3._1._1);
+            } else {
+               return false;
+            }
+      }();
+      return justOpenedOneNoTrump ? responsesToOneNoTrump : _U.list([]);
+   };
    var openingBids = F2(function (favorability,history) {
       var fourthSeatThree = function (suit) {
          return {bid: A2($Auction.Bid,3,$Maybe.Just(suit))
-                ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,
-                                               $Bidding.HighCardPoints,
-                                               10,
-                                               12)
-                                               ,A2($Bidding.Minimum,
-                                               $Bidding.Length(suit),
-                                               $Bidding.Constant(7))]))};
+                ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,10,12)
+                                               ,A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(7))]))};
       };
       var preemptTricks = function (level) {
-         var margin = function () {
-            var _p3 = favorability;
-            switch (_p3.ctor)
-            {case "Unfavorable": return 2;
-               case "Equal": return 3;
-               default: return 4;}
-         }();
+         var margin = function () {    var _p4 = favorability;switch (_p4.ctor) {case "Unfavorable": return 2;case "Equal": return 3;default: return 4;}}();
          return $Bidding.Constant(6 + level - margin);
       };
       var preempt = F3(function (level,suit,trickCondition) {
          return {bid: A2($Auction.Bid,level,$Maybe.Just(suit))
-                ,meaning: $Bidding.And(_U.list([A2($Bidding.Maximum,
-                                               $Bidding.HighCardPoints,
-                                               $Bidding.Constant(10))
+                ,meaning: $Bidding.And(_U.list([A2($Bidding.Maximum,$Bidding.HighCardPoints,$Bidding.Constant(10))
                                                ,A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(7))
-                                               ,A2(trickCondition,
-                                               $Bidding.PlayingTricks,
-                                               preemptTricks(level))]))};
+                                               ,A2(trickCondition,$Bidding.PlayingTricks,preemptTricks(level))]))};
       });
-      var highestPreempt = F2(function (level,suit) {
-         return A3(preempt,level,suit,$Bidding.Minimum);
-      });
-      var moderatePreempt = F2(function (level,suit) {
-         return A3(preempt,level,suit,$Bidding.Equal);
-      });
+      var highestPreempt = F2(function (level,suit) {    return A3(preempt,level,suit,$Bidding.Minimum);});
+      var moderatePreempt = F2(function (level,suit) {    return A3(preempt,level,suit,$Bidding.Equal);});
       var strongPoints = 22;
-      var oneLevelMaximumPoints = A2($Bidding.LessThan,
-      $Bidding.HighCardPoints,
-      $Bidding.Constant(strongPoints));
+      var oneLevelMaximumPoints = A2($Bidding.LessThan,$Bidding.HighCardPoints,$Bidding.Constant(strongPoints));
       var oneLevelPoints = 13;
-      var oneLevelMinimumPoints = A2($Bidding.Minimum,
-      $Bidding.Points($Maybe.Nothing),
-      $Bidding.Constant(oneLevelPoints));
+      var oneLevelMinimumPoints = A2($Bidding.Minimum,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(oneLevelPoints));
       var weakTwo = function (suit) {
          return {bid: A2($Auction.Bid,2,$Maybe.Just(suit))
-                ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,
-                                               $Bidding.HighCardPoints,
-                                               5,
-                                               10)
-                                               ,A2($Bidding.LessThan,
-                                               $Bidding.Points($Maybe.Nothing),
-                                               $Bidding.Constant(oneLevelPoints))
+                ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,5,10)
+                                               ,A2($Bidding.LessThan,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(oneLevelPoints))
                                                ,A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
-                                               ,A2($Bidding.LessThan,
-                                               $Bidding.PlayingTricks,
-                                               preemptTricks(3))]))};
+                                               ,A2($Bidding.LessThan,$Bidding.PlayingTricks,preemptTricks(3))]))};
       };
-      var pass = {bid: $Auction.Pass
-                 ,meaning: A2($Bidding.LessThan,
-                 $Bidding.Points($Maybe.Nothing),
-                 $Bidding.Constant(oneLevelPoints))};
+      var pass = {bid: $Auction.Pass,meaning: A2($Bidding.LessThan,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(oneLevelPoints))};
       var minorLength = 3;
       var majorLength = 5;
       var openWithMinor = F2(function (minor,major) {
-         return $Bidding.Or(_U.list([A2($Bidding.LessThan,
-                                    $Bidding.Length(major),
-                                    $Bidding.Constant(majorLength))
-                                    ,A2($Bidding.GreaterThan,
-                                    $Bidding.Length(minor),
-                                    $Bidding.Length(major))]));
+         return $Bidding.Or(_U.list([A2($Bidding.LessThan,$Bidding.Length(major),$Bidding.Constant(majorLength))
+                                    ,A2($Bidding.GreaterThan,$Bidding.Length(minor),$Bidding.Length(major))]));
       });
-      var oneDiamonds = {bid: A2($Auction.Bid,
-                        1,
-                        $Maybe.Just($Card.Diamonds))
+      var oneDiamonds = {bid: A2($Auction.Bid,1,$Maybe.Just($Card.Diamonds))
                         ,meaning: $Bidding.And(_U.list([oneLevelMinimumPoints
                                                        ,oneLevelMaximumPoints
-                                                       ,A2($Bidding.Minimum,
-                                                       $Bidding.Length($Card.Diamonds),
-                                                       $Bidding.Constant(minorLength))
+                                                       ,A2($Bidding.Minimum,$Bidding.Length($Card.Diamonds),$Bidding.Constant(minorLength))
                                                        ,A2(openWithMinor,$Card.Diamonds,$Card.Spades)
                                                        ,A2(openWithMinor,$Card.Diamonds,$Card.Hearts)
-                                                       ,A2($Bidding.Minimum,
-                                                       $Bidding.Length($Card.Diamonds),
-                                                       $Bidding.Length($Card.Clubs))
+                                                       ,A2($Bidding.Minimum,$Bidding.Length($Card.Diamonds),$Bidding.Length($Card.Clubs))
                                                        ,$Bidding.Or(_U.list([A2($Bidding.GreaterThan,
                                                                             $Bidding.Length($Card.Diamonds),
                                                                             $Bidding.Length($Card.Clubs))
@@ -14328,111 +12531,58 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       var oneClubs = {bid: A2($Auction.Bid,1,$Maybe.Just($Card.Clubs))
                      ,meaning: $Bidding.And(_U.list([oneLevelMinimumPoints
                                                     ,oneLevelMaximumPoints
-                                                    ,A2($Bidding.Minimum,
-                                                    $Bidding.Length($Card.Clubs),
-                                                    $Bidding.Constant(minorLength))
+                                                    ,A2($Bidding.Minimum,$Bidding.Length($Card.Clubs),$Bidding.Constant(minorLength))
                                                     ,A2(openWithMinor,$Card.Clubs,$Card.Spades)
                                                     ,A2(openWithMinor,$Card.Clubs,$Card.Hearts)
-                                                    ,A2($Bidding.Minimum,
-                                                    $Bidding.Length($Card.Clubs),
-                                                    $Bidding.Length($Card.Diamonds))
-                                                    ,$Bidding.Or(_U.list([A2($Bidding.GreaterThan,
-                                                                         $Bidding.Length($Card.Clubs),
-                                                                         $Bidding.Length($Card.Diamonds))
+                                                    ,A2($Bidding.Minimum,$Bidding.Length($Card.Clubs),$Bidding.Length($Card.Diamonds))
+                                                    ,$Bidding.Or(_U.list([A2($Bidding.GreaterThan,$Bidding.Length($Card.Clubs),$Bidding.Length($Card.Diamonds))
                                                                          ,A2($Bidding.Maximum,
                                                                          $Bidding.Length($Card.Diamonds),
                                                                          $Bidding.Constant(minorLength))]))]))};
-      var oneSpades = {bid: A2($Auction.Bid,
-                      1,
-                      $Maybe.Just($Card.Spades))
+      var oneSpades = {bid: A2($Auction.Bid,1,$Maybe.Just($Card.Spades))
                       ,meaning: $Bidding.And(_U.list([oneLevelMinimumPoints
                                                      ,oneLevelMaximumPoints
-                                                     ,A2($Bidding.Minimum,
-                                                     $Bidding.Length($Card.Spades),
-                                                     $Bidding.Constant(majorLength))
-                                                     ,A2($Bidding.Minimum,
-                                                     $Bidding.Length($Card.Spades),
-                                                     $Bidding.Length($Card.Hearts))
-                                                     ,A2($Bidding.Minimum,
-                                                     $Bidding.Length($Card.Spades),
-                                                     $Bidding.Length($Card.Diamonds))
-                                                     ,A2($Bidding.Minimum,
-                                                     $Bidding.Length($Card.Spades),
-                                                     $Bidding.Length($Card.Clubs))]))};
-      var oneHearts = {bid: A2($Auction.Bid,
-                      1,
-                      $Maybe.Just($Card.Hearts))
+                                                     ,A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Constant(majorLength))
+                                                     ,A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Length($Card.Hearts))
+                                                     ,A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Length($Card.Diamonds))
+                                                     ,A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Length($Card.Clubs))]))};
+      var oneHearts = {bid: A2($Auction.Bid,1,$Maybe.Just($Card.Hearts))
                       ,meaning: $Bidding.And(_U.list([oneLevelMinimumPoints
                                                      ,oneLevelMaximumPoints
-                                                     ,A2($Bidding.Minimum,
-                                                     $Bidding.Length($Card.Hearts),
-                                                     $Bidding.Constant(majorLength))
-                                                     ,A2($Bidding.GreaterThan,
-                                                     $Bidding.Length($Card.Hearts),
-                                                     $Bidding.Length($Card.Spades))
-                                                     ,A2($Bidding.Minimum,
-                                                     $Bidding.Length($Card.Hearts),
-                                                     $Bidding.Length($Card.Diamonds))
-                                                     ,A2($Bidding.Minimum,
-                                                     $Bidding.Length($Card.Hearts),
-                                                     $Bidding.Length($Card.Clubs))]))};
+                                                     ,A2($Bidding.Minimum,$Bidding.Length($Card.Hearts),$Bidding.Constant(majorLength))
+                                                     ,A2($Bidding.GreaterThan,$Bidding.Length($Card.Hearts),$Bidding.Length($Card.Spades))
+                                                     ,A2($Bidding.Minimum,$Bidding.Length($Card.Hearts),$Bidding.Length($Card.Diamonds))
+                                                     ,A2($Bidding.Minimum,$Bidding.Length($Card.Hearts),$Bidding.Length($Card.Clubs))]))};
       var twoClubs = function () {
-         var fiveCardMajor = $Bidding.Or(_U.list([A2($Bidding.Minimum,
-                                                 $Bidding.Length($Card.Spades),
-                                                 $Bidding.Constant(majorLength))
-                                                 ,A2($Bidding.Minimum,
-                                                 $Bidding.Length($Card.Hearts),
-                                                 $Bidding.Constant(majorLength))]));
-         var oneShyOfMinorGame = A2($Bidding.Minimum,
-         $Bidding.PlayingTricks,
-         $Bidding.Constant(10));
-         var oneShyOfMajorGame = $Bidding.And(_U.list([A2($Bidding.Minimum,
-                                                      $Bidding.PlayingTricks,
-                                                      $Bidding.Constant(9))
-                                                      ,fiveCardMajor]));
-         var weakerMeaning = $Bidding.And(_U.list([A2($Bidding.Minimum,
-                                                  $Bidding.HighCardPoints,
-                                                  $Bidding.Constant(17))
+         var fiveCardMajor = $Bidding.Or(_U.list([A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Constant(majorLength))
+                                                 ,A2($Bidding.Minimum,$Bidding.Length($Card.Hearts),$Bidding.Constant(majorLength))]));
+         var oneShyOfMinorGame = A2($Bidding.Minimum,$Bidding.PlayingTricks,$Bidding.Constant(10));
+         var oneShyOfMajorGame = $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.PlayingTricks,$Bidding.Constant(9)),fiveCardMajor]));
+         var weakerMeaning = $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.HighCardPoints,$Bidding.Constant(17))
                                                   ,$Bidding.Or(_U.list([oneShyOfMajorGame,oneShyOfMinorGame]))]));
-         var standardMeaning = A2($Bidding.Minimum,
-         $Bidding.HighCardPoints,
-         $Bidding.Constant(strongPoints));
-         return {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Clubs))
-                ,meaning: $Bidding.Or(_U.list([standardMeaning
-                                              ,weakerMeaning]))};
+         var standardMeaning = A2($Bidding.Minimum,$Bidding.HighCardPoints,$Bidding.Constant(strongPoints));
+         return {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Clubs)),meaning: $Bidding.Or(_U.list([standardMeaning,weakerMeaning]))};
       }();
       var noTrump = F3(function (level,lo,hi) {
          return {bid: A2($Auction.Bid,level,$Maybe.Nothing)
-                ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,
-                                               $Bidding.HighCardPoints,
-                                               lo,
-                                               hi)
-                                               ,$Bidding.Balanced]))};
+                ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,lo,hi),$Bidding.Balanced]))};
       });
       var oneNoTrump = A3(noTrump,1,15,17);
       var twoNoTrump = A3(noTrump,2,20,21);
       var threeNoTrump = A3(noTrump,3,25,27);
       var fourthSeat = function () {
-         var _p4 = history;
-         if (_p4.ctor === "::" && _p4._1.ctor === "::" && _p4._1._1.ctor === "::" && _p4._1._1._1.ctor === "[]")
-         {
+         var _p5 = history;
+         if (_p5.ctor === "::" && _p5._1.ctor === "::" && _p5._1._1.ctor === "::" && _p5._1._1._1.ctor === "[]") {
                return true;
             } else {
                return false;
             }
       }();
-      var threeInsteadOfOne = function (suit) {
-         var betterBid = fourthSeat ? fourthSeatThree(suit) : A2(highestPreempt,
-         3,
-         suit);
-         return betterBid.meaning;
-      };
+      var threeInsteadOfOne = function (suit) {    var betterBid = fourthSeat ? fourthSeatThree(suit) : A2(highestPreempt,3,suit);return betterBid.meaning;};
       var preempts = fourthSeat ? _U.list([fourthSeatThree($Card.Clubs)
                                           ,fourthSeatThree($Card.Diamonds)
                                           ,fourthSeatThree($Card.Hearts)
-                                          ,fourthSeatThree($Card.Spades)]) : _U.list([A2(moderatePreempt,
-                                                                                     3,
-                                                                                     $Card.Clubs)
+                                          ,fourthSeatThree($Card.Spades)]) : _U.list([A2(moderatePreempt,3,$Card.Clubs)
                                                                                      ,A2(moderatePreempt,3,$Card.Diamonds)
                                                                                      ,A2(moderatePreempt,3,$Card.Hearts)
                                                                                      ,A2(moderatePreempt,3,$Card.Spades)
@@ -14444,30 +12594,19 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                                                                                      ,A2(highestPreempt,5,$Card.Diamonds)]);
       return prioritized(_U.list([_U.list([threeNoTrump])
                                  ,preempts
-                                 ,_U.list([twoClubs
-                                          ,weakTwo($Card.Diamonds)
-                                          ,weakTwo($Card.Hearts)
-                                          ,weakTwo($Card.Spades)])
-                                 ,_U.list([oneNoTrump
-                                          ,twoNoTrump
-                                          ,oneSpades
-                                          ,oneHearts
-                                          ,oneDiamonds
-                                          ,oneClubs])
+                                 ,_U.list([twoClubs,weakTwo($Card.Diamonds),weakTwo($Card.Hearts),weakTwo($Card.Spades)])
+                                 ,_U.list([oneNoTrump,twoNoTrump,oneSpades,oneHearts,oneDiamonds,oneClubs])
                                  ,_U.list([pass])]));
    });
    var suggest = F2(function (favorability,history) {
-      var _p5 = $Bidding.role(history);
-      if (_p5.ctor === "Openable") {
-            return A2(openingBids,favorability,history);
-         } else {
-            return _U.list([]);
-         }
+      var _p6 = $Bidding.role(history);
+      switch (_p6.ctor)
+      {case "Openable": return A2(openingBids,favorability,history);
+         case "Responder": return responseBids(history);
+         default: return _U.list([]);}
    });
-   var system = {name: "Standard American Yellow Card"
-                ,suggestions: suggest};
-   return _elm.Bidding.StandardAmerican.values = {_op: _op
-                                                 ,system: system};
+   var system = {name: "Standard American Yellow Card",suggestions: suggest};
+   return _elm.Bidding.StandardAmerican.values = {_op: _op,system: system};
 };
 Elm.Game = Elm.Game || {};
 Elm.Game.make = function (_elm) {
@@ -14494,58 +12633,30 @@ Elm.Game.make = function (_elm) {
    $Vulnerability = Elm.Vulnerability.make(_elm);
    var _op = {};
    var currentBidder = F2(function (dealer,auction) {
-      return A3($List.foldl,
-      F2(function (x,y) {    return x(y);}),
-      dealer,
-      A2($List.repeat,$List.length(auction),$Seat.next));
+      return A3($List.foldl,F2(function (x,y) {    return x(y);}),dealer,A2($List.repeat,$List.length(auction),$Seat.next));
    });
    var bidForBots = function (oldState) {
       bidForBots: while (true) {
-         var nextBidder = A2(currentBidder,
-         oldState.dealer,
-         oldState.auction);
-         if (!_U.eq(nextBidder,
-         $Seat.South) && $Auction.isOpen(A2($List.map,
-         function (_) {
-            return _.bid;
-         },
-         oldState.auction))) {
-               var favorability = A2($Vulnerability.favorability,
-               nextBidder,
-               oldState.vulnerability);
-               var _p0 = A5($Bidding.choose,
-               oldState.system,
-               favorability,
-               oldState.auction,
-               A2($Seat.lookup,nextBidder,oldState.hands),
-               oldState.seed);
+         var nextBidder = A2(currentBidder,oldState.dealer,oldState.auction);
+         if (!_U.eq(nextBidder,$Seat.South) && $Auction.isOpen(A2($List.map,function (_) {    return _.bid;},oldState.auction))) {
+               var favorability = A2($Vulnerability.favorability,nextBidder,oldState.vulnerability);
+               var _p0 = A5($Bidding.choose,oldState.system,favorability,oldState.auction,A2($Seat.lookup,nextBidder,oldState.hands),oldState.seed);
                var newBid = _p0._0;
                var newSeed = _p0._1;
                var newAuction = A2($List._op["::"],newBid,oldState.auction);
-               var _v0 = _U.update(oldState,
-               {auction: newAuction,seed: newSeed});
+               var _v0 = _U.update(oldState,{auction: newAuction,seed: newSeed});
                oldState = _v0;
                continue bidForBots;
             } else return oldState;
       }
    };
    var deal = F3(function (dealer,vulnerability,seed) {
-      var _p1 = A2($Random.generate,
-      $Random$Array.shuffle($Card.deck),
-      seed);
+      var _p1 = A2($Random.generate,$Random$Array.shuffle($Card.deck),seed);
       var shuffled = _p1._0;
       var seed$ = _p1._1;
       var cardsPerHand = $Array.length(shuffled) / 4 | 0;
-      var takeCards = function (n) {
-         return $Array.toList(A3($Array.slice,
-         cardsPerHand * n,
-         cardsPerHand * (n + 1),
-         shuffled));
-      };
-      var hands = {west: takeCards(0)
-                  ,north: takeCards(1)
-                  ,east: takeCards(2)
-                  ,south: takeCards(3)};
+      var takeCards = function (n) {    return $Array.toList(A3($Array.slice,cardsPerHand * n,cardsPerHand * (n + 1),shuffled));};
+      var hands = {west: takeCards(0),north: takeCards(1),east: takeCards(2),south: takeCards(3)};
       var state = {system: $Bidding$StandardAmerican.system
                   ,hands: hands
                   ,dealer: dealer
@@ -14562,67 +12673,34 @@ Elm.Game.make = function (_elm) {
                switch (_p2._0.ctor)
                {case "Reseed": break _v1_0;
                   case "NewDeal": var _p3 = _p2._1._0;
-                    var newState = bidForBots(A3(deal,
-                    $Seat.next(_p3.dealer),
-                    $Vulnerability.next(_p3.vulnerability),
-                    _p3.seed));
+                    var newState = bidForBots(A3(deal,$Seat.next(_p3.dealer),$Vulnerability.next(_p3.vulnerability),_p3.seed));
                     var newVulnerability = $Vulnerability.next(_p3.vulnerability);
-                    return {ctor: "_Tuple2"
-                           ,_0: $Maybe.Just(newState)
-                           ,_1: $Effects.none};
+                    return {ctor: "_Tuple2",_0: $Maybe.Just(newState),_1: $Effects.none};
                   case "Bid": var _p4 = _p2._1._0;
-                    var favorability = A2($Vulnerability.favorability,
-                    A2(currentBidder,_p4.dealer,_p4.auction),
-                    _p4.vulnerability);
-                    var annotated = A4($Bidding.annotate,
-                    _p4.system,
-                    favorability,
-                    _p4.auction,
-                    _p2._0._0);
-                    var newState = bidForBots(_U.update(_p4,
-                    {auction: A2($List._op["::"],annotated,_p4.auction)}));
-                    return {ctor: "_Tuple2"
-                           ,_0: $Maybe.Just(newState)
-                           ,_1: $Effects.none};
-                  default: var newState = _U.update(_p2._1._0,
-                    {explained: _p2._0._0});
-                    return {ctor: "_Tuple2"
-                           ,_0: $Maybe.Just(newState)
-                           ,_1: $Effects.none};}
+                    var favorability = A2($Vulnerability.favorability,A2(currentBidder,_p4.dealer,_p4.auction),_p4.vulnerability);
+                    var annotated = A4($Bidding.annotate,_p4.system,favorability,_p4.auction,_p2._0._0);
+                    var newState = bidForBots(_U.update(_p4,{auction: A2($List._op["::"],annotated,_p4.auction)}));
+                    return {ctor: "_Tuple2",_0: $Maybe.Just(newState),_1: $Effects.none};
+                  default: var newState = _U.update(_p2._1._0,{explained: _p2._0._0});
+                    return {ctor: "_Tuple2",_0: $Maybe.Just(newState),_1: $Effects.none};}
             } else {
                if (_p2._0.ctor === "Reseed") {
                      break _v1_0;
                   } else {
-                     return {ctor: "_Tuple2"
-                            ,_0: $Maybe.Nothing
-                            ,_1: $Effects.none};
+                     return {ctor: "_Tuple2",_0: $Maybe.Nothing,_1: $Effects.none};
                   }
             }
       } while (false);
       var seed = $Random.initialSeed($Basics.round(_p2._0._0));
       var state = A3(deal,$Seat.South,$Vulnerability.initial,seed);
-      return {ctor: "_Tuple2"
-             ,_0: $Maybe.Just(state)
-             ,_1: $Effects.none};
+      return {ctor: "_Tuple2",_0: $Maybe.Just(state),_1: $Effects.none};
    });
-   var Explain = function (a) {
-      return {ctor: "Explain",_0: a};
-   };
+   var Explain = function (a) {    return {ctor: "Explain",_0: a};};
    var Bid = function (a) {    return {ctor: "Bid",_0: a};};
    var NewDeal = {ctor: "NewDeal"};
    var Reseed = function (a) {    return {ctor: "Reseed",_0: a};};
-   var init = {ctor: "_Tuple2"
-              ,_0: $Maybe.Nothing
-              ,_1: $Effects.tick(Reseed)};
-   var GameState = F7(function (a,b,c,d,e,f,g) {
-      return {system: a
-             ,hands: b
-             ,dealer: c
-             ,vulnerability: d
-             ,auction: e
-             ,seed: f
-             ,explained: g};
-   });
+   var init = {ctor: "_Tuple2",_0: $Maybe.Nothing,_1: $Effects.tick(Reseed)};
+   var GameState = F7(function (a,b,c,d,e,f,g) {    return {system: a,hands: b,dealer: c,vulnerability: d,auction: e,seed: f,explained: g};});
    return _elm.Game.values = {_op: _op
                              ,init: init
                              ,update: update
@@ -14663,61 +12741,31 @@ Elm.View.make = function (_elm) {
          {case "And": return _p0._0;
             case "Or": return _p0._0;
             default: return _U.crashCase("View",
-              {start: {line: 379,column: 7},end: {line: 382,column: 82}},
+              {start: {line: 381,column: 7},end: {line: 384,column: 82}},
               _p0)("tried to take grandchildren over non-conjunction nodes");}
       };
-      var isOr = function (meaning) {
-         var _p2 = meaning;
-         if (_p2.ctor === "Or") {
-               return true;
-            } else {
-               return false;
-            }
-      };
-      var isAnd = function (meaning) {
-         var _p3 = meaning;
-         if (_p3.ctor === "And") {
-               return true;
-            } else {
-               return false;
-            }
-      };
+      var isOr = function (meaning) {    var _p2 = meaning;if (_p2.ctor === "Or") {    return true;} else {    return false;}};
+      var isAnd = function (meaning) {    var _p3 = meaning;if (_p3.ctor === "And") {    return true;} else {    return false;}};
       var _p4 = meaning;
       switch (_p4.ctor)
-      {case "And": var children$ = A2($List.map,
-           collapseRedundancies,
-           _p4._0);
-           return A2($List.all,
-           isAnd,
-           children$) ? $Bidding.And(A2($List.concatMap,
-           grandchildren,
-           children$)) : $Bidding.And(children$);
-         case "Or": var children$ = A2($List.map,
-           collapseRedundancies,
-           _p4._0);
-           return A2($List.all,
-           isOr,
-           children$) ? $Bidding.Or(A2($List.concatMap,
-           grandchildren,
-           children$)) : $Bidding.Or(children$);
+      {case "And": var children$ = A2($List.map,collapseRedundancies,_p4._0);
+           return A2($List.all,isAnd,children$) ? $Bidding.And(A2($List.concatMap,grandchildren,children$)) : $Bidding.And(children$);
+         case "Or": var children$ = A2($List.map,collapseRedundancies,_p4._0);
+           return A2($List.all,isOr,children$) ? $Bidding.Or(A2($List.concatMap,grandchildren,children$)) : $Bidding.Or(children$);
          default: return meaning;}
    };
    var collapseDegenerates = function (meaning) {
       collapseDegenerates: while (true) {
          var _p5 = meaning;
          switch (_p5.ctor)
-         {case "And":
-            if (_p5._0.ctor === "::" && _p5._0._1.ctor === "[]") {
+         {case "And": if (_p5._0.ctor === "::" && _p5._0._1.ctor === "[]") {
                     var _v5 = _p5._0._0;
                     meaning = _v5;
                     continue collapseDegenerates;
                  } else {
-                    return $Bidding.And(A2($List.map,
-                    collapseDegenerates,
-                    _p5._0));
+                    return $Bidding.And(A2($List.map,collapseDegenerates,_p5._0));
                  }
-            case "Or": if (_p5._0.ctor === "::" && _p5._0._1.ctor === "[]")
-              {
+            case "Or": if (_p5._0.ctor === "::" && _p5._0._1.ctor === "[]") {
                     var _v6 = _p5._0._0;
                     meaning = _v6;
                     continue collapseDegenerates;
@@ -14732,31 +12780,21 @@ Elm.View.make = function (_elm) {
       var scrub = function (child) {
          var _p6 = child;
          switch (_p6.ctor)
-         {case "And": return $Maybe.Just($Bidding.And(A2($List.map,
-              hideDenials,
-              _p6._0)));
-            case "Or": return $Maybe.Just($Bidding.Or(A2($List.map,
-              hideDenials,
-              _p6._0)));
+         {case "And": return $Maybe.Just($Bidding.And(A2($List.map,hideDenials,_p6._0)));
+            case "Or": return $Maybe.Just($Bidding.Or(A2($List.map,hideDenials,_p6._0)));
             case "Deny": return $Maybe.Nothing;
             default: return $Maybe.Just(child);}
       };
       var _p7 = meaning;
       switch (_p7.ctor)
-      {case "And": return $Bidding.And(A2($List.filterMap,
-           scrub,
-           _p7._0));
+      {case "And": return $Bidding.And(A2($List.filterMap,scrub,_p7._0));
          case "Or": return $Bidding.Or(A2($List.map,hideDenials,_p7._0));
          default: return meaning;}
    };
-   var simplify = function (_p8) {
-      return collapseRedundancies(collapseDegenerates(hideDenials(_p8)));
-   };
+   var simplify = function (_p8) {    return collapseRedundancies(collapseDegenerates(hideDenials(_p8)));};
    var viewVulnerability = function (vuln) {
       var message = function () {
-         var _p9 = {ctor: "_Tuple2"
-                   ,_0: vuln.northSouth
-                   ,_1: vuln.eastWest};
+         var _p9 = {ctor: "_Tuple2",_0: vuln.northSouth,_1: vuln.eastWest};
          if (_p9._0 === false) {
                if (_p9._1 === false) {
                      return "neither side vulnerable";
@@ -14774,18 +12812,12 @@ Elm.View.make = function (_elm) {
       return $Html.text(message);
    };
    var cluster = F3(function (filler,count,elems) {
-      var pad = function (chunk) {
-         return A2($Basics._op["++"],
-         chunk,
-         A2($List.repeat,count - $List.length(chunk),filler));
-      };
+      var pad = function (chunk) {    return A2($Basics._op["++"],chunk,A2($List.repeat,count - $List.length(chunk),filler));};
       var _p10 = A2($List.take,count,elems);
       if (_p10.ctor === "[]") {
             return _U.list([]);
          } else {
-            return A2($List._op["::"],
-            pad(_p10),
-            A3(cluster,filler,count,A2($List.drop,count,elems)));
+            return A2($List._op["::"],pad(_p10),A3(cluster,filler,count,A2($List.drop,count,elems)));
          }
    });
    var suitText = function (suit) {
@@ -14812,9 +12844,7 @@ Elm.View.make = function (_elm) {
          var _p13 = trump;
          if (_p13.ctor === "Just") {
                var _p14 = _p13._0;
-               return A2($Html.span,
-               _U.list([suitClass(_p14)]),
-               _U.list([$Html.text(suitText(_p14))]));
+               return A2($Html.span,_U.list([suitClass(_p14)]),_U.list([$Html.text(suitText(_p14))]));
             } else {
                return $Html.text("NT");
             }
@@ -14824,14 +12854,9 @@ Elm.View.make = function (_elm) {
       {case "Pass": return _U.list([$Html.text("Pass")]);
          case "Double": return _U.list([$Html.text("Double")]);
          case "Redouble": return _U.list([$Html.text("Redouble")]);
-         default: return _U.list([$Html.text($Basics.toString(_p15._0))
-                                 ,viewTrump(_p15._1)]);}
+         default: return _U.list([$Html.text($Basics.toString(_p15._0)),viewTrump(_p15._1)]);}
    };
-   var suitSymbol = function (suit) {
-      return A2($Html.span,
-      _U.list([suitClass(suit)]),
-      _U.list([$Html.text(suitText(suit))]));
-   };
+   var suitSymbol = function (suit) {    return A2($Html.span,_U.list([suitClass(suit)]),_U.list([$Html.text(suitText(suit))]));};
    var viewMetric = function (metric) {
       var _p16 = metric;
       switch (_p16.ctor)
@@ -14843,70 +12868,35 @@ Elm.View.make = function (_elm) {
                  if (_p16._0._0.ctor === "Nothing") {
                        return $Html.text("Points (NT)");
                     } else {
-                       return A2($Html.span,
-                       _U.list([]),
-                       _U.list([$Html.text("Points (")
-                               ,suitSymbol(_p16._0._0._0)
-                               ,$Html.text(")")]));
+                       return A2($Html.span,_U.list([]),_U.list([$Html.text("Points ("),suitSymbol(_p16._0._0._0),$Html.text(")")]));
                     }
               }
-         case "Length": return A2($Html.span,
-           _U.list([]),
-           _U.list([$Html.text("Length of "),suitSymbol(_p16._0)]));
-         default: return $Html.text("Playing Tricks");}
+         case "Length": return A2($Html.span,_U.list([]),_U.list([$Html.text("Length of "),suitSymbol(_p16._0)]));
+         case "PlayingTricks": return $Html.text("Playing Tricks");
+         default: return A2($Html.span,_U.list([]),_U.list([$Html.text("Quick Losers ("),suitSymbol(_p16._0),$Html.text(")")]));}
    };
    var viewMeaning = function (meaning) {
       var list = F2(function (description,meanings) {
          return A2($Html.div,
          _U.list([]),
          _U.list([$Html.text(description)
-                 ,A2($Html.ul,
-                 _U.list([]),
-                 A2($List.map,
-                 function (m) {
-                    return A2($Html.li,_U.list([]),_U.list([viewMeaning(m)]));
-                 },
-                 meanings))]));
+                 ,A2($Html.ul,_U.list([]),A2($List.map,function (m) {    return A2($Html.li,_U.list([]),_U.list([viewMeaning(m)]));},meanings))]));
       });
       var _p17 = meaning;
       switch (_p17.ctor)
-      {case "OutOfSystem":
-         return $Html.text("(not part of the bidding system)");
+      {case "OutOfSystem": return $Html.text("(not part of the bidding system)");
          case "InRange": return A2($Html.span,
            _U.list([]),
            _U.list([viewMetric(_p17._0)
                    ,$Html.text(A2($Basics._op["++"],
                    " between ",
-                   A2($Basics._op["++"],
-                   $Basics.toString(_p17._1),
-                   A2($Basics._op["++"]," and ",$Basics.toString(_p17._2)))))]));
-         case "Equal": return A2($Html.span,
-           _U.list([]),
-           _U.list([viewMetric(_p17._0)
-                   ,$Html.text(" = ")
-                   ,viewMetric(_p17._1)]));
-         case "Minimum": return A2($Html.span,
-           _U.list([]),
-           _U.list([viewMetric(_p17._0)
-                   ,$Html.text(" ≥ ")
-                   ,viewMetric(_p17._1)]));
-         case "Maximum": return A2($Html.span,
-           _U.list([]),
-           _U.list([viewMetric(_p17._0)
-                   ,$Html.text(" ≤ ")
-                   ,viewMetric(_p17._1)]));
-         case "GreaterThan": return A2($Html.span,
-           _U.list([]),
-           _U.list([viewMetric(_p17._0)
-                   ,$Html.text(" > ")
-                   ,viewMetric(_p17._1)]));
-         case "LessThan": return A2($Html.span,
-           _U.list([]),
-           _U.list([viewMetric(_p17._0)
-                   ,$Html.text(" < ")
-                   ,viewMetric(_p17._1)]));
-         case "Balanced":
-         return $Html.text("Balanced (4-3-3-3, 4-4-3-2, or 5-3-3-2)");
+                   A2($Basics._op["++"],$Basics.toString(_p17._1),A2($Basics._op["++"]," and ",$Basics.toString(_p17._2)))))]));
+         case "Equal": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p17._0),$Html.text(" = "),viewMetric(_p17._1)]));
+         case "Minimum": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p17._0),$Html.text(" ≥ "),viewMetric(_p17._1)]));
+         case "Maximum": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p17._0),$Html.text(" ≤ "),viewMetric(_p17._1)]));
+         case "GreaterThan": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p17._0),$Html.text(" > "),viewMetric(_p17._1)]));
+         case "LessThan": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p17._0),$Html.text(" < "),viewMetric(_p17._1)]));
+         case "Balanced": return $Html.text("Balanced (4-3-3-3, 4-4-3-2, or 5-3-3-2)");
          case "Or": return A2(list,"Any of:",_p17._0);
          case "And": return A2(list,"All of:",_p17._0);
          default: return A2(list,"Deny:",_U.list([_p17._0]));}
@@ -14917,75 +12907,38 @@ Elm.View.make = function (_elm) {
          if (_p18.ctor === "Nothing") {
                return _U.list([]);
             } else {
-               return _U.list([A2($Html.h1,
-                              _U.list([]),
-                              _U.list([$Html.text("Explanation")]))
-                              ,viewMeaning(simplify(_p18._0))]);
+               return _U.list([A2($Html.h1,_U.list([]),_U.list([$Html.text("Explanation")])),viewMeaning(simplify(_p18._0))]);
             }
       }();
       return A2($Html.div,_U.list([]),content);
    };
-   var makeBidCell = F4(function (address,
-   system,
-   favorability,
-   history) {
-      var levels = F2(function (bid1,bid2) {
-         return _U.eq($Auction.level(bid1.bid),
-         $Auction.level(bid2.bid));
-      });
+   var makeBidCell = F4(function (address,system,favorability,history) {
+      var levels = F2(function (bid1,bid2) {    return _U.eq($Auction.level(bid1.bid),$Auction.level(bid2.bid));});
       var movePassToRightSide = function (bids) {
          var _p19 = bids;
          if (_p19.ctor === "::" && _p19._1.ctor === "::") {
                var _p20 = _p19._1._0;
-               return _U.eq($Auction.level(_p20.bid),0) ? A2($List._op["::"],
-               _p20,
-               A2($List._op["::"],_p19._0,_p19._1._1)) : bids;
+               return _U.eq($Auction.level(_p20.bid),0) ? A2($List._op["::"],_p20,A2($List._op["::"],_p19._0,_p19._1._1)) : bids;
             } else {
                return bids;
             }
       };
       var button = function (bid) {
-         var events = _U.list([A2($Html$Events.onClick,
-                              address,
-                              $Game.Bid(bid.bid))
-                              ,A2($Html$Events.onMouseEnter,
-                              address,
-                              $Game.Explain($Maybe.Just(bid.meaning)))
-                              ,A2($Html$Events.onMouseLeave,
-                              address,
-                              $Game.Explain($Maybe.Nothing))]);
+         var events = _U.list([A2($Html$Events.onClick,address,$Game.Bid(bid.bid))
+                              ,A2($Html$Events.onMouseEnter,address,$Game.Explain($Maybe.Just(bid.meaning)))
+                              ,A2($Html$Events.onMouseLeave,address,$Game.Explain($Maybe.Nothing))]);
          return A2($Html.button,events,viewBid(bid.bid));
       };
-      var legalBids = $Auction.legalBids(A2($List.map,
-      function (_) {
-         return _.bid;
-      },
-      history));
-      var annotatedLegalBids = A2($List.map,
-      A3($Bidding.annotate,system,favorability,history),
-      legalBids);
+      var legalBids = $Auction.legalBids(A2($List.map,function (_) {    return _.bid;},history));
+      var annotatedLegalBids = A2($List.map,A3($Bidding.annotate,system,favorability,history),legalBids);
       var buttons = A2($List$Extra.intercalate,
       _U.list([A2($Html.br,_U.list([]),_U.list([]))]),
-      A2($List.map,
-      $List.map(button),
-      A2($List$Extra.groupBy,
-      levels,
-      movePassToRightSide(annotatedLegalBids))));
-      return A2($Html.td,
-      _U.list([$Html$Attributes.$class("choices")]),
-      buttons);
+      A2($List.map,$List.map(button),A2($List$Extra.groupBy,levels,movePassToRightSide(annotatedLegalBids))));
+      return A2($Html.td,_U.list([$Html$Attributes.$class("choices")]),buttons);
    });
-   var viewAuction = F5(function (address,
-   dealer,
-   system,
-   vulnerability,
-   annotatedAuction) {
-      var row = function (cells) {
-         return A2($Html.tr,_U.list([]),cells);
-      };
-      var nullCell = A2($Html.td,
-      _U.list([]),
-      _U.list([$Html.text("—")]));
+   var viewAuction = F5(function (address,dealer,system,vulnerability,annotatedAuction) {
+      var row = function (cells) {    return A2($Html.tr,_U.list([]),cells);};
+      var nullCell = A2($Html.td,_U.list([]),_U.list([$Html.text("—")]));
       var nullCells = function () {
          var _p21 = dealer;
          switch (_p21.ctor)
@@ -14996,47 +12949,19 @@ Elm.View.make = function (_elm) {
       }();
       var blankCell = A2($Html.td,_U.list([]),_U.list([]));
       var bidCell = function (bid) {
-         var events = _U.list([A2($Html$Events.onMouseEnter,
-                              address,
-                              $Game.Explain($Maybe.Just(bid.meaning)))
-                              ,A2($Html$Events.onMouseLeave,
-                              address,
-                              $Game.Explain($Maybe.Nothing))]);
+         var events = _U.list([A2($Html$Events.onMouseEnter,address,$Game.Explain($Maybe.Just(bid.meaning)))
+                              ,A2($Html$Events.onMouseLeave,address,$Game.Explain($Maybe.Nothing))]);
          return A2($Html.td,events,viewBid(bid.bid));
       };
-      var headerCell = function (name) {
-         return A2($Html.th,_U.list([]),_U.list([$Html.text(name)]));
-      };
-      var favorability = A2($Vulnerability.favorability,
-      A2($Game.currentBidder,dealer,annotatedAuction),
-      vulnerability);
-      var auction = A2($List.map,
-      function (_) {
-         return _.bid;
-      },
-      annotatedAuction);
-      var makeBidCells = $Auction.isOpen(auction) ? _U.list([A4(makeBidCell,
-      address,
-      system,
-      favorability,
-      annotatedAuction)]) : _U.list([]);
-      var allCells = A2($Basics._op["++"],
-      nullCells,
-      A2($Basics._op["++"],
-      $List.reverse(A2($List.map,bidCell,annotatedAuction)),
-      makeBidCells));
+      var headerCell = function (name) {    return A2($Html.th,_U.list([]),_U.list([$Html.text(name)]));};
+      var favorability = A2($Vulnerability.favorability,A2($Game.currentBidder,dealer,annotatedAuction),vulnerability);
+      var auction = A2($List.map,function (_) {    return _.bid;},annotatedAuction);
+      var makeBidCells = $Auction.isOpen(auction) ? _U.list([A4(makeBidCell,address,system,favorability,annotatedAuction)]) : _U.list([]);
+      var allCells = A2($Basics._op["++"],nullCells,A2($Basics._op["++"],$List.reverse(A2($List.map,bidCell,annotatedAuction)),makeBidCells));
       return A2($Html.table,
       _U.list([$Html$Attributes.$class("auction")]),
-      _U.list([A2($Html.thead,
-              _U.list([]),
-              _U.list([A2($Html.tr,
-              _U.list([]),
-              A2($List.map,
-              headerCell,
-              _U.list(["West","North","East","South"])))]))
-              ,A2($Html.tbody,
-              _U.list([]),
-              A2($List.map,row,A3(cluster,blankCell,4,allCells)))]));
+      _U.list([A2($Html.thead,_U.list([]),_U.list([A2($Html.tr,_U.list([]),A2($List.map,headerCell,_U.list(["West","North","East","South"])))]))
+              ,A2($Html.tbody,_U.list([]),A2($List.map,row,A3(cluster,blankCell,4,allCells)))]));
    });
    var viewRank = function (card) {
       var value = function () {
@@ -15059,21 +12984,9 @@ Elm.View.make = function (_elm) {
       return A2($Html.li,_U.list([]),_U.list([$Html.text(value)]));
    };
    var viewSuit = F2(function (hand,suit) {
-      var cards = A2($List.sortWith,
-      $Card.rankDescending,
-      A2($List.filter,
-      function (card) {
-         return _U.eq(card.suit,suit);
-      },
-      hand));
-      var contents = $List.isEmpty(cards) ? _U.list([A2($Html.li,
-      _U.list([]),
-      _U.list([$Html.text("—")]))]) : A2($List.map,viewRank,cards);
-      return A2($Html.li,
-      _U.list([suitClass(suit)]),
-      _U.list([A2($Html.ul,
-      _U.list([$Html$Attributes.$class("ranks")]),
-      contents)]));
+      var cards = A2($List.sortWith,$Card.rankDescending,A2($List.filter,function (card) {    return _U.eq(card.suit,suit);},hand));
+      var contents = $List.isEmpty(cards) ? _U.list([A2($Html.li,_U.list([]),_U.list([$Html.text("—")]))]) : A2($List.map,viewRank,cards);
+      return A2($Html.li,_U.list([suitClass(suit)]),_U.list([A2($Html.ul,_U.list([$Html$Attributes.$class("ranks")]),contents)]));
    });
    var viewHand = F2(function (seat,hand) {
       return A2($Html.div,
@@ -15081,43 +12994,21 @@ Elm.View.make = function (_elm) {
       _U.list([$Html.text($Basics.toString(seat))
               ,A2($Html.ul,
               _U.list([$Html$Attributes.$class("suits")]),
-              A2($List.map,
-              viewSuit(hand),
-              _U.list([$Card.Spades
-                      ,$Card.Hearts
-                      ,$Card.Diamonds
-                      ,$Card.Clubs])))]));
+              A2($List.map,viewSuit(hand),_U.list([$Card.Spades,$Card.Hearts,$Card.Diamonds,$Card.Clubs])))]));
    });
    var viewState = F2(function (address,state) {
-      var seatCell = function (seat) {
-         return A2($Html.td,
-         _U.list([]),
-         _U.list([A2(viewHand,seat,A2($Seat.lookup,seat,state.hands))]));
-      };
+      var seatCell = function (seat) {    return A2($Html.td,_U.list([]),_U.list([A2(viewHand,seat,A2($Seat.lookup,seat,state.hands))]));};
       var emptyCell = A2($Html.td,_U.list([]),_U.list([]));
       return A2($Html.div,
       _U.list([]),
       _U.list([viewVulnerability(state.vulnerability)
               ,A2($Html.table,
               _U.list([]),
-              _U.list([A2($Html.tr,
-                      _U.list([]),
-                      _U.list([emptyCell,seatCell($Seat.North),emptyCell]))
-                      ,A2($Html.tr,
-                      _U.list([]),
-                      _U.list([seatCell($Seat.West),emptyCell,seatCell($Seat.East)]))
-                      ,A2($Html.tr,
-                      _U.list([]),
-                      _U.list([emptyCell,seatCell($Seat.South),emptyCell]))]))
-              ,A5(viewAuction,
-              address,
-              state.dealer,
-              state.system,
-              state.vulnerability,
-              state.auction)
-              ,A2($Html.button,
-              _U.list([A2($Html$Events.onClick,address,$Game.NewDeal)]),
-              _U.list([$Html.text("Rage Quit")]))
+              _U.list([A2($Html.tr,_U.list([]),_U.list([emptyCell,seatCell($Seat.North),emptyCell]))
+                      ,A2($Html.tr,_U.list([]),_U.list([seatCell($Seat.West),emptyCell,seatCell($Seat.East)]))
+                      ,A2($Html.tr,_U.list([]),_U.list([emptyCell,seatCell($Seat.South),emptyCell]))]))
+              ,A5(viewAuction,address,state.dealer,state.system,state.vulnerability,state.auction)
+              ,A2($Html.button,_U.list([A2($Html$Events.onClick,address,$Game.NewDeal)]),_U.list([$Html.text("Rage Quit")]))
               ,viewExplanation(state.explained)]));
    });
    var view = F2(function (address,model) {
@@ -15128,12 +13019,7 @@ Elm.View.make = function (_elm) {
             return A2($Html.div,_U.list([]),_U.list([]));
          }
    });
-   return _elm.View.values = {_op: _op
-                             ,view: view
-                             ,viewState: viewState
-                             ,viewHand: viewHand
-                             ,viewSuit: viewSuit
-                             ,viewAuction: viewAuction};
+   return _elm.View.values = {_op: _op,view: view,viewState: viewState,viewHand: viewHand,viewSuit: viewSuit,viewAuction: viewAuction};
 };
 Elm.Main = Elm.Main || {};
 Elm.Main.make = function (_elm) {
@@ -15154,12 +13040,8 @@ Elm.Main.make = function (_elm) {
    $Task = Elm.Task.make(_elm),
    $View = Elm.View.make(_elm);
    var _op = {};
-   var app = $StartApp.start({init: $Game.init
-                             ,view: $View.view
-                             ,update: $Game.update
-                             ,inputs: _U.list([])});
-   var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",
-   app.tasks);
+   var app = $StartApp.start({init: $Game.init,view: $View.view,update: $Game.update,inputs: _U.list([])});
+   var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
    var main = app.html;
    return _elm.Main.values = {_op: _op,main: main};
 };
