@@ -804,33 +804,43 @@ oneNoTrumpResponseSuite =
           , clubs = [ Card.King, Card.Ten, Card.Nine ]
           }
 
-        , { name = "17 points, 6 hearts"
+        , { name = "16 HCP, 2-2-4-5 distribution"
+          , expected = [Auction.Bid 4 Nothing]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+          , spades = [ Card.King, Card.Five ]
+          , hearts = [ Card.Ace, Card.King ]
+          , diamonds = [ Card.Queen, Card.Seven, Card.Six, Card.Four ]
+          , clubs = [ Card.Ace, Card.Eight, Card.Five, Card.Three, Card.Two ]
+          }
+
+        , { name = "16 points, 6 hearts"
           , expected = [Auction.Bid 3 (Just Card.Hearts)]
           , favorability = Vulnerability.Equal
           , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
-          , spades = [ Card.Ace, Card.Ten, Card.Nine ]
+          , spades = [ Card.King, Card.Ten, Card.Nine ]
           , hearts = [ Card.Ace, Card.Jack, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
           , diamonds = [ Card.King, Card.Ten ]
           , clubs = [ Card.King, Card.Ten ]
           }
 
-        , { name = "17 points, 6 spades"
+        , { name = "16 points, 6 spades"
           , expected = [Auction.Bid 3 (Just Card.Spades)]
           , favorability = Vulnerability.Equal
           , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
           , spades = [ Card.Ace, Card.Jack, Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
-          , hearts = [ Card.Ace, Card.Ten, Card.Nine ]
+          , hearts = [ Card.King, Card.Ten, Card.Nine ]
           , diamonds = [ Card.King, Card.Ten ]
           , clubs = [ Card.King, Card.Ten ]
           }
 
-        , { name = "17 HCP, 4-4-3-2 distribution"
+        , { name = "16 HCP, 4-4-3-2 distribution"
           , expected = [Auction.Bid 4 Nothing]
           , favorability = Vulnerability.Equal
           , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
           , spades = [ Card.Ace, Card.Jack, Card.Ten, Card.Nine ]
           , hearts = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight ]
-          , diamonds = [ Card.Ace, Card.Ten, Card.Nine ]
+          , diamonds = [ Card.King, Card.Ten, Card.Nine ]
           , clubs = [ Card.Ace, Card.Ten ]
           }
 

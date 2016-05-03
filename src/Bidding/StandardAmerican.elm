@@ -238,7 +238,7 @@ responseBids history =
 responsesToOneNoTrump : List Bidding.AnnotatedBid
 responsesToOneNoTrump =
   let
-    inviteSlamPoints = Bidding.Constant (33 - 16)
+    inviteSlamPoints = Bidding.Constant (33 - 17)
     noFourCardMajor =
       Bidding.And
         [ Bidding.Maximum (Bidding.Length Card.Spades) (Bidding.Constant 3)
@@ -316,7 +316,7 @@ responsesToOneNoTrump =
       { bid = Auction.Bid 4 Nothing
       , meaning = Bidding.And
           [ Bidding.Equal Bidding.HighCardPoints inviteSlamPoints
-          , Bidding.Balanced
+          , Bidding.Or [Bidding.Balanced, Bidding.SemiBalanced]
           ]
       }
     noVoids =
