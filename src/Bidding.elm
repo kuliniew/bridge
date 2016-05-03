@@ -55,6 +55,7 @@ type Meaning
   | GreaterThan Metric Metric
   | LessThan Metric Metric
   | Balanced
+  | SemiBalanced
   | Or (List Meaning)
   | And (List Meaning)
   | Deny Meaning
@@ -130,7 +131,10 @@ satisfiedBy hand bid =
           eval below hand < eval metric hand
         LessThan metric above ->
           eval metric hand < eval above hand
-        Balanced -> Evaluation.balanced (Evaluation.distribution hand)
+        Balanced ->
+          Evaluation.balanced (Evaluation.distribution hand)
+        SemiBalanced ->
+          Evaluation.semiBalanced (Evaluation.distribution hand)
         Or alternatives ->
           List.any satisfies alternatives
         And requirements ->

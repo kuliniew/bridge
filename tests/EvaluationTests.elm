@@ -22,6 +22,7 @@ all =
     , lengthSuite
     , distributionSuite
     , balancedSuite
+    , semiBalancedSuite
 
     , playingTricksSuite
 
@@ -273,8 +274,34 @@ balancedSuite =
     , ElmTest.test "5-4-2-2 is not balanced" <|
         ElmTest.assert (not <| Evaluation.balanced [5, 4, 2, 2])
 
+    , ElmTest.test "6-3-2-2 is not balanced" <|
+        ElmTest.assert (not <| Evaluation.balanced [6, 3, 2, 2])
+
     , ElmTest.test "4-4-4-1 is not balanced" <|
         ElmTest.assert (not <| Evaluation.balanced [4, 4, 4, 1])
+    ]
+
+
+semiBalancedSuite : ElmTest.Test
+semiBalancedSuite =
+  ElmTest.suite "semiBalanced"
+    [ ElmTest.test "5-4-2-2 is semi-balanced" <|
+        ElmTest.assert (Evaluation.semiBalanced [5, 4, 2, 2])
+
+    , ElmTest.test "6-3-2-2 is semi-balanced" <|
+        ElmTest.assert (Evaluation.semiBalanced [6, 3, 2, 2])
+
+    , ElmTest.test "4-4-3-2 is not semi-balanced" <|
+        ElmTest.assert (not <| Evaluation.semiBalanced [4, 4, 3, 2])
+
+    , ElmTest.test "4-3-3-3 is not semi-balanced" <|
+        ElmTest.assert (not <| Evaluation.semiBalanced [4, 3, 3, 3])
+
+    , ElmTest.test "5-3-3-2 is not semi-balanced" <|
+        ElmTest.assert (not <| Evaluation.semiBalanced [5, 3, 3, 2])
+
+    , ElmTest.test "4-4-4-1 is not semi-balanced" <|
+        ElmTest.assert (not <| Evaluation.semiBalanced [4, 4, 4, 1])
     ]
 
 

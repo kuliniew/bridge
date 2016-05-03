@@ -7,6 +7,7 @@ module Evaluation
   , length
   , distribution
   , balanced
+  , semiBalanced
 
   , playingTricks
   , playingTricksAny
@@ -90,6 +91,15 @@ balanced dist =
     [4, 4, 3, 2] -> True
     [4, 3, 3, 3] -> True
     [5, 3, 3, 2] -> True
+    _ -> False
+
+
+{-| Check if a distribution is semi-balanced.
+-}
+semiBalanced dist =
+  case dist of
+    [5, 4, 2, 2] -> True
+    [6, 3, 2, 2] -> True
     _ -> False
 
 
