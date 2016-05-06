@@ -11950,6 +11950,26 @@ Elm.Auction.make = function (_elm) {
    };
    return _elm.Auction.values = {_op: _op,isOpen: isOpen,legalBids: legalBids,level: level,Pass: Pass,Double: Double,Redouble: Redouble,Bid: Bid};
 };
+Elm.Convention = Elm.Convention || {};
+Elm.Convention.make = function (_elm) {
+   "use strict";
+   _elm.Convention = _elm.Convention || {};
+   if (_elm.Convention.values) return _elm.Convention.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var Finish = function (a) {    return {ctor: "Finish",_0: a};};
+   var Start = function (a) {    return {ctor: "Start",_0: a};};
+   var Stayman = {ctor: "Stayman"};
+   var JacobyTransfer = {ctor: "JacobyTransfer"};
+   var Gerber = {ctor: "Gerber"};
+   return _elm.Convention.values = {_op: _op,Gerber: Gerber,JacobyTransfer: JacobyTransfer,Stayman: Stayman,Start: Start,Finish: Finish};
+};
 Elm.Evaluation = Elm.Evaluation || {};
 Elm.Evaluation.make = function (_elm) {
    "use strict";
@@ -12259,6 +12279,7 @@ Elm.Bidding.make = function (_elm) {
    $Auction = Elm.Auction.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Card = Elm.Card.make(_elm),
+   $Convention = Elm.Convention.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Evaluation = Elm.Evaluation.make(_elm),
    $List = Elm.List.make(_elm),
@@ -12282,7 +12303,7 @@ Elm.Bidding.make = function (_elm) {
          case 1: return Defender;
          case 2: return Responder;
          case 3: return Defender;
-         default: return _U.crashCase("Bidding",{start: {line: 184,column: 5},end: {line: 189,column: 106}},_p0)(A2($Basics._op["++"],
+         default: return _U.crashCase("Bidding",{start: {line: 198,column: 5},end: {line: 203,column: 106}},_p0)(A2($Basics._op["++"],
            "bidsFromOpening % 4 wound up being ",
            A2($Basics._op["++"],$Basics.toString(bidsFromOpening)," somehow!")));}
    };
@@ -12343,19 +12364,20 @@ Elm.Bidding.make = function (_elm) {
    var Equal = F2(function (a,b) {    return {ctor: "Equal",_0: a,_1: b};});
    var InRange = F3(function (a,b,c) {    return {ctor: "InRange",_0: a,_1: b,_2: c};});
    var OutOfSystem = {ctor: "OutOfSystem"};
+   var outOfSystem = function (bid) {    return {bid: bid,meaning: OutOfSystem,description: $Maybe.Nothing,convention: $Maybe.Nothing};};
    var annotate = F4(function (system,favorability,history,bid) {
       var _p6 = A2(lookup,bid,A2(system.suggestions,favorability,history));
       if (_p6.ctor === "Just") {
             return _p6._0;
          } else {
-            return {bid: bid,meaning: OutOfSystem};
+            return outOfSystem(bid);
          }
    });
    var choose = F4(function (system,favorability,history,hand) {
-      var fallback = {bid: $Auction.Pass,meaning: OutOfSystem};
+      var fallback = outOfSystem($Auction.Pass);
       return $Random.generate(A2($Random$Extra.selectWithDefault,fallback,A4(viableChoices,system,favorability,history,hand)));
    });
-   var AnnotatedBid = F2(function (a,b) {    return {bid: a,meaning: b};});
+   var AnnotatedBid = F4(function (a,b,c,d) {    return {bid: a,meaning: b,description: c,convention: d};});
    var System = F2(function (a,b) {    return {name: a,suggestions: b};});
    return _elm.Bidding.values = {_op: _op
                                 ,annotate: annotate
@@ -12400,6 +12422,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Bidding = Elm.Bidding.make(_elm),
    $Card = Elm.Card.make(_elm),
+   $Convention = Elm.Convention.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
@@ -12436,6 +12459,8 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       }();
       var minorSlam = function (suit) {
          return {bid: A2($Auction.Bid,6,$Maybe.Just(suit))
+                ,description: $Maybe.Just("Slam")
+                ,convention: $Maybe.Nothing
                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Points($Maybe.Just($Maybe.Just(suit))),$Bidding.Constant(20))
                                                ,A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
                                                ,atLeastOneVoid]))};
@@ -12444,17 +12469,26 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
          var noVoidIn = function (suit) {    return A2($Bidding.GreaterThan,$Bidding.Length(suit),$Bidding.Constant(0));};
          return A2($List.map,noVoidIn,suits);
       }();
-      var bidGame = {bid: A2($Auction.Bid,3,$Maybe.Nothing),meaning: A3($Bidding.InRange,$Bidding.HighCardPoints,10,15)};
+      var bidGame = {bid: A2($Auction.Bid,3,$Maybe.Nothing)
+                    ,description: $Maybe.Just("Game")
+                    ,convention: $Maybe.Nothing
+                    ,meaning: A3($Bidding.InRange,$Bidding.HighCardPoints,10,15)};
       var inviteGameWithLongMinor = function (suit) {
          return {bid: A2($Auction.Bid,3,$Maybe.Just(suit))
+                ,description: $Maybe.Just("Game invite")
+                ,convention: $Maybe.Nothing
                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
                                                ,A3($Bidding.InRange,$Bidding.HighCardPoints,7,9)]))};
       };
       var minorTransfer = {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Spades))
+                          ,description: $Maybe.Just("Minor Transfer")
+                          ,convention: $Maybe.Nothing
                           ,meaning: $Bidding.And(_U.list([$Bidding.Or(_U.list([A2($Bidding.Minimum,$Bidding.Length($Card.Clubs),$Bidding.Constant(6))
                                                                               ,A2($Bidding.Minimum,$Bidding.Length($Card.Diamonds),$Bidding.Constant(6))]))
                                                          ,A2($Bidding.LessThan,$Bidding.HighCardPoints,$Bidding.Constant(7))]))};
       var pass = {bid: $Auction.Pass
+                 ,description: $Maybe.Nothing
+                 ,convention: $Maybe.Nothing
                  ,meaning: $Bidding.And(_U.list([A2($Bidding.Maximum,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(7))
                                                 ,A2($Bidding.LessThan,$Bidding.Length($Card.Spades),$Bidding.Constant(5))
                                                 ,A2($Bidding.LessThan,$Bidding.Length($Card.Hearts),$Bidding.Constant(5))
@@ -12466,6 +12500,8 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       },
       suits));
       var stayman = {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Clubs))
+                    ,description: $Maybe.Nothing
+                    ,convention: $Maybe.Just($Convention.Start($Convention.Stayman))
                     ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(8))
                                                    ,$Bidding.Or(_U.list([A2($Bidding.Equal,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))
                                                                         ,A2($Bidding.Equal,$Bidding.Length($Card.Spades),$Bidding.Constant(4))]))
@@ -12474,17 +12510,23 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       var noFourCardMajor = $Bidding.And(_U.list([A2($Bidding.Maximum,$Bidding.Length($Card.Spades),$Bidding.Constant(3))
                                                  ,A2($Bidding.Maximum,$Bidding.Length($Card.Hearts),$Bidding.Constant(3))]));
       var inviteGame = {bid: A2($Auction.Bid,2,$Maybe.Nothing)
+                       ,description: $Maybe.Just("Game invite")
+                       ,convention: $Maybe.Nothing
                        ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,8,9)
                                                       ,$Bidding.Balanced
                                                       ,$Bidding.Or(_U.list([noFourCardMajor,fourThreeThreeThree]))]))};
       var inviteSlamPoints = 33 - 17;
       var inviteSlam = function (suit) {
          return {bid: A2($Auction.Bid,3,$Maybe.Just(suit))
+                ,description: $Maybe.Just("Slam invite")
+                ,convention: $Maybe.Nothing
                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
                                                ,A2($Bidding.Minimum,$Bidding.Points($Maybe.Just($Maybe.Just(suit))),$Bidding.Constant(inviteSlamPoints))]))};
       };
       var jacobyTransfer = F2(function (target,via) {
          return {bid: A2($Auction.Bid,2,$Maybe.Just(via))
+                ,description: $Maybe.Nothing
+                ,convention: $Maybe.Just($Convention.Start($Convention.JacobyTransfer))
                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(target),$Bidding.Constant(5)),$Bidding.Deny(inviteSlam(target).meaning)]))};
       });
       var priority3 = _U.list([pass
@@ -12496,9 +12538,13 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                               ,bidGame]);
       var priority2 = _U.list([inviteGameWithLongMinor($Card.Clubs),inviteGameWithLongMinor($Card.Diamonds),inviteSlam($Card.Hearts),inviteSlam($Card.Spades)]);
       var inviteSlamNoTrump = {bid: A2($Auction.Bid,4,$Maybe.Nothing)
+                              ,description: $Maybe.Just("Quantitative raise")
+                              ,convention: $Maybe.Nothing
                               ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,inviteSlamPoints,inviteSlamPoints + 1)
                                                              ,$Bidding.Or(_U.list([$Bidding.Balanced,$Bidding.SemiBalanced]))]))};
       var gerber = {bid: A2($Auction.Bid,4,$Maybe.Just($Card.Clubs))
+                   ,description: $Maybe.Nothing
+                   ,convention: $Maybe.Just($Convention.Start($Convention.Gerber))
                    ,meaning: $Bidding.And(A2($List._op["::"],
                    A2($Bidding.GreaterThan,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(inviteSlamPoints)),
                    A2($Basics._op["++"],noVoids,noTwoQuickLosers)))};
@@ -12520,6 +12566,8 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
    var openingBids = F2(function (favorability,history) {
       var fourthSeatThree = function (suit) {
          return {bid: A2($Auction.Bid,3,$Maybe.Just(suit))
+                ,description: $Maybe.Just("Non-preempt")
+                ,convention: $Maybe.Nothing
                 ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,10,12)
                                                ,A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(7))]))};
       };
@@ -12529,6 +12577,8 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       };
       var preempt = F3(function (level,suit,trickCondition) {
          return {bid: A2($Auction.Bid,level,$Maybe.Just(suit))
+                ,description: $Maybe.Just("Preempt")
+                ,convention: $Maybe.Nothing
                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Maximum,$Bidding.HighCardPoints,$Bidding.Constant(10))
                                                ,A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(7))
                                                ,A2(trickCondition,$Bidding.PlayingTricks,preemptTricks(level))]))};
@@ -12541,12 +12591,17 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       var oneLevelMinimumPoints = A2($Bidding.Minimum,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(oneLevelPoints));
       var weakTwo = function (suit) {
          return {bid: A2($Auction.Bid,2,$Maybe.Just(suit))
+                ,description: $Maybe.Just("Weak")
+                ,convention: $Maybe.Nothing
                 ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,5,10)
                                                ,A2($Bidding.LessThan,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(oneLevelPoints))
                                                ,A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
                                                ,A2($Bidding.LessThan,$Bidding.PlayingTricks,preemptTricks(3))]))};
       };
-      var pass = {bid: $Auction.Pass,meaning: A2($Bidding.LessThan,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(oneLevelPoints))};
+      var pass = {bid: $Auction.Pass
+                 ,description: $Maybe.Nothing
+                 ,convention: $Maybe.Nothing
+                 ,meaning: A2($Bidding.LessThan,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(oneLevelPoints))};
       var minorLength = 3;
       var majorLength = 5;
       var openWithMinor = F2(function (minor,major) {
@@ -12554,6 +12609,8 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                                     ,A2($Bidding.GreaterThan,$Bidding.Length(minor),$Bidding.Length(major))]));
       });
       var oneDiamonds = {bid: A2($Auction.Bid,1,$Maybe.Just($Card.Diamonds))
+                        ,description: $Maybe.Just("No five-card major")
+                        ,convention: $Maybe.Nothing
                         ,meaning: $Bidding.And(_U.list([oneLevelMinimumPoints
                                                        ,oneLevelMaximumPoints
                                                        ,A2($Bidding.Minimum,$Bidding.Length($Card.Diamonds),$Bidding.Constant(minorLength))
@@ -12567,6 +12624,8 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                                                                             $Bidding.Length($Card.Diamonds),
                                                                             $Bidding.Constant(minorLength + 1))]))]))};
       var oneClubs = {bid: A2($Auction.Bid,1,$Maybe.Just($Card.Clubs))
+                     ,description: $Maybe.Just("No five-card major")
+                     ,convention: $Maybe.Nothing
                      ,meaning: $Bidding.And(_U.list([oneLevelMinimumPoints
                                                     ,oneLevelMaximumPoints
                                                     ,A2($Bidding.Minimum,$Bidding.Length($Card.Clubs),$Bidding.Constant(minorLength))
@@ -12578,6 +12637,8 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                                                                          $Bidding.Length($Card.Diamonds),
                                                                          $Bidding.Constant(minorLength))]))]))};
       var oneSpades = {bid: A2($Auction.Bid,1,$Maybe.Just($Card.Spades))
+                      ,description: $Maybe.Just("Five-card major")
+                      ,convention: $Maybe.Nothing
                       ,meaning: $Bidding.And(_U.list([oneLevelMinimumPoints
                                                      ,oneLevelMaximumPoints
                                                      ,A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Constant(majorLength))
@@ -12585,6 +12646,8 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                                                      ,A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Length($Card.Diamonds))
                                                      ,A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Length($Card.Clubs))]))};
       var oneHearts = {bid: A2($Auction.Bid,1,$Maybe.Just($Card.Hearts))
+                      ,description: $Maybe.Just("Five-card major")
+                      ,convention: $Maybe.Nothing
                       ,meaning: $Bidding.And(_U.list([oneLevelMinimumPoints
                                                      ,oneLevelMaximumPoints
                                                      ,A2($Bidding.Minimum,$Bidding.Length($Card.Hearts),$Bidding.Constant(majorLength))
@@ -12599,10 +12662,15 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
          var weakerMeaning = $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.HighCardPoints,$Bidding.Constant(17))
                                                   ,$Bidding.Or(_U.list([oneShyOfMajorGame,oneShyOfMinorGame]))]));
          var standardMeaning = A2($Bidding.Minimum,$Bidding.HighCardPoints,$Bidding.Constant(strongPoints));
-         return {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Clubs)),meaning: $Bidding.Or(_U.list([standardMeaning,weakerMeaning]))};
+         return {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Clubs))
+                ,description: $Maybe.Just("Strong 2♣")
+                ,convention: $Maybe.Nothing
+                ,meaning: $Bidding.Or(_U.list([standardMeaning,weakerMeaning]))};
       }();
       var noTrump = F3(function (level,lo,hi) {
          return {bid: A2($Auction.Bid,level,$Maybe.Nothing)
+                ,description: $Maybe.Just("Balanced opening")
+                ,convention: $Maybe.Nothing
                 ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,lo,hi),$Bidding.Balanced]))};
       });
       var oneNoTrump = A3(noTrump,1,15,17);
@@ -12759,6 +12827,7 @@ Elm.View.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Bidding = Elm.Bidding.make(_elm),
    $Card = Elm.Card.make(_elm),
+   $Convention = Elm.Convention.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Game = Elm.Game.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -12779,7 +12848,7 @@ Elm.View.make = function (_elm) {
          {case "And": return _p0._0;
             case "Or": return _p0._0;
             default: return _U.crashCase("View",
-              {start: {line: 383,column: 7},end: {line: 386,column: 82}},
+              {start: {line: 412,column: 7},end: {line: 415,column: 82}},
               _p0)("tried to take grandchildren over non-conjunction nodes");}
       };
       var isOr = function (meaning) {    var _p2 = meaning;if (_p2.ctor === "Or") {    return true;} else {    return false;}};
@@ -12830,17 +12899,54 @@ Elm.View.make = function (_elm) {
          default: return meaning;}
    };
    var simplify = function (_p8) {    return collapseRedundancies(collapseDegenerates(hideDenials(_p8)));};
+   var viewConvention = function (convention) {
+      return $Html.text(function () {
+         var _p9 = convention;
+         switch (_p9.ctor)
+         {case "Gerber": return "Gerber";
+            case "JacobyTransfer": return "Jacoby Transfer";
+            default: return "Stayman";}
+      }());
+   };
+   var viewDescription = function (bid) {
+      return A2($Html.div,
+      _U.list([]),
+      function () {
+         var _p10 = {ctor: "_Tuple2",_0: bid.convention,_1: bid.description};
+         if (_p10._0.ctor === "Just") {
+               if (_p10._0._0.ctor === "Start") {
+                     if (_p10._1.ctor === "Just") {
+                           return _U.list([viewConvention(_p10._0._0._0),$Html.text(": "),$Html.text(_p10._1._0)]);
+                        } else {
+                           return _U.list([viewConvention(_p10._0._0._0)]);
+                        }
+                  } else {
+                     if (_p10._1.ctor === "Just") {
+                           return _U.list([viewConvention(_p10._0._0._0),$Html.text(" response: "),$Html.text(_p10._1._0)]);
+                        } else {
+                           return _U.list([viewConvention(_p10._0._0._0),$Html.text(" response")]);
+                        }
+                  }
+            } else {
+               if (_p10._1.ctor === "Just") {
+                     return _U.list([$Html.text(_p10._1._0)]);
+                  } else {
+                     return _U.list([]);
+                  }
+            }
+      }());
+   };
    var viewVulnerability = function (vuln) {
       var message = function () {
-         var _p9 = {ctor: "_Tuple2",_0: vuln.northSouth,_1: vuln.eastWest};
-         if (_p9._0 === false) {
-               if (_p9._1 === false) {
+         var _p11 = {ctor: "_Tuple2",_0: vuln.northSouth,_1: vuln.eastWest};
+         if (_p11._0 === false) {
+               if (_p11._1 === false) {
                      return "neither side vulnerable";
                   } else {
                      return "East/West vulnerable";
                   }
             } else {
-               if (_p9._1 === false) {
+               if (_p11._1 === false) {
                      return "North/South vulnerable";
                   } else {
                      return "both sides vulnerable";
@@ -12851,16 +12957,16 @@ Elm.View.make = function (_elm) {
    };
    var cluster = F3(function (filler,count,elems) {
       var pad = function (chunk) {    return A2($Basics._op["++"],chunk,A2($List.repeat,count - $List.length(chunk),filler));};
-      var _p10 = A2($List.take,count,elems);
-      if (_p10.ctor === "[]") {
+      var _p12 = A2($List.take,count,elems);
+      if (_p12.ctor === "[]") {
             return _U.list([]);
          } else {
-            return A2($List._op["::"],pad(_p10),A3(cluster,filler,count,A2($List.drop,count,elems)));
+            return A2($List._op["::"],pad(_p12),A3(cluster,filler,count,A2($List.drop,count,elems)));
          }
    });
    var suitText = function (suit) {
-      var _p11 = suit;
-      switch (_p11.ctor)
+      var _p13 = suit;
+      switch (_p13.ctor)
       {case "Clubs": return "♣";
          case "Diamonds": return "♦";
          case "Hearts": return "♥";
@@ -12868,8 +12974,8 @@ Elm.View.make = function (_elm) {
    };
    var suitClass = function (suit) {
       var $class = function () {
-         var _p12 = suit;
-         switch (_p12.ctor)
+         var _p14 = suit;
+         switch (_p14.ctor)
          {case "Clubs": return "clubs";
             case "Diamonds": return "diamonds";
             case "Hearts": return "hearts";
@@ -12879,39 +12985,39 @@ Elm.View.make = function (_elm) {
    };
    var viewBid = function (bid) {
       var viewTrump = function (trump) {
-         var _p13 = trump;
-         if (_p13.ctor === "Just") {
-               var _p14 = _p13._0;
-               return A2($Html.span,_U.list([suitClass(_p14)]),_U.list([$Html.text(suitText(_p14))]));
+         var _p15 = trump;
+         if (_p15.ctor === "Just") {
+               var _p16 = _p15._0;
+               return A2($Html.span,_U.list([suitClass(_p16)]),_U.list([$Html.text(suitText(_p16))]));
             } else {
                return $Html.text("NT");
             }
       };
-      var _p15 = bid;
-      switch (_p15.ctor)
+      var _p17 = bid;
+      switch (_p17.ctor)
       {case "Pass": return _U.list([$Html.text("Pass")]);
          case "Double": return _U.list([$Html.text("Double")]);
          case "Redouble": return _U.list([$Html.text("Redouble")]);
-         default: return _U.list([$Html.text($Basics.toString(_p15._0)),viewTrump(_p15._1)]);}
+         default: return _U.list([$Html.text($Basics.toString(_p17._0)),viewTrump(_p17._1)]);}
    };
    var suitSymbol = function (suit) {    return A2($Html.span,_U.list([suitClass(suit)]),_U.list([$Html.text(suitText(suit))]));};
    var viewMetric = function (metric) {
-      var _p16 = metric;
-      switch (_p16.ctor)
-      {case "Constant": return $Html.text($Basics.toString(_p16._0));
+      var _p18 = metric;
+      switch (_p18.ctor)
+      {case "Constant": return $Html.text($Basics.toString(_p18._0));
          case "HighCardPoints": return $Html.text("HCP");
-         case "Points": if (_p16._0.ctor === "Nothing") {
+         case "Points": if (_p18._0.ctor === "Nothing") {
                  return $Html.text("Points (counting length)");
               } else {
-                 if (_p16._0._0.ctor === "Nothing") {
+                 if (_p18._0._0.ctor === "Nothing") {
                        return $Html.text("Points (NT)");
                     } else {
-                       return A2($Html.span,_U.list([]),_U.list([$Html.text("Points ("),suitSymbol(_p16._0._0._0),$Html.text(")")]));
+                       return A2($Html.span,_U.list([]),_U.list([$Html.text("Points ("),suitSymbol(_p18._0._0._0),$Html.text(")")]));
                     }
               }
-         case "Length": return A2($Html.span,_U.list([]),_U.list([$Html.text("Length of "),suitSymbol(_p16._0)]));
+         case "Length": return A2($Html.span,_U.list([]),_U.list([$Html.text("Length of "),suitSymbol(_p18._0)]));
          case "PlayingTricks": return $Html.text("Playing Tricks");
-         default: return A2($Html.span,_U.list([]),_U.list([$Html.text("Quick Losers ("),suitSymbol(_p16._0),$Html.text(")")]));}
+         default: return A2($Html.span,_U.list([]),_U.list([$Html.text("Quick Losers ("),suitSymbol(_p18._0),$Html.text(")")]));}
    };
    var viewMeaning = function (meaning) {
       var list = F2(function (description,meanings) {
@@ -12920,33 +13026,34 @@ Elm.View.make = function (_elm) {
          _U.list([$Html.text(description)
                  ,A2($Html.ul,_U.list([]),A2($List.map,function (m) {    return A2($Html.li,_U.list([]),_U.list([viewMeaning(m)]));},meanings))]));
       });
-      var _p17 = meaning;
-      switch (_p17.ctor)
+      var _p19 = meaning;
+      switch (_p19.ctor)
       {case "OutOfSystem": return $Html.text("(not part of the bidding system)");
          case "InRange": return A2($Html.span,
            _U.list([]),
-           _U.list([viewMetric(_p17._0)
+           _U.list([viewMetric(_p19._0)
                    ,$Html.text(A2($Basics._op["++"],
                    " between ",
-                   A2($Basics._op["++"],$Basics.toString(_p17._1),A2($Basics._op["++"]," and ",$Basics.toString(_p17._2)))))]));
-         case "Equal": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p17._0),$Html.text(" = "),viewMetric(_p17._1)]));
-         case "Minimum": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p17._0),$Html.text(" ≥ "),viewMetric(_p17._1)]));
-         case "Maximum": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p17._0),$Html.text(" ≤ "),viewMetric(_p17._1)]));
-         case "GreaterThan": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p17._0),$Html.text(" > "),viewMetric(_p17._1)]));
-         case "LessThan": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p17._0),$Html.text(" < "),viewMetric(_p17._1)]));
+                   A2($Basics._op["++"],$Basics.toString(_p19._1),A2($Basics._op["++"]," and ",$Basics.toString(_p19._2)))))]));
+         case "Equal": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p19._0),$Html.text(" = "),viewMetric(_p19._1)]));
+         case "Minimum": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p19._0),$Html.text(" ≥ "),viewMetric(_p19._1)]));
+         case "Maximum": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p19._0),$Html.text(" ≤ "),viewMetric(_p19._1)]));
+         case "GreaterThan": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p19._0),$Html.text(" > "),viewMetric(_p19._1)]));
+         case "LessThan": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p19._0),$Html.text(" < "),viewMetric(_p19._1)]));
          case "Balanced": return $Html.text("Balanced (4-3-3-3, 4-4-3-2, or 5-3-3-2)");
          case "SemiBalanced": return $Html.text("Semi-balaned (5-4-2-2 or 6-3-2-2)");
-         case "Or": return A2(list,"Any of:",_p17._0);
-         case "And": return A2(list,"All of:",_p17._0);
-         default: return A2(list,"Deny:",_U.list([_p17._0]));}
+         case "Or": return A2(list,"Any of:",_p19._0);
+         case "And": return A2(list,"All of:",_p19._0);
+         default: return A2(list,"Deny:",_U.list([_p19._0]));}
    };
-   var viewExplanation = function (explained) {
+   var viewExplanation = function (target) {
       var content = function () {
-         var _p18 = explained;
-         if (_p18.ctor === "Nothing") {
+         var _p20 = target;
+         if (_p20.ctor === "Nothing") {
                return _U.list([]);
             } else {
-               return _U.list([A2($Html.h1,_U.list([]),_U.list([$Html.text("Explanation")])),viewMeaning(simplify(_p18._0))]);
+               var _p21 = _p20._0;
+               return _U.list([A2($Html.h1,_U.list([]),_U.list([$Html.text("Explanation")])),viewDescription(_p21),viewMeaning(simplify(_p21.meaning))]);
             }
       }();
       return A2($Html.div,_U.list([]),content);
@@ -12954,17 +13061,17 @@ Elm.View.make = function (_elm) {
    var makeBidCell = F4(function (address,system,favorability,history) {
       var levels = F2(function (bid1,bid2) {    return _U.eq($Auction.level(bid1.bid),$Auction.level(bid2.bid));});
       var movePassToRightSide = function (bids) {
-         var _p19 = bids;
-         if (_p19.ctor === "::" && _p19._1.ctor === "::") {
-               var _p20 = _p19._1._0;
-               return _U.eq($Auction.level(_p20.bid),0) ? A2($List._op["::"],_p20,A2($List._op["::"],_p19._0,_p19._1._1)) : bids;
+         var _p22 = bids;
+         if (_p22.ctor === "::" && _p22._1.ctor === "::") {
+               var _p23 = _p22._1._0;
+               return _U.eq($Auction.level(_p23.bid),0) ? A2($List._op["::"],_p23,A2($List._op["::"],_p22._0,_p22._1._1)) : bids;
             } else {
                return bids;
             }
       };
       var button = function (bid) {
          var events = _U.list([A2($Html$Events.onClick,address,$Game.Bid(bid.bid))
-                              ,A2($Html$Events.onMouseEnter,address,$Game.Explain($Maybe.Just(bid.meaning)))
+                              ,A2($Html$Events.onMouseEnter,address,$Game.Explain($Maybe.Just(bid)))
                               ,A2($Html$Events.onMouseLeave,address,$Game.Explain($Maybe.Nothing))]);
          return A2($Html.button,events,viewBid(bid.bid));
       };
@@ -12979,8 +13086,8 @@ Elm.View.make = function (_elm) {
       var row = function (cells) {    return A2($Html.tr,_U.list([]),cells);};
       var nullCell = A2($Html.td,_U.list([]),_U.list([$Html.text("—")]));
       var nullCells = function () {
-         var _p21 = dealer;
-         switch (_p21.ctor)
+         var _p24 = dealer;
+         switch (_p24.ctor)
          {case "West": return _U.list([]);
             case "North": return _U.list([nullCell]);
             case "East": return _U.list([nullCell,nullCell]);
@@ -12988,7 +13095,7 @@ Elm.View.make = function (_elm) {
       }();
       var blankCell = A2($Html.td,_U.list([]),_U.list([]));
       var bidCell = function (bid) {
-         var events = _U.list([A2($Html$Events.onMouseEnter,address,$Game.Explain($Maybe.Just(bid.meaning)))
+         var events = _U.list([A2($Html$Events.onMouseEnter,address,$Game.Explain($Maybe.Just(bid)))
                               ,A2($Html$Events.onMouseLeave,address,$Game.Explain($Maybe.Nothing))]);
          return A2($Html.td,events,viewBid(bid.bid));
       };
@@ -13004,8 +13111,8 @@ Elm.View.make = function (_elm) {
    });
    var viewRank = function (card) {
       var value = function () {
-         var _p22 = card.rank;
-         switch (_p22.ctor)
+         var _p25 = card.rank;
+         switch (_p25.ctor)
          {case "Ace": return "A";
             case "King": return "K";
             case "Queen": return "Q";
@@ -13051,9 +13158,9 @@ Elm.View.make = function (_elm) {
               ,viewExplanation(state.explained)]));
    });
    var view = F2(function (address,model) {
-      var _p23 = model;
-      if (_p23.ctor === "Just") {
-            return A2(viewState,address,_p23._0);
+      var _p26 = model;
+      if (_p26.ctor === "Just") {
+            return A2(viewState,address,_p26._0);
          } else {
             return A2($Html.div,_U.list([]),_U.list([]));
          }
