@@ -96,6 +96,7 @@ balanced dist =
 
 {-| Check if a distribution is semi-balanced.
 -}
+semiBalanced : List Int -> Bool
 semiBalanced dist =
   case dist of
     [5, 4, 2, 2] -> True

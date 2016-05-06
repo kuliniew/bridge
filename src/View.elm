@@ -297,6 +297,8 @@ viewMeaning meaning =
           ]
       Bidding.Balanced ->
         Html.text "Balanced (4-3-3-3, 4-4-3-2, or 5-3-3-2)"
+      Bidding.SemiBalanced ->
+        Html.text "Semi-balaned (5-4-2-2 or 6-3-2-2)"
       Bidding.Or meanings ->
         list "Any of:" meanings
       Bidding.And meanings ->
