@@ -303,7 +303,7 @@ responsesToOneNoTrump =
       }
     bidGame =
       { bid = Auction.Bid 3 Nothing
-      , meaning = Bidding.InRange Bidding.HighCardPoints 10 13
+      , meaning = Bidding.InRange Bidding.HighCardPoints 10 15
       }
     inviteSlam suit =
       { bid = Auction.Bid 3 (Just suit)

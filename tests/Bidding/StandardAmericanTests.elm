@@ -817,6 +817,19 @@ oneNoTrumpResponseSuite =
           , clubs = [ Card.King, Card.Ten, Card.Nine ]
           }
 
+          -- Not quite sure about this one.  According to http://www.bridgebum.com/1nt_15_17.php
+          -- 3NT is for 10-13 HCP, but hands like this are slightly stronger but not good enough
+          -- for a slam invite.
+        , { name = "14 HCP"
+          , expected = [Auction.Bid 3 Nothing]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+          , spades = [ Card.King, Card.Jack ]
+          , hearts = [ Card.King, Card.Three, Card.Two ]
+          , diamonds = [ Card.King, Card.Seven, Card.Four ]
+          , clubs = [ Card.Ace, Card.Six, Card.Five, Card.Four, Card.Three ]
+          }
+
         , { name = "16 HCP, 2-2-4-5 distribution"
           , expected = [Auction.Bid 4 Nothing]
           , favorability = Vulnerability.Equal
