@@ -298,7 +298,7 @@ responsesToOneNoTrump =
       { bid = Auction.Bid 3 (Just suit)
       , meaning = Bidding.And
           [ Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 6)
-          , Bidding.InRange Bidding.HighCardPoints 7 8
+          , Bidding.InRange Bidding.HighCardPoints 7 9
           ]
       }
     bidGame =

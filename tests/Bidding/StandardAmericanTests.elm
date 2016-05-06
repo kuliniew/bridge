@@ -754,6 +754,19 @@ oneNoTrumpResponseSuite =
           , clubs = [ Card.King, Card.Nine ]
           }
 
+          -- Not quite sure about this one.  According to http://www.bridgebum.com/1nt_15_17.php
+          -- 3-clubs is for 7-8 HCP and 3NT is for 10-13 HCP.  Let's say 9 HCP and 6 clubs is
+          -- better treated as the former.
+        , { name = "9 HCP, 6 clubs"
+          , expected = [Auction.Bid 3 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+          , spades = [ Card.Jack, Card.Seven ]
+          , hearts = [ Card.Ten ]
+          , diamonds = [ Card.Jack, Card.Ten, Card.Six, Card.Four ]
+          , clubs = [ Card.Ace, Card.King, Card.Ten, Card.Seven, Card.Five, Card.Four ]
+          }
+
         , { name = "9 points, 4 spades, 4-3-3-3 distribution"
           , expected = [Auction.Bid 2 Nothing]
           , favorability = Vulnerability.Equal
