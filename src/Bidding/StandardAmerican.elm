@@ -6,6 +6,7 @@ module Bidding.StandardAmerican (system) where
 import Auction
 import Bidding
 import Card
+import Convention
 import Vulnerability
 
 
@@ -39,6 +40,8 @@ openingBids favorability history =
         _ -> False
     noTrump level lo hi =
       { bid = Auction.Bid level Nothing
+      , description = Just "Balanced opening"
+      , convention = Nothing
       , meaning = Bidding.And
           [ Bidding.InRange Bidding.HighCardPoints lo hi
           , Bidding.Balanced
@@ -79,6 +82,8 @@ openingBids favorability history =
         betterBid.meaning
     oneSpades =
       { bid = Auction.Bid 1 (Just Card.Spades)
+      , description = Just "Five-card major"
+      , convention = Nothing
       , meaning = Bidding.And
           [ oneLevelMinimumPoints
           , oneLevelMaximumPoints
@@ -90,6 +95,8 @@ openingBids favorability history =
       }
     oneHearts =
       { bid = Auction.Bid 1 (Just Card.Hearts)
+      , description = Just "Five-card major"
+      , convention = Nothing
       , meaning = Bidding.And
           [ oneLevelMinimumPoints
           , oneLevelMaximumPoints
@@ -101,6 +108,8 @@ openingBids favorability history =
       }
     oneDiamonds =
       { bid = Auction.Bid 1 (Just Card.Diamonds)
+      , description = Just "No five-card major"
+      , convention = Nothing
       , meaning = Bidding.And
           [ oneLevelMinimumPoints
           , oneLevelMaximumPoints
@@ -116,6 +125,8 @@ openingBids favorability history =
       }
     oneClubs =
       { bid = Auction.Bid 1 (Just Card.Clubs)
+      , description = Just "No five-card major"
+      , convention = Nothing
       , meaning = Bidding.And
           [ oneLevelMinimumPoints
           , oneLevelMaximumPoints
@@ -152,10 +163,14 @@ openingBids favorability history =
             ]
       in
         { bid = Auction.Bid 2 (Just Card.Clubs)
+        , description = Just "Strong 2♣"
+        , convention = Nothing
         , meaning = Bidding.Or [standardMeaning, weakerMeaning]
         }
     weakTwo suit =
       { bid = Auction.Bid 2 (Just suit)
+      , description = Just "Weak"
+      , convention = Nothing
       , meaning = Bidding.And
           [ Bidding.InRange Bidding.HighCardPoints 5 10    -- SAYC says 5-11, but 11 HCP + six cards == 13 points == 1-level opening
           , Bidding.LessThan (Bidding.Points Nothing) (Bidding.Constant oneLevelPoints)
@@ -165,6 +180,8 @@ openingBids favorability history =
       }
     preempt level suit trickCondition =
       { bid = Auction.Bid level (Just suit)
+      , description = Just "Preempt"
+      , convention = Nothing
       , meaning = Bidding.And
           [ Bidding.Maximum Bidding.HighCardPoints (Bidding.Constant 10)
           , Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 7)
@@ -177,6 +194,8 @@ openingBids favorability history =
       preempt level suit Bidding.Equal
     fourthSeatThree suit =
       { bid = Auction.Bid 3 (Just suit)
+      , description = Just "Non-preempt"
+      , convention = Nothing
       , meaning = Bidding.And
           [ Bidding.InRange Bidding.HighCardPoints 10 12
           , Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 7)
@@ -204,6 +223,8 @@ openingBids favorability history =
           ]
     pass =
       { bid = Auction.Pass
+      , description = Nothing
+      , convention = Nothing
       , meaning = Bidding.LessThan (Bidding.Points Nothing) (Bidding.Constant oneLevelPoints)
       }
   in
@@ -250,6 +271,8 @@ responsesToOneNoTrump =
       Bidding.Or <| List.map (\suit -> Bidding.Maximum (Bidding.Length suit) (Bidding.Constant 2)) suits
     pass =
       { bid = Auction.Pass
+      , description = Nothing
+      , convention = Nothing
       , meaning = Bidding.And
           [ Bidding.Maximum (Bidding.Points Nothing) (Bidding.Constant 7)
           , Bidding.LessThan (Bidding.Length Card.Spades) (Bidding.Constant 5)
@@ -260,6 +283,8 @@ responsesToOneNoTrump =
       }
     jacobyTransfer target via =
       { bid = Auction.Bid 2 (Just via)
+      , description = Nothing
+      , convention = Just (Convention.Start Convention.JacobyTransfer)
       , meaning = Bidding.And
           [ Bidding.Minimum (Bidding.Length target) (Bidding.Constant 5)
           , Bidding.Deny (inviteSlam target).meaning
@@ -267,6 +292,8 @@ responsesToOneNoTrump =
       }
     minorTransfer =
       { bid = Auction.Bid 2 (Just Card.Spades)
+      , description = Just "Minor Transfer"
+      , convention = Nothing
       , meaning = Bidding.And
           [ Bidding.Or
               [ Bidding.Minimum (Bidding.Length Card.Clubs) (Bidding.Constant 6)
@@ -277,6 +304,8 @@ responsesToOneNoTrump =
       }
     stayman =
       { bid = Auction.Bid 2 (Just Card.Clubs)
+      , description = Nothing
+      , convention = Just (Convention.Start Convention.Stayman)
       , meaning = Bidding.And
           [ Bidding.Minimum (Bidding.Points Nothing) (Bidding.Constant 8)
           , Bidding.Or
@@ -288,6 +317,8 @@ responsesToOneNoTrump =
       }
     inviteGame =
       { bid = Auction.Bid 2 Nothing
+      , description = Just "Game invite"
+      , convention = Nothing
       , meaning = Bidding.And
           [ Bidding.InRange Bidding.HighCardPoints 8 9
           , Bidding.Balanced
@@ -296,6 +327,8 @@ responsesToOneNoTrump =
       }
     inviteGameWithLongMinor suit =
       { bid = Auction.Bid 3 (Just suit)
+      , description = Just "Game invite"
+      , convention = Nothing
       , meaning = Bidding.And
           [ Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 6)
           , Bidding.InRange Bidding.HighCardPoints 7 9
@@ -303,10 +336,14 @@ responsesToOneNoTrump =
       }
     bidGame =
       { bid = Auction.Bid 3 Nothing
+      , description = Just "Game"
+      , convention = Nothing
       , meaning = Bidding.InRange Bidding.HighCardPoints 10 15
       }
     inviteSlam suit =
       { bid = Auction.Bid 3 (Just suit)
+      , description = Just "Slam invite"
+      , convention = Nothing
       , meaning = Bidding.And
           [ Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 6)
           , Bidding.Minimum (Bidding.Points <| Just (Just suit)) (Bidding.Constant inviteSlamPoints)
@@ -314,6 +351,8 @@ responsesToOneNoTrump =
       }
     inviteSlamNoTrump =
       { bid = Auction.Bid 4 Nothing
+      , description = Just "Quantitative raise"
+      , convention = Nothing
       , meaning = Bidding.And
           [ Bidding.InRange Bidding.HighCardPoints inviteSlamPoints (inviteSlamPoints + 1)
           , Bidding.Or [Bidding.Balanced, Bidding.SemiBalanced]
@@ -339,6 +378,8 @@ responsesToOneNoTrump =
         List.map noTwoQuickLosersIn suits
     gerber =
       { bid = Auction.Bid 4 (Just Card.Clubs)
+      , description = Nothing
+      , convention = Just (Convention.Start Convention.Gerber)
       , meaning = Bidding.And
           ( Bidding.GreaterThan (Bidding.Points Nothing) (Bidding.Constant inviteSlamPoints)    -- FIXME: probably should be based on a known fit?
           :: noVoids
@@ -347,6 +388,8 @@ responsesToOneNoTrump =
       }
     minorSlam suit =
       { bid = Auction.Bid 6 (Just suit)
+      , description = Just "Slam"
+      , convention = Nothing
       , meaning = Bidding.And
           [ Bidding.Minimum (Bidding.Points <| Just (Just suit)) (Bidding.Constant 20)
           , Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 6)

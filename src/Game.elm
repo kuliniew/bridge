@@ -31,7 +31,7 @@ type alias GameState =
   , vulnerability : Vulnerability
   , auction : List Bidding.AnnotatedBid
   , seed : Random.Seed
-  , explained : Maybe Bidding.Meaning
+  , explained : Maybe Bidding.AnnotatedBid
   }
 
 
@@ -39,7 +39,7 @@ type Action
   = Reseed Time
   | NewDeal
   | Bid Auction.Bid
-  | Explain (Maybe Bidding.Meaning)
+  | Explain (Maybe Bidding.AnnotatedBid)
 
 
 init : (Model, Effects Action)

@@ -18,6 +18,7 @@ common functions used by several different systems.
 
 import Auction
 import Card exposing (Card)
+import Convention
 import Evaluation
 import Vulnerability
 
@@ -41,6 +42,8 @@ type alias System =
 type alias AnnotatedBid =
   { bid : Auction.Bid
   , meaning : Meaning
+  , description : Maybe String
+  , convention : Maybe Convention.Usage
   }
 
 
@@ -78,7 +81,7 @@ annotate : System -> Vulnerability.Favorability -> List AnnotatedBid -> Auction.
 annotate system favorability history bid =
   case lookup bid (system.suggestions favorability history) of
     Just annotated -> annotated
-    Nothing -> { bid = bid, meaning = OutOfSystem }
+    Nothing -> outOfSystem bid
 
 
 {-| Lookup a specific bid in a list of suggestions.
@@ -95,9 +98,20 @@ result will be Pass for reason of being OutOfSystem.
 choose : System -> Vulnerability.Favorability -> List AnnotatedBid -> List Card -> Random.Seed -> (AnnotatedBid, Random.Seed)
 choose system favorability history hand =
   let
-    fallback = { bid = Auction.Pass, meaning = OutOfSystem }
+    fallback = outOfSystem Auction.Pass
   in
     Random.generate (Random.Extra.selectWithDefault fallback <| viableChoices system favorability history hand)
+
+
+{-| Annotate a bid outside of the bidding system.
+-}
+outOfSystem : Auction.Bid -> AnnotatedBid
+outOfSystem bid =
+  { bid = bid
+  , meaning = OutOfSystem
+  , description = Nothing
+  , convention = Nothing
+  }
 
 
 {-| Get a list of viable suggested bids, based on the contents of

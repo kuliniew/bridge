@@ -25,11 +25,7 @@ annotateSuite =
         ElmTest.assertEqual twoNoTrump (Bidding.annotate testSystem Vulnerability.Equal [] (Auction.Bid 2 Nothing))
 
     , ElmTest.test "falls back to OutOfSystem" <|
-        let
-          expected =
-            { bid = Auction.Bid 3 Nothing, meaning = Bidding.OutOfSystem }
-        in
-          ElmTest.assertEqual expected (Bidding.annotate testSystem Vulnerability.Equal [] (Auction.Bid 3 Nothing))
+        ElmTest.assertEqual Bidding.OutOfSystem (Bidding.annotate testSystem Vulnerability.Equal [] (Auction.Bid 3 Nothing)).meaning
     ]
 
 
@@ -46,12 +42,10 @@ chooseSuite =
         let
           nullSystem =
             { name = "Null System", suggestions = \_ _ -> [] }
-          expected =
-            { bid = Auction.Pass, meaning = Bidding.OutOfSystem }
           (choice, _) =
             Bidding.choose nullSystem Vulnerability.Equal [] [] (Random.initialSeed 0)
         in
-          ElmTest.assertEqual expected choice
+          ElmTest.assertEqual Auction.Pass choice.bid
     ]
 
 
@@ -227,12 +221,20 @@ testSystem =
 
 oneNoTrump : Bidding.AnnotatedBid
 oneNoTrump =
-  { bid = Auction.Bid 1 Nothing, meaning = nop }
+  { bid = Auction.Bid 1 Nothing
+  , description = Nothing
+  , convention = Nothing
+  , meaning = nop
+  }
 
 
 twoNoTrump : Bidding.AnnotatedBid
 twoNoTrump =
-  { bid = Auction.Bid 2 Nothing, meaning = nop }
+  { bid = Auction.Bid 2 Nothing
+  , description = Nothing
+  , convention = Nothing
+  , meaning = nop
+  }
 
 nop : Bidding.Meaning
 nop = Bidding.Minimum (Bidding.Constant 0) (Bidding.Constant 0)

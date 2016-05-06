@@ -9,6 +9,7 @@ module View
 import Auction
 import Bidding
 import Card exposing (Card)
+import Convention exposing (Convention)
 import Game exposing (Action)
 import Seat exposing (Seat)
 import Vulnerability exposing (Vulnerability)
@@ -102,7 +103,7 @@ viewAuction address dealer system vulnerability annotatedAuction =
     bidCell bid =
       let
         events =
-          [ Events.onMouseEnter address (Game.Explain <| Just bid.meaning)
+          [ Events.onMouseEnter address (Game.Explain <| Just bid)
           , Events.onMouseLeave address (Game.Explain Nothing)
           ]
       in
@@ -144,7 +145,7 @@ makeBidCell address system favorability history =
       let
         events =
           [ Events.onClick address (Game.Bid bid.bid)
-          , Events.onMouseEnter address (Game.Explain <| Just bid.meaning)
+          , Events.onMouseEnter address (Game.Explain <| Just bid)
           , Events.onMouseLeave address (Game.Explain Nothing)
           ]
       in
@@ -234,18 +235,46 @@ viewVulnerability vuln =
     Html.text message
 
 
-viewExplanation : Maybe Bidding.Meaning -> Html
-viewExplanation explained =
+viewExplanation : Maybe Bidding.AnnotatedBid -> Html
+viewExplanation target =
   let
     content =
-      case explained of
+      case target of
         Nothing -> []
-        Just meaning ->
+        Just bid ->
           [ Html.h1 [] [ Html.text "Explanation" ]
-          , viewMeaning (simplify meaning)
+          , viewDescription bid
+          , viewMeaning (simplify bid.meaning)
           ]
   in
     Html.div [] content
+
+
+viewDescription : Bidding.AnnotatedBid -> Html
+viewDescription bid =
+  Html.div [] <|
+    case (bid.convention, bid.description) of
+      (Just (Convention.Start convention), Just description) ->
+        [ viewConvention convention, Html.text ": ", Html.text description ]
+      (Just (Convention.Start convention), Nothing) ->
+        [ viewConvention convention ]
+      (Just (Convention.Finish convention), Just description) ->
+        [ viewConvention convention, Html.text " response: ", Html.text description ]
+      (Just (Convention.Finish convention), Nothing) ->
+        [ viewConvention convention, Html.text " response" ]
+      (Nothing, Just description) ->
+        [ Html.text description ]
+      (Nothing, Nothing) ->
+        []
+
+
+viewConvention : Convention -> Html
+viewConvention convention =
+  Html.text <|
+    case convention of
+      Convention.Gerber -> "Gerber"
+      Convention.JacobyTransfer -> "Jacoby Transfer"
+      Convention.Stayman -> "Stayman"
 
 
 viewMeaning : Bidding.Meaning -> Html
