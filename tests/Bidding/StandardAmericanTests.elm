@@ -870,6 +870,16 @@ oneNoTrumpResponseSuite =
           , clubs = [ Card.Ace, Card.Ten ]
           }
 
+        , { name = "17 HCP, 5-3-3-2 distribution"
+          , expected = [Auction.Bid 4 Nothing]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+          , spades = [ Card.Queen, Card.Four, Card.Two ]
+          , hearts = [ Card.King, Card.Queen, Card.Jack ]
+          , diamonds = [ Card.Four, Card.Three ]
+          , clubs = [ Card.Ace, Card.King, Card.Queen, Card.Eight, Card.Four ]
+          }
+
           -- FIXME: These are probably better for general tests for using Gerber
 
         , { name = "18 points, 6 spades, no voids, no 2 quick losers in any suit"

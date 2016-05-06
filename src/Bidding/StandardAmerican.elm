@@ -238,7 +238,7 @@ responseBids history =
 responsesToOneNoTrump : List Bidding.AnnotatedBid
 responsesToOneNoTrump =
   let
-    inviteSlamPoints = Bidding.Constant (33 - 17)
+    inviteSlamPoints = 33 - 17
     noFourCardMajor =
       Bidding.And
         [ Bidding.Maximum (Bidding.Length Card.Spades) (Bidding.Constant 3)
@@ -309,13 +309,13 @@ responsesToOneNoTrump =
       { bid = Auction.Bid 3 (Just suit)
       , meaning = Bidding.And
           [ Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 6)
-          , Bidding.Minimum (Bidding.Points <| Just (Just suit)) inviteSlamPoints
+          , Bidding.Minimum (Bidding.Points <| Just (Just suit)) (Bidding.Constant inviteSlamPoints)
           ]
       }
     inviteSlamNoTrump =
       { bid = Auction.Bid 4 Nothing
       , meaning = Bidding.And
-          [ Bidding.Equal Bidding.HighCardPoints inviteSlamPoints
+          [ Bidding.InRange Bidding.HighCardPoints inviteSlamPoints (inviteSlamPoints + 1)
           , Bidding.Or [Bidding.Balanced, Bidding.SemiBalanced]
           ]
       }
@@ -334,7 +334,7 @@ responsesToOneNoTrump =
     gerber =
       { bid = Auction.Bid 4 (Just Card.Clubs)
       , meaning = Bidding.And
-          ( Bidding.GreaterThan (Bidding.Points Nothing) inviteSlamPoints    -- FIXME: probably should be based on a known fit?
+          ( Bidding.GreaterThan (Bidding.Points Nothing) (Bidding.Constant inviteSlamPoints)    -- FIXME: probably should be based on a known fit?
           :: noVoids
           ++ noTwoQuickLosers
           )
