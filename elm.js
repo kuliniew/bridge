@@ -12026,32 +12026,55 @@ Elm.Evaluation.make = function (_elm) {
       },
       _U.list([$Card.Spades,$Card.Hearts,$Card.Diamonds,$Card.Clubs]))));
    };
-   var balanced = function (dist) {
+   var semiBalanced = function (dist) {
       var _p1 = dist;
-      _v1_3: do {
-         if (_p1.ctor === "::" && _p1._1.ctor === "::" && _p1._1._1.ctor === "::" && _p1._1._1._0 === 3 && _p1._1._1._1.ctor === "::" && _p1._1._1._1._1.ctor === "[]")
+      _v1_2: do {
+         if (_p1.ctor === "::" && _p1._1.ctor === "::" && _p1._1._1.ctor === "::" && _p1._1._1._0 === 2 && _p1._1._1._1.ctor === "::" && _p1._1._1._1._0 === 2 && _p1._1._1._1._1.ctor === "[]")
          {
                switch (_p1._0)
-               {case 4: switch (_p1._1._0)
-                    {case 4: if (_p1._1._1._1._0 === 2) {
-                               return true;
-                            } else {
-                               break _v1_3;
-                            }
-                       case 3: if (_p1._1._1._1._0 === 3) {
-                               return true;
-                            } else {
-                               break _v1_3;
-                            }
-                       default: break _v1_3;}
-                  case 5: if (_p1._1._0 === 3 && _p1._1._1._1._0 === 2) {
+               {case 5: if (_p1._1._0 === 4) {
                           return true;
                        } else {
-                          break _v1_3;
+                          break _v1_2;
                        }
-                  default: break _v1_3;}
+                  case 6: if (_p1._1._0 === 3) {
+                          return true;
+                       } else {
+                          break _v1_2;
+                       }
+                  default: break _v1_2;}
             } else {
-               break _v1_3;
+               break _v1_2;
+            }
+      } while (false);
+      return false;
+   };
+   var balanced = function (dist) {
+      var _p2 = dist;
+      _v2_3: do {
+         if (_p2.ctor === "::" && _p2._1.ctor === "::" && _p2._1._1.ctor === "::" && _p2._1._1._0 === 3 && _p2._1._1._1.ctor === "::" && _p2._1._1._1._1.ctor === "[]")
+         {
+               switch (_p2._0)
+               {case 4: switch (_p2._1._0)
+                    {case 4: if (_p2._1._1._1._0 === 2) {
+                               return true;
+                            } else {
+                               break _v2_3;
+                            }
+                       case 3: if (_p2._1._1._1._0 === 3) {
+                               return true;
+                            } else {
+                               break _v2_3;
+                            }
+                       default: break _v2_3;}
+                  case 5: if (_p2._1._0 === 3 && _p2._1._1._1._0 === 2) {
+                          return true;
+                       } else {
+                          break _v2_3;
+                       }
+                  default: break _v2_3;}
+            } else {
+               break _v2_3;
             }
       } while (false);
       return false;
@@ -12074,27 +12097,27 @@ Elm.Evaluation.make = function (_elm) {
    };
    var highCardPoints = function () {
       var pointsForCard = function (card) {
-         var _p2 = card.rank;
-         switch (_p2.ctor)
+         var _p3 = card.rank;
+         switch (_p3.ctor)
          {case "Ace": return 4;
             case "King": return 3;
             case "Queen": return 2;
             case "Jack": return 1;
             default: return 0;}
       };
-      return function (_p3) {
-         return $List.sum(A2($List.map,pointsForCard,_p3));
+      return function (_p4) {
+         return $List.sum(A2($List.map,pointsForCard,_p4));
       };
    }();
    var points = F2(function (trump,cards) {
-      var _p4 = trump;
-      if (_p4.ctor === "Nothing") {
+      var _p5 = trump;
+      if (_p5.ctor === "Nothing") {
             return highCardPoints(cards) + lengthPoints(cards);
          } else {
-            if (_p4._0.ctor === "Nothing") {
+            if (_p5._0.ctor === "Nothing") {
                   return highCardPoints(cards);
                } else {
-                  return highCardPoints(cards) + A2(shortnessPoints,_p4._0._0,cards);
+                  return highCardPoints(cards) + A2(shortnessPoints,_p5._0._0,cards);
                }
          }
    });
@@ -12106,6 +12129,7 @@ Elm.Evaluation.make = function (_elm) {
                                    ,length: length
                                    ,distribution: distribution
                                    ,balanced: balanced
+                                   ,semiBalanced: semiBalanced
                                    ,playingTricks: playingTricks
                                    ,playingTricksAny: playingTricksAny
                                    ,quickLosers: quickLosers};
@@ -12258,7 +12282,7 @@ Elm.Bidding.make = function (_elm) {
          case 1: return Defender;
          case 2: return Responder;
          case 3: return Defender;
-         default: return _U.crashCase("Bidding",{start: {line: 180,column: 5},end: {line: 185,column: 106}},_p0)(A2($Basics._op["++"],
+         default: return _U.crashCase("Bidding",{start: {line: 184,column: 5},end: {line: 189,column: 106}},_p0)(A2($Basics._op["++"],
            "bidsFromOpening % 4 wound up being ",
            A2($Basics._op["++"],$Basics.toString(bidsFromOpening)," somehow!")));}
    };
@@ -12286,6 +12310,7 @@ Elm.Bidding.make = function (_elm) {
             case "GreaterThan": return _U.cmp(A2($eval,_p4._1,hand),A2($eval,_p4._0,hand)) < 0;
             case "LessThan": return _U.cmp(A2($eval,_p4._0,hand),A2($eval,_p4._1,hand)) < 0;
             case "Balanced": return $Evaluation.balanced($Evaluation.distribution(hand));
+            case "SemiBalanced": return $Evaluation.semiBalanced($Evaluation.distribution(hand));
             case "Or": return A2($List.any,satisfies,_p4._0);
             case "And": return A2($List.all,satisfies,_p4._0);
             default: return $Basics.not(satisfies(_p4._0));}
@@ -12309,6 +12334,7 @@ Elm.Bidding.make = function (_elm) {
    var Deny = function (a) {    return {ctor: "Deny",_0: a};};
    var And = function (a) {    return {ctor: "And",_0: a};};
    var Or = function (a) {    return {ctor: "Or",_0: a};};
+   var SemiBalanced = {ctor: "SemiBalanced"};
    var Balanced = {ctor: "Balanced"};
    var LessThan = F2(function (a,b) {    return {ctor: "LessThan",_0: a,_1: b};});
    var GreaterThan = F2(function (a,b) {    return {ctor: "GreaterThan",_0: a,_1: b};});
@@ -12347,6 +12373,7 @@ Elm.Bidding.make = function (_elm) {
                                 ,GreaterThan: GreaterThan
                                 ,LessThan: LessThan
                                 ,Balanced: Balanced
+                                ,SemiBalanced: SemiBalanced
                                 ,Or: Or
                                 ,And: And
                                 ,Deny: Deny
@@ -12403,15 +12430,25 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
          var noTwoQuickLosersIn = function (suit) {    return A2($Bidding.LessThan,$Bidding.QuickLosers(suit),$Bidding.Constant(2));};
          return A2($List.map,noTwoQuickLosersIn,suits);
       }();
+      var atLeastOneVoid = function () {
+         var voidIn = function (suit) {    return A2($Bidding.Equal,$Bidding.Length(suit),$Bidding.Constant(0));};
+         return $Bidding.Or(A2($List.map,voidIn,suits));
+      }();
+      var minorSlam = function (suit) {
+         return {bid: A2($Auction.Bid,6,$Maybe.Just(suit))
+                ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Points($Maybe.Just($Maybe.Just(suit))),$Bidding.Constant(20))
+                                               ,A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
+                                               ,atLeastOneVoid]))};
+      };
       var noVoids = function () {
          var noVoidIn = function (suit) {    return A2($Bidding.GreaterThan,$Bidding.Length(suit),$Bidding.Constant(0));};
          return A2($List.map,noVoidIn,suits);
       }();
-      var bidGame = {bid: A2($Auction.Bid,3,$Maybe.Nothing),meaning: A3($Bidding.InRange,$Bidding.HighCardPoints,10,13)};
+      var bidGame = {bid: A2($Auction.Bid,3,$Maybe.Nothing),meaning: A3($Bidding.InRange,$Bidding.HighCardPoints,10,15)};
       var inviteGameWithLongMinor = function (suit) {
          return {bid: A2($Auction.Bid,3,$Maybe.Just(suit))
                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
-                                               ,A3($Bidding.InRange,$Bidding.HighCardPoints,7,8)]))};
+                                               ,A3($Bidding.InRange,$Bidding.HighCardPoints,7,9)]))};
       };
       var minorTransfer = {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Spades))
                           ,meaning: $Bidding.And(_U.list([$Bidding.Or(_U.list([A2($Bidding.Minimum,$Bidding.Length($Card.Clubs),$Bidding.Constant(6))
@@ -12440,11 +12477,11 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                        ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,8,9)
                                                       ,$Bidding.Balanced
                                                       ,$Bidding.Or(_U.list([noFourCardMajor,fourThreeThreeThree]))]))};
-      var inviteSlamPoints = $Bidding.Constant(33 - 16);
+      var inviteSlamPoints = 33 - 17;
       var inviteSlam = function (suit) {
          return {bid: A2($Auction.Bid,3,$Maybe.Just(suit))
                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
-                                               ,A2($Bidding.Minimum,$Bidding.Points($Maybe.Just($Maybe.Just(suit))),inviteSlamPoints)]))};
+                                               ,A2($Bidding.Minimum,$Bidding.Points($Maybe.Just($Maybe.Just(suit))),$Bidding.Constant(inviteSlamPoints))]))};
       };
       var jacobyTransfer = F2(function (target,via) {
          return {bid: A2($Auction.Bid,2,$Maybe.Just(via))
@@ -12459,12 +12496,13 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                               ,bidGame]);
       var priority2 = _U.list([inviteGameWithLongMinor($Card.Clubs),inviteGameWithLongMinor($Card.Diamonds),inviteSlam($Card.Hearts),inviteSlam($Card.Spades)]);
       var inviteSlamNoTrump = {bid: A2($Auction.Bid,4,$Maybe.Nothing)
-                              ,meaning: $Bidding.And(_U.list([A2($Bidding.Equal,$Bidding.HighCardPoints,inviteSlamPoints),$Bidding.Balanced]))};
+                              ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,inviteSlamPoints,inviteSlamPoints + 1)
+                                                             ,$Bidding.Or(_U.list([$Bidding.Balanced,$Bidding.SemiBalanced]))]))};
       var gerber = {bid: A2($Auction.Bid,4,$Maybe.Just($Card.Clubs))
                    ,meaning: $Bidding.And(A2($List._op["::"],
-                   A2($Bidding.GreaterThan,$Bidding.Points($Maybe.Nothing),inviteSlamPoints),
+                   A2($Bidding.GreaterThan,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(inviteSlamPoints)),
                    A2($Basics._op["++"],noVoids,noTwoQuickLosers)))};
-      var priority1 = _U.list([inviteSlamNoTrump,gerber]);
+      var priority1 = _U.list([inviteSlamNoTrump,gerber,minorSlam($Card.Clubs),minorSlam($Card.Diamonds)]);
       return prioritized(_U.list([priority1,priority2,priority3]));
    }();
    var responseBids = function (history) {
@@ -12741,7 +12779,7 @@ Elm.View.make = function (_elm) {
          {case "And": return _p0._0;
             case "Or": return _p0._0;
             default: return _U.crashCase("View",
-              {start: {line: 381,column: 7},end: {line: 384,column: 82}},
+              {start: {line: 383,column: 7},end: {line: 386,column: 82}},
               _p0)("tried to take grandchildren over non-conjunction nodes");}
       };
       var isOr = function (meaning) {    var _p2 = meaning;if (_p2.ctor === "Or") {    return true;} else {    return false;}};
@@ -12897,6 +12935,7 @@ Elm.View.make = function (_elm) {
          case "GreaterThan": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p17._0),$Html.text(" > "),viewMetric(_p17._1)]));
          case "LessThan": return A2($Html.span,_U.list([]),_U.list([viewMetric(_p17._0),$Html.text(" < "),viewMetric(_p17._1)]));
          case "Balanced": return $Html.text("Balanced (4-3-3-3, 4-4-3-2, or 5-3-3-2)");
+         case "SemiBalanced": return $Html.text("Semi-balaned (5-4-2-2 or 6-3-2-2)");
          case "Or": return A2(list,"Any of:",_p17._0);
          case "And": return A2(list,"All of:",_p17._0);
          default: return A2(list,"Deny:",_U.list([_p17._0]));}
