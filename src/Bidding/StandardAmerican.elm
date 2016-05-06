@@ -325,6 +325,12 @@ responsesToOneNoTrump =
           Bidding.GreaterThan (Bidding.Length suit) (Bidding.Constant 0)
       in
         List.map noVoidIn suits
+    atLeastOneVoid =
+      let
+        voidIn suit =
+          Bidding.Equal (Bidding.Length suit) (Bidding.Constant 0)
+      in
+        Bidding.Or <| List.map voidIn suits
     noTwoQuickLosers =
       let
         noTwoQuickLosersIn suit =
@@ -339,9 +345,19 @@ responsesToOneNoTrump =
           ++ noTwoQuickLosers
           )
       }
+    minorSlam suit =
+      { bid = Auction.Bid 6 (Just suit)
+      , meaning = Bidding.And
+          [ Bidding.Minimum (Bidding.Points <| Just (Just suit)) (Bidding.Constant 20)
+          , Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 6)
+          , atLeastOneVoid
+          ]
+      }
     priority1 =
       [ inviteSlamNoTrump
       , gerber
+      , minorSlam Card.Clubs
+      , minorSlam Card.Diamonds
       ]
     priority2 =
       [ inviteGameWithLongMinor Card.Clubs

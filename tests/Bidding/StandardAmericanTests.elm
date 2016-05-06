@@ -941,6 +941,31 @@ oneNoTrumpResponseSuite =
           , diamonds = [ Card.Queen, Card.Ten, Card.Nine ]
           , clubs = [ Card.Ace, Card.Ten ]
           }
+
+        -- Not sure what to do with hands like this (where Gerber isn't appropriate
+        -- due to the void, but the hand is so strong *something* has to be done).
+        -- Really, these situations should be handled by a "slam interest" set of
+        -- bidding logic and tests.
+
+        , { name = "23 points, 6 clubs, void"
+          , expected = [Auction.Bid 6 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+          , spades = [ Card.King, Card.Jack, Card.Three ]
+          , hearts = []
+          , diamonds = [ Card.Ace, Card.King, Card.Eight, Card.Five ]
+          , clubs = [ Card.Ace, Card.King, Card.Queen, Card.Ten, Card.Seven, Card.Five ]
+          }
+
+        , { name = "23 points, 6 diamonds, void"
+          , expected = [Auction.Bid 6 (Just Card.Diamonds)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 1 Nothing ]
+          , spades = [ Card.King, Card.Jack, Card.Three ]
+          , hearts = []
+          , diamonds = [ Card.Ace, Card.King, Card.Queen, Card.Ten, Card.Seven, Card.Five ]
+          , clubs = [ Card.Ace, Card.King, Card.Eight, Card.Five ]
+          }
         ]
   in
     ElmTest.suite "response to 1NT" (existenceTest :: unitTests)
