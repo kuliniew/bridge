@@ -321,7 +321,7 @@ responsesToOneNoTrump =
       , convention = Nothing
       , meaning = Bidding.And
           [ Bidding.InRange Bidding.HighCardPoints 8 9
-          , Bidding.Balanced
+          , Bidding.Or [Bidding.Balanced, Bidding.SemiBalanced]
           , Bidding.Or [noFourCardMajor, fourThreeThreeThree]
           ]
       }
