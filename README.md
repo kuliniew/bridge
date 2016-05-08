@@ -1,5 +1,7 @@
 # Bridge
 
+[![Build Status](https://travis-ci.org/kuliniew/bridge.svg?branch=master)](https://travis-ci.org/kuliniew/bridge)
+
 A tool for practicing bridge against computer opponents.
 
 ## Live Demo
