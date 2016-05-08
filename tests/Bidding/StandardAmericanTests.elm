@@ -634,6 +634,16 @@ oneNoTrumpResponseSuite =
           , clubs = [ Card.Ten, Card.Nine ]
           }
 
+        , { name = "7 HCP, no 5-card major, no 6-card minor"
+          , expected = [Auction.Pass]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 1 Nothing]
+          , spades = [ Card.King, Card.Nine, Card.Two ]
+          , hearts = [ Card.Ten, Card.Eight ]
+          , diamonds = [ Card.Ten, Card.Eight, Card.Seven, Card.Five, Card.Three ]
+          , clubs = [ Card.Ace, Card.Six, Card.Five ]
+          }
+
         , { name = "7 points, 4 spades, 4 hearts"
           , expected = [Auction.Pass]
           , favorability = Vulnerability.Equal

@@ -274,7 +274,7 @@ responsesToOneNoTrump =
       , description = Nothing
       , convention = Nothing
       , meaning = Bidding.And
-          [ Bidding.Maximum (Bidding.Points Nothing) (Bidding.Constant 7)
+          [ Bidding.Maximum Bidding.HighCardPoints (Bidding.Constant 7)
           , Bidding.LessThan (Bidding.Length Card.Spades) (Bidding.Constant 5)
           , Bidding.LessThan (Bidding.Length Card.Hearts) (Bidding.Constant 5)
           , Bidding.LessThan (Bidding.Length Card.Diamonds) (Bidding.Constant 6)
