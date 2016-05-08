@@ -11765,6 +11765,8 @@ Elm.Card.make = function (_elm) {
    $Debug = Elm.Debug.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Random = Elm.Random.make(_elm),
+   $Random$Array = Elm.Random.Array.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
@@ -11811,6 +11813,11 @@ Elm.Card.make = function (_elm) {
       var addRanks = function (suit) {    return A2($List.map,toCard(suit),$Array.toList(ranks));};
       return $Array.fromList(A2($List.concatMap,addRanks,$Array.toList(suits)));
    }();
+   var deal = function () {
+      var cardsPerHand = $Array.length(deck) / 4 | 0;
+      var takeCards = F2(function (shuffled,n) {    return $Array.toList(A3($Array.slice,cardsPerHand * n,cardsPerHand * (n + 1),shuffled));});
+      return A2($Random.map,function (shuffled) {    return A2($List.map,takeCards(shuffled),_U.range(0,3));},$Random$Array.shuffle(deck));
+   }();
    var fromSuits = function (sample) {
       var addSuit = F2(function (suit,rank) {    return {suit: suit,rank: rank};});
       var cards = $List.concat(_U.list([A2($List.map,addSuit(Spades),sample.spades)
@@ -11818,7 +11825,7 @@ Elm.Card.make = function (_elm) {
                                        ,A2($List.map,addSuit(Diamonds),sample.diamonds)
                                        ,A2($List.map,addSuit(Clubs),sample.clubs)]));
       var length = $List.length(cards);
-      return _U.eq(length,13) ? cards : _U.crash("Card",{start: {line: 135,column: 12},end: {line: 135,column: 23}})(A2($Basics._op["++"],
+      return _U.eq(length,13) ? cards : _U.crash("Card",{start: {line: 152,column: 12},end: {line: 152,column: 23}})(A2($Basics._op["++"],
       "sanity check: sample hand has ",
       A2($Basics._op["++"],$Basics.toString(length)," cards, not 13")));
    };
@@ -11826,6 +11833,7 @@ Elm.Card.make = function (_elm) {
                              ,suits: suits
                              ,ranks: ranks
                              ,deck: deck
+                             ,deal: deal
                              ,rankDescending: rankDescending
                              ,fromSuits: fromSuits
                              ,Card: Card
@@ -12489,7 +12497,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       var pass = {bid: $Auction.Pass
                  ,description: $Maybe.Nothing
                  ,convention: $Maybe.Nothing
-                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Maximum,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(7))
+                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Maximum,$Bidding.HighCardPoints,$Bidding.Constant(7))
                                                 ,A2($Bidding.LessThan,$Bidding.Length($Card.Spades),$Bidding.Constant(5))
                                                 ,A2($Bidding.LessThan,$Bidding.Length($Card.Hearts),$Bidding.Constant(5))
                                                 ,A2($Bidding.LessThan,$Bidding.Length($Card.Diamonds),$Bidding.Constant(6))
@@ -12513,7 +12521,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                        ,description: $Maybe.Just("Game invite")
                        ,convention: $Maybe.Nothing
                        ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,8,9)
-                                                      ,$Bidding.Balanced
+                                                      ,$Bidding.Or(_U.list([$Bidding.Balanced,$Bidding.SemiBalanced]))
                                                       ,$Bidding.Or(_U.list([noFourCardMajor,fourThreeThreeThree]))]))};
       var inviteSlamPoints = 33 - 17;
       var inviteSlam = function (suit) {
@@ -12720,7 +12728,6 @@ Elm.Game.make = function (_elm) {
    _elm.Game = _elm.Game || {};
    if (_elm.Game.values) return _elm.Game.values;
    var _U = Elm.Native.Utils.make(_elm),
-   $Array = Elm.Array.make(_elm),
    $Auction = Elm.Auction.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bidding = Elm.Bidding.make(_elm),
@@ -12731,7 +12738,6 @@ Elm.Game.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Random = Elm.Random.make(_elm),
-   $Random$Array = Elm.Random.Array.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Seat = Elm.Seat.make(_elm),
    $Signal = Elm.Signal.make(_elm),
@@ -12757,12 +12763,17 @@ Elm.Game.make = function (_elm) {
       }
    };
    var deal = F3(function (dealer,vulnerability,seed) {
-      var _p1 = A2($Random.generate,$Random$Array.shuffle($Card.deck),seed);
-      var shuffled = _p1._0;
+      var _p1 = A2($Random.generate,$Card.deal,seed);
+      var dealt = _p1._0;
       var seed$ = _p1._1;
-      var cardsPerHand = $Array.length(shuffled) / 4 | 0;
-      var takeCards = function (n) {    return $Array.toList(A3($Array.slice,cardsPerHand * n,cardsPerHand * (n + 1),shuffled));};
-      var hands = {west: takeCards(0),north: takeCards(1),east: takeCards(2),south: takeCards(3)};
+      var hands = function () {
+         var _p2 = dealt;
+         if (_p2.ctor === "::" && _p2._1.ctor === "::" && _p2._1._1.ctor === "::" && _p2._1._1._1.ctor === "::" && _p2._1._1._1._1.ctor === "[]") {
+               return {west: _p2._0,north: _p2._1._0,east: _p2._1._1._0,south: _p2._1._1._1._0};
+            } else {
+               return _U.crashCase("Game",{start: {line: 85,column: 7},end: {line: 92,column: 71}},_p2)("Card.deal didn\'t return exactly four hands!");
+            }
+      }();
       var state = {system: $Bidding$StandardAmerican.system
                   ,hands: hands
                   ,dealer: dealer
@@ -12773,31 +12784,31 @@ Elm.Game.make = function (_elm) {
       return state;
    });
    var update = F2(function (action,model) {
-      var _p2 = {ctor: "_Tuple2",_0: action,_1: model};
-      _v1_0: do {
-         if (_p2._1.ctor === "Just") {
-               switch (_p2._0.ctor)
-               {case "Reseed": break _v1_0;
-                  case "NewDeal": var _p3 = _p2._1._0;
-                    var newState = bidForBots(A3(deal,$Seat.next(_p3.dealer),$Vulnerability.next(_p3.vulnerability),_p3.seed));
-                    var newVulnerability = $Vulnerability.next(_p3.vulnerability);
+      var _p4 = {ctor: "_Tuple2",_0: action,_1: model};
+      _v2_0: do {
+         if (_p4._1.ctor === "Just") {
+               switch (_p4._0.ctor)
+               {case "Reseed": break _v2_0;
+                  case "NewDeal": var _p5 = _p4._1._0;
+                    var newState = bidForBots(A3(deal,$Seat.next(_p5.dealer),$Vulnerability.next(_p5.vulnerability),_p5.seed));
+                    var newVulnerability = $Vulnerability.next(_p5.vulnerability);
                     return {ctor: "_Tuple2",_0: $Maybe.Just(newState),_1: $Effects.none};
-                  case "Bid": var _p4 = _p2._1._0;
-                    var favorability = A2($Vulnerability.favorability,A2(currentBidder,_p4.dealer,_p4.auction),_p4.vulnerability);
-                    var annotated = A4($Bidding.annotate,_p4.system,favorability,_p4.auction,_p2._0._0);
-                    var newState = bidForBots(_U.update(_p4,{auction: A2($List._op["::"],annotated,_p4.auction)}));
+                  case "Bid": var _p6 = _p4._1._0;
+                    var favorability = A2($Vulnerability.favorability,A2(currentBidder,_p6.dealer,_p6.auction),_p6.vulnerability);
+                    var annotated = A4($Bidding.annotate,_p6.system,favorability,_p6.auction,_p4._0._0);
+                    var newState = bidForBots(_U.update(_p6,{auction: A2($List._op["::"],annotated,_p6.auction)}));
                     return {ctor: "_Tuple2",_0: $Maybe.Just(newState),_1: $Effects.none};
-                  default: var newState = _U.update(_p2._1._0,{explained: _p2._0._0});
+                  default: var newState = _U.update(_p4._1._0,{explained: _p4._0._0});
                     return {ctor: "_Tuple2",_0: $Maybe.Just(newState),_1: $Effects.none};}
             } else {
-               if (_p2._0.ctor === "Reseed") {
-                     break _v1_0;
+               if (_p4._0.ctor === "Reseed") {
+                     break _v2_0;
                   } else {
                      return {ctor: "_Tuple2",_0: $Maybe.Nothing,_1: $Effects.none};
                   }
             }
       } while (false);
-      var seed = $Random.initialSeed($Basics.round(_p2._0._0));
+      var seed = $Random.initialSeed($Basics.round(_p4._0._0));
       var state = A3(deal,$Seat.South,$Vulnerability.initial,seed);
       return {ctor: "_Tuple2",_0: $Maybe.Just(state),_1: $Effects.none};
    });
