@@ -976,6 +976,29 @@ oneNoTrumpResponseSuite =
 suggestionsExist : List Auction.Bid -> ElmTest.Test
 suggestionsExist history =
   let
+    rotate xs =
+      case (List.head xs, List.tail xs) of
+        (Just h, Just t) -> t ++ [h]
+        _ -> Debug.crash "tried to rotate an empty list somehow!"
+    head' xs =
+      case List.head xs of
+        Just x -> x
+        Nothing -> Debug.crash "Card.Producer.deal produced an empty list of hands!"
+    injectOutOfSystem suggestions =
+      if List.isEmpty suggestions
+         then [ { bid = Auction.Pass, meaning = Bidding.OutOfSystem, description = Nothing, convention = Nothing } ]
+         else suggestions
+    consistent favorability annHist hands =
+      case annHist of
+        [] -> True
+        bid :: rest ->
+          if List.member bid (injectOutOfSystem <| Bidding.viableChoices Bidding.StandardAmerican.system favorability rest (head' hands))
+            then consistent favorability rest (rotate hands)
+            else False
+    plausibleSetup =
+      Check.Producer.tuple (Vulnerability.Producer.favorability, Card.Producer.deal)
+        |> Check.Producer.filter (\(favorability, hands) -> consistent favorability (annotate favorability history) (rotate hands))
+        |> Check.Producer.map (\(favorability, hands) -> (favorability, head' hands))
     suggestionsExist' favorability hand =
       not <| List.isEmpty <| Bidding.viableChoices Bidding.StandardAmerican.system favorability (annotate favorability history) hand
   in
@@ -985,7 +1008,7 @@ suggestionsExist history =
       `Check.true`
         uncurry suggestionsExist'
       `Check.for`
-        Check.Producer.tuple (Vulnerability.Producer.favorability, Card.Producer.hand)
+        plausibleSetup
 
 
 {-| Test that the expectd bids are suggested in a situation.
