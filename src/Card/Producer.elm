@@ -3,6 +3,7 @@ module Card.Producer
   , rank
   , card
   , hand
+  , deal
   ) where
 
 import Card
@@ -46,9 +47,19 @@ card =
 -}
 hand : Producer (List Card.Card)
 hand =
-  { generator =
-      Random.Array.shuffle Card.deck
-        |> Random.map (Array.slice 0 13)
-        |> Random.map Array.toList
+  let
+    head' xs =
+      case List.head xs of
+        Just x -> x
+        Nothing -> Debug.crash "Card.deal was supposed to return 4 hands, but returned 0"
+  in
+    Check.Producer.map head' deal
+
+
+{-| A producer for a complete deal of cards.
+-}
+deal : Producer (List (List Card.Card))
+deal =
+  { generator = Card.deal
   , shrinker = Shrink.noShrink
   }

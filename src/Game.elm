@@ -14,10 +14,8 @@ import Card exposing (Card)
 import Seat exposing (Seat)
 import Vulnerability exposing (Vulnerability)
 
-import Array
 import Effects exposing (Effects)
 import Random
-import Random.Array
 import Time exposing (Time)
 
 
@@ -82,15 +80,16 @@ update action model =
 deal : Seat -> Vulnerability -> Random.Seed -> GameState
 deal dealer vulnerability seed =
   let
-    (shuffled, seed') = Random.generate (Random.Array.shuffle Card.deck) seed
-    cardsPerHand = Array.length shuffled // 4
-    takeCards n = Array.toList (Array.slice (cardsPerHand * n) (cardsPerHand * (n + 1)) shuffled)
+    (dealt, seed') = Random.generate Card.deal seed
     hands =
-      { west = takeCards 0
-      , north = takeCards 1
-      , east = takeCards 2
-      , south = takeCards 3
-      }
+      case dealt of
+        [west, north, east, south] ->
+          { west = west
+          , north = north
+          , east = east
+          , south = south
+          }
+        _ -> Debug.crash "Card.deal didn't return exactly four hands!"
     state =
       { system = Bidding.StandardAmerican.system
       , hands = hands

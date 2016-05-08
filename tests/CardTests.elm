@@ -3,12 +3,14 @@ module CardTests (all) where
 import Card exposing (Card)
 import Card.Producer
 import GeneralTests
+import TestUtils
 
 import Array
 import Check
 import Check.Producer
 import Check.Test
 import ElmTest
+import List.Extra
 
 
 all : ElmTest.Test
@@ -39,6 +41,44 @@ all =
     , ElmTest.test "deck has 52 cards" <|
         ElmTest.assertEqual 52 (Array.length Card.deck)
 
+    , dealTests
+    ]
+
+
+dealTests : ElmTest.Test
+dealTests =
+  ElmTest.suite "deal"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "four hands are dealt"
+        `Check.that`
+          List.length
+        `Check.is`
+          always 4
+        `Check.for`
+          Card.Producer.deal
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "each hand has 13 cards"
+        `Check.true`
+          (List.all (\hand -> List.length hand == 13))
+        `Check.for`
+          Card.Producer.deal
+
+    , let
+        -- O(n^2), but List.Extra.dropDuplicates only works with comparable
+        unique cards =
+          List.Extra.selectSplit cards
+            |> List.all (\(_, card, rest) -> not <| List.member card rest)
+      in
+        TestUtils.generativeTest <|
+          Check.claim
+            "each card is in exactly one hand"
+          `Check.true`
+            (unique << List.concat)
+          `Check.for`
+            Card.Producer.deal
     ]
 
 claims : Check.Claim

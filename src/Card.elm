@@ -5,6 +5,7 @@ module Card
   , ranks
   , Card
   , deck
+  , deal
   , rankDescending
   , SampleHand
   , fromSuits
@@ -14,6 +15,8 @@ module Card
 -}
 
 import Array exposing (Array)
+import Random
+import Random.Array
 
 
 {-| The suit of a card.
@@ -100,6 +103,20 @@ deck =
     Array.toList suits
       |> List.concatMap addRanks
       |> Array.fromList
+
+
+{-| Deal the deck of cards for a game of bridge.
+-}
+deal : Random.Generator (List (List Card))
+deal =
+  let
+    cardsPerHand =
+      Array.length deck // 4
+    takeCards shuffled n =
+      Array.toList (Array.slice (cardsPerHand * n) (cardsPerHand * (n + 1)) shuffled)
+  in
+    Random.Array.shuffle deck
+      |> Random.map (\shuffled -> List.map (takeCards shuffled) [0 .. 3])
 
 
 {-| Comparitor to sort cards in descending order by rank.
