@@ -12456,11 +12456,64 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       });
       return prioritized$(_U.list([]));
    }();
+   var noTwoQuickLosers = function () {
+      var noTwoQuickLosersIn = function (suit) {    return A2($Bidding.LessThan,$Bidding.QuickLosers(suit),$Bidding.Constant(2));};
+      return $Bidding.And(A2($List.map,noTwoQuickLosersIn,suits));
+   }();
+   var noVoids = function () {
+      var noVoidIn = function (suit) {    return A2($Bidding.GreaterThan,$Bidding.Length(suit),$Bidding.Constant(0));};
+      return $Bidding.And(A2($List.map,noVoidIn,suits));
+   }();
+   var notFourThreeThreeThree = $Bidding.Or(A2($List.map,function (suit) {    return A2($Bidding.Maximum,$Bidding.Length(suit),$Bidding.Constant(2));},suits));
+   var fourThreeThreeThree = $Bidding.And(A2($List.map,function (suit) {    return A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(3));},suits));
+   var responsesToTwoNoTrump = function () {
+      var jacobyTransfer = F2(function (target,via) {
+         return {bid: A2($Auction.Bid,3,$Maybe.Just(via))
+                ,description: $Maybe.Nothing
+                ,convention: $Maybe.Just($Convention.Start($Convention.JacobyTransfer))
+                ,meaning: A2($Bidding.Minimum,$Bidding.Length(target),$Bidding.Constant(5))};
+      });
+      var inviteSlamPoints = 33 - 20;
+      var inviteSlam = {bid: A2($Auction.Bid,4,$Maybe.Nothing)
+                       ,description: $Maybe.Just("quantitative raise")
+                       ,convention: $Maybe.Nothing
+                       ,meaning: A2($Bidding.Minimum,$Bidding.HighCardPoints,$Bidding.Constant(inviteSlamPoints))};
+      var gerber = {bid: A2($Auction.Bid,4,$Maybe.Just($Card.Clubs))
+                   ,description: $Maybe.Nothing
+                   ,convention: $Maybe.Just($Convention.Start($Convention.Gerber))
+                   ,meaning: $Bidding.And(_U.list([A2($Bidding.GreaterThan,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(inviteSlamPoints))
+                                                  ,noVoids
+                                                  ,noTwoQuickLosers]))};
+      var priority1 = _U.list([gerber]);
+      var gamePoints = 5;
+      var pass = {bid: $Auction.Pass
+                 ,description: $Maybe.Nothing
+                 ,convention: $Maybe.Nothing
+                 ,meaning: $Bidding.And(_U.list([A2($Bidding.LessThan,$Bidding.HighCardPoints,$Bidding.Constant(gamePoints))
+                                                ,A2($Bidding.LessThan,$Bidding.Length($Card.Spades),$Bidding.Constant(5))
+                                                ,A2($Bidding.LessThan,$Bidding.Length($Card.Hearts),$Bidding.Constant(5))]))};
+      var stayman = {bid: A2($Auction.Bid,3,$Maybe.Just($Card.Clubs))
+                    ,description: $Maybe.Nothing
+                    ,convention: $Maybe.Just($Convention.Start($Convention.Stayman))
+                    ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.Points($Maybe.Nothing),gamePoints,inviteSlamPoints - 1)
+                                                   ,$Bidding.Or(_U.list([A2($Bidding.Equal,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))
+                                                                        ,A2($Bidding.Equal,$Bidding.Length($Card.Spades),$Bidding.Constant(4))]))
+                                                   ,notFourThreeThreeThree]))};
+      var game = {bid: A2($Auction.Bid,3,$Maybe.Nothing)
+                 ,description: $Maybe.Just("raise to game")
+                 ,convention: $Maybe.Nothing
+                 ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.HighCardPoints,gamePoints,inviteSlamPoints - 1)
+                                                ,$Bidding.Or(_U.list([$Bidding.And(_U.list([A2($Bidding.LessThan,
+                                                                                           $Bidding.Length($Card.Spades),
+                                                                                           $Bidding.Constant(4))
+                                                                                           ,A2($Bidding.LessThan,
+                                                                                           $Bidding.Length($Card.Hearts),
+                                                                                           $Bidding.Constant(4))]))
+                                                                     ,fourThreeThreeThree]))]))};
+      var priority2 = _U.list([pass,stayman,A2(jacobyTransfer,$Card.Spades,$Card.Hearts),A2(jacobyTransfer,$Card.Hearts,$Card.Diamonds),game,inviteSlam]);
+      return prioritized(_U.list([priority1,priority2]));
+   }();
    var responsesToOneNoTrump = function () {
-      var noTwoQuickLosers = function () {
-         var noTwoQuickLosersIn = function (suit) {    return A2($Bidding.LessThan,$Bidding.QuickLosers(suit),$Bidding.Constant(2));};
-         return A2($List.map,noTwoQuickLosersIn,suits);
-      }();
       var atLeastOneVoid = function () {
          var voidIn = function (suit) {    return A2($Bidding.Equal,$Bidding.Length(suit),$Bidding.Constant(0));};
          return $Bidding.Or(A2($List.map,voidIn,suits));
@@ -12473,10 +12526,6 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                                                ,A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
                                                ,atLeastOneVoid]))};
       };
-      var noVoids = function () {
-         var noVoidIn = function (suit) {    return A2($Bidding.GreaterThan,$Bidding.Length(suit),$Bidding.Constant(0));};
-         return A2($List.map,noVoidIn,suits);
-      }();
       var bidGame = {bid: A2($Auction.Bid,3,$Maybe.Nothing)
                     ,description: $Maybe.Just("Game")
                     ,convention: $Maybe.Nothing
@@ -12488,6 +12537,13 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
                                                ,A3($Bidding.InRange,$Bidding.HighCardPoints,7,9)]))};
       };
+      var stayman = {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Clubs))
+                    ,description: $Maybe.Nothing
+                    ,convention: $Maybe.Just($Convention.Start($Convention.Stayman))
+                    ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(8))
+                                                   ,$Bidding.Or(_U.list([A2($Bidding.Equal,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))
+                                                                        ,A2($Bidding.Equal,$Bidding.Length($Card.Spades),$Bidding.Constant(4))]))
+                                                   ,notFourThreeThreeThree]))};
       var minorTransfer = {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Spades))
                           ,description: $Maybe.Just("Minor Transfer")
                           ,convention: $Maybe.Nothing
@@ -12502,19 +12558,6 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                                                 ,A2($Bidding.LessThan,$Bidding.Length($Card.Hearts),$Bidding.Constant(5))
                                                 ,A2($Bidding.LessThan,$Bidding.Length($Card.Diamonds),$Bidding.Constant(6))
                                                 ,A2($Bidding.LessThan,$Bidding.Length($Card.Clubs),$Bidding.Constant(6))]))};
-      var notFourThreeThreeThree = $Bidding.Or(A2($List.map,
-      function (suit) {
-         return A2($Bidding.Maximum,$Bidding.Length(suit),$Bidding.Constant(2));
-      },
-      suits));
-      var stayman = {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Clubs))
-                    ,description: $Maybe.Nothing
-                    ,convention: $Maybe.Just($Convention.Start($Convention.Stayman))
-                    ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(8))
-                                                   ,$Bidding.Or(_U.list([A2($Bidding.Equal,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))
-                                                                        ,A2($Bidding.Equal,$Bidding.Length($Card.Spades),$Bidding.Constant(4))]))
-                                                   ,notFourThreeThreeThree]))};
-      var fourThreeThreeThree = $Bidding.And(A2($List.map,function (suit) {    return A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(3));},suits));
       var noFourCardMajor = $Bidding.And(_U.list([A2($Bidding.Maximum,$Bidding.Length($Card.Spades),$Bidding.Constant(3))
                                                  ,A2($Bidding.Maximum,$Bidding.Length($Card.Hearts),$Bidding.Constant(3))]));
       var inviteGame = {bid: A2($Auction.Bid,2,$Maybe.Nothing)
@@ -12553,23 +12596,33 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       var gerber = {bid: A2($Auction.Bid,4,$Maybe.Just($Card.Clubs))
                    ,description: $Maybe.Nothing
                    ,convention: $Maybe.Just($Convention.Start($Convention.Gerber))
-                   ,meaning: $Bidding.And(A2($List._op["::"],
-                   A2($Bidding.GreaterThan,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(inviteSlamPoints)),
-                   A2($Basics._op["++"],noVoids,noTwoQuickLosers)))};
+                   ,meaning: $Bidding.And(_U.list([A2($Bidding.GreaterThan,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(inviteSlamPoints))
+                                                  ,noVoids
+                                                  ,noTwoQuickLosers]))};
       var priority1 = _U.list([inviteSlamNoTrump,gerber,minorSlam($Card.Clubs),minorSlam($Card.Diamonds)]);
       return prioritized(_U.list([priority1,priority2,priority3]));
    }();
    var responseBids = function (history) {
-      var justOpenedOneNoTrump = function () {
+      var firstResponse = function () {
          var _p3 = A2($List.map,function (_) {    return _.bid;},history);
-         if (_p3.ctor === "::" && _p3._0.ctor === "Pass" && _p3._1.ctor === "::" && _p3._1._0.ctor === "Bid" && _p3._1._0._0 === 1 && _p3._1._0._1.ctor === "Nothing")
-         {
-               return A2($List.all,function (bid) {    return _U.eq(bid,$Auction.Pass);},_p3._1._1);
+         if (_p3.ctor === "::" && _p3._0.ctor === "Pass" && _p3._1.ctor === "::") {
+               return A2($List.all,F2(function (x,y) {    return _U.eq(x,y);})($Auction.Pass),_p3._1._1) ? $Maybe.Just(_p3._1._0) : $Maybe.Nothing;
             } else {
-               return false;
+               return $Maybe.Nothing;
             }
       }();
-      return justOpenedOneNoTrump ? responsesToOneNoTrump : _U.list([]);
+      var _p4 = firstResponse;
+      _v2_2: do {
+         if (_p4.ctor === "Just" && _p4._0.ctor === "Bid" && _p4._0._1.ctor === "Nothing") {
+               switch (_p4._0._0)
+               {case 1: return responsesToOneNoTrump;
+                  case 2: return responsesToTwoNoTrump;
+                  default: break _v2_2;}
+            } else {
+               break _v2_2;
+            }
+      } while (false);
+      return _U.list([]);
    };
    var openingBids = F2(function (favorability,history) {
       var fourthSeatThree = function (suit) {
@@ -12580,7 +12633,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                                                ,A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(7))]))};
       };
       var preemptTricks = function (level) {
-         var margin = function () {    var _p4 = favorability;switch (_p4.ctor) {case "Unfavorable": return 2;case "Equal": return 3;default: return 4;}}();
+         var margin = function () {    var _p5 = favorability;switch (_p5.ctor) {case "Unfavorable": return 2;case "Equal": return 3;default: return 4;}}();
          return $Bidding.Constant(6 + level - margin);
       };
       var preempt = F3(function (level,suit,trickCondition) {
@@ -12685,8 +12738,8 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       var twoNoTrump = A3(noTrump,2,20,21);
       var threeNoTrump = A3(noTrump,3,25,27);
       var fourthSeat = function () {
-         var _p5 = history;
-         if (_p5.ctor === "::" && _p5._1.ctor === "::" && _p5._1._1.ctor === "::" && _p5._1._1._1.ctor === "[]") {
+         var _p6 = history;
+         if (_p6.ctor === "::" && _p6._1.ctor === "::" && _p6._1._1.ctor === "::" && _p6._1._1._1.ctor === "[]") {
                return true;
             } else {
                return false;
@@ -12713,8 +12766,8 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                                  ,_U.list([pass])]));
    });
    var suggest = F2(function (favorability,history) {
-      var _p6 = $Bidding.role(history);
-      switch (_p6.ctor)
+      var _p7 = $Bidding.role(history);
+      switch (_p7.ctor)
       {case "Openable": return A2(openingBids,favorability,history);
          case "Responder": return responseBids(history);
          default: return _U.list([]);}
