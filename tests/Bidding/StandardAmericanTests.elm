@@ -21,6 +21,7 @@ all =
   ElmTest.suite "Bidding.StandardAmericanTests"
     [ openingSuite
     , oneNoTrumpResponseSuite
+    , twoNoTrumpResponseSuite
     ]
 
 
@@ -989,6 +990,200 @@ oneNoTrumpResponseSuite =
         ]
   in
     ElmTest.suite "response to 1NT" (existenceTest :: unitTests)
+
+
+twoNoTrumpResponseSuite : ElmTest.Test
+twoNoTrumpResponseSuite =
+  let
+    history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+    existenceTest =
+      suggestionsExist history
+    unitTests =
+      List.map testBid
+        [ { name = "0 HCP, 4 spades, 4 hearts"
+          , expected = [Auction.Pass]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Ten, Card.Nine ]
+          }
+
+        , { name = "0 HCP, 5 diamonds, 5 clubs"
+          , expected = [Auction.Pass]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Ten ]
+          , hearts = [ Card.Ten, Card.Nine ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+          , clubs = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+          }
+
+        , { name = "0 HCP, 5 spades"
+          , expected = [Auction.Bid 3 (Just Card.Hearts)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Ten, Card.Nine ]
+          }
+
+        , { name = "0 HCP, 5 hearts"
+          , expected = [Auction.Bid 3 (Just Card.Diamonds)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Ten, Card.Nine, Card.Eight ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Ten, Card.Nine ]
+          }
+
+        , { name = "5 points, 4 spades"
+          , expected = [Auction.Bid 3 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Jack, Card.Ten, Card.Seven, Card.Two ]
+          , hearts = [ Card.Jack, Card.Nine, Card.Eight ]
+          , diamonds = [ Card.King, Card.Ten, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Four, Card.Three ]
+          }
+
+        , { name = "5 points, 4 hearts"
+          , expected = [Auction.Bid 3 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Jack, Card.Nine, Card.Eight ]
+          , hearts = [ Card.Jack, Card.Ten, Card.Seven, Card.Two ]
+          , diamonds = [ Card.King, Card.Ten, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Four, Card.Three ]
+          }
+
+        , { name = "5 points, 4 spades, 4 hearts"
+          , expected = [Auction.Bid 3 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.King, Card.Ten, Card.Nine, Card.Eight ]
+          , hearts = [ Card.Jack, Card.Ten, Card.Seven, Card.Two ]
+          , diamonds = [ Card.Jack, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Four, Card.Three ]
+          }
+
+        , { name = "5 HCP, 2 spades, 3 hearts, 4-4-3-2 distribution"
+          , expected = [Auction.Bid 3 Nothing]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Four, Card.Three ]
+          , hearts = [ Card.Jack, Card.Ten, Card.Seven ]
+          , diamonds = [ Card.Jack, Card.Nine, Card.Eight, Card.Two ]
+          , clubs = [ Card.King, Card.Ten, Card.Nine, Card.Eight ]
+          }
+
+        , { name = "5 HCP, 3 spades, 3 hearts, 5-3-3-2 distribution"
+          , expected = [Auction.Bid 3 Nothing]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Eight, Card.Four, Card.Three ]
+          , hearts = [ Card.Jack, Card.Ten, Card.Seven ]
+          , diamonds = [ Card.Jack, Card.Ten, Card.Nine, Card.Eight, Card.Two ]
+          , clubs = [ Card.King, Card.Nine ]
+          }
+
+        , { name = "5 HCP, 5-4-2-2 distribution, no 4-card major"
+          , expected = [Auction.Bid 3 Nothing]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Four, Card.Three ]
+          , hearts = [ Card.Queen, Card.Ten ]
+          , diamonds = [ Card.Seven, Card.Six, Card.Four, Card.Three ]
+          , clubs = [ Card.King, Card.Ten, Card.Nine, Card.Four, Card.Two ]
+          }
+
+        , { name = "5 HCP, 4-3-3-3 distribution, 4 hearts"
+          , expected = [Auction.Bid 3 Nothing]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Jack, Card.Six, Card.Three ]
+          , hearts = [ Card.Queen, Card.Jack, Card.Nine, Card.Four ]
+          , diamonds = [ Card.Jack, Card.Ten, Card.Six ]
+          , clubs = [ Card.Ten, Card.Nine, Card.Six ]
+          }
+
+        , { name = "13 HCP, 2-2-4-5 distribution"
+          , expected = [Auction.Bid 4 Nothing]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.King, Card.Five ]
+          , hearts = [ Card.Ace, Card.Ten ]
+          , diamonds = [ Card.Queen, Card.Seven, Card.Six, Card.Four ]
+          , clubs = [ Card.Ace, Card.Eight, Card.Five, Card.Three, Card.Two ]
+          }
+
+        , { name = "13 HCP, 4-4-3-2 distribution"
+          , expected = [Auction.Bid 4 Nothing]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Ace, Card.Jack, Card.Ten, Card.Nine ]
+          , hearts = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Ace, Card.Ten ]
+          }
+
+        , { name = "13 HCP, 5-3-3-2 distribution"
+          , expected = [Auction.Bid 4 Nothing]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Queen, Card.Four, Card.Two ]
+          , hearts = [ Card.King, Card.Queen, Card.Jack ]
+          , diamonds = [ Card.Four, Card.Three ]
+          , clubs = [ Card.King, Card.Queen, Card.Eight, Card.Four, Card.Three ]
+          }
+
+          -- FIXME: These are probably better for general tests for using Gerber
+
+        , { name = "13 points, 6 spades, no voids, no 2 quick losers in any suit"
+          , expected = [Auction.Bid 4 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+          , hearts = [ Card.King, Card.Ten ]
+          , diamonds = [ Card.King, Card.Ten ]
+          , clubs = [ Card.King, Card.Ten, Card.Nine ]
+          }
+
+        , { name = "13 points, 6 hearts, no voids, no 2 quick losers in any suit"
+          , expected = [Auction.Bid 4 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.King, Card.Ten, Card.Nine ]
+          , hearts = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+          , diamonds = [ Card.King, Card.Ten ]
+          , clubs = [ Card.King, Card.Ten ]
+          }
+
+        , { name = "13 points, 6 diamonds, no voids, no 2 quick losers in any suit"
+          , expected = [Auction.Bid 4 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.King, Card.Ten, Card.Nine ]
+          , hearts = [ Card.King, Card.Ten ]
+          , diamonds = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+          , clubs = [ Card.King, Card.Ten ]
+          }
+
+        , { name = "13 points, 6 clubs, no voids, no 2 quick losers in any suit"
+          , expected = [Auction.Bid 4 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 Nothing ]
+          , spades = [ Card.King, Card.Ten, Card.Nine ]
+          , hearts = [ Card.King, Card.Ten ]
+          , diamonds = [ Card.King, Card.Ten ]
+          , clubs = [ Card.Ace, Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+          }
+        ]
+  in
+    ElmTest.suite "response to 2NT" (existenceTest :: unitTests)
 
 
 {-| Test that bids are suggested regardless of the hand or vulnerability.

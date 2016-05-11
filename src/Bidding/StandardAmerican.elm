@@ -242,16 +242,19 @@ openingBids favorability history =
 responseBids : List Bidding.AnnotatedBid -> List Bidding.AnnotatedBid
 responseBids history =
   let
-    justOpenedOneNoTrump =
+    firstResponse =
       case List.map .bid history of
-        Auction.Pass :: Auction.Bid 1 Nothing :: rest ->
-          List.all (\bid -> bid == Auction.Pass) rest
+        Auction.Pass :: bid :: rest ->
+          if List.all ((==) Auction.Pass) rest
+            then Just bid
+            else Nothing
         _ ->
-          False
+          Nothing
   in
-    if justOpenedOneNoTrump
-    then responsesToOneNoTrump
-    else []
+    case firstResponse of
+      Just (Auction.Bid 1 Nothing) -> responsesToOneNoTrump
+      Just (Auction.Bid 2 Nothing) -> responsesToTwoNoTrump
+      _ -> []
 
 
 {-| Responses to an opening bid of 1NT.
@@ -265,10 +268,6 @@ responsesToOneNoTrump =
         [ Bidding.Maximum (Bidding.Length Card.Spades) (Bidding.Constant 3)
         , Bidding.Maximum (Bidding.Length Card.Hearts) (Bidding.Constant 3)
         ]
-    fourThreeThreeThree =
-      Bidding.And <| List.map (\suit -> Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 3)) suits
-    notFourThreeThreeThree =
-      Bidding.Or <| List.map (\suit -> Bidding.Maximum (Bidding.Length suit) (Bidding.Constant 2)) suits
     pass =
       { bid = Auction.Pass
       , description = Nothing
@@ -358,33 +357,21 @@ responsesToOneNoTrump =
           , Bidding.Or [Bidding.Balanced, Bidding.SemiBalanced]
           ]
       }
-    noVoids =
-      let
-        noVoidIn suit =
-          Bidding.GreaterThan (Bidding.Length suit) (Bidding.Constant 0)
-      in
-        List.map noVoidIn suits
     atLeastOneVoid =
       let
         voidIn suit =
           Bidding.Equal (Bidding.Length suit) (Bidding.Constant 0)
       in
         Bidding.Or <| List.map voidIn suits
-    noTwoQuickLosers =
-      let
-        noTwoQuickLosersIn suit =
-          Bidding.LessThan (Bidding.QuickLosers suit) (Bidding.Constant 2)
-      in
-        List.map noTwoQuickLosersIn suits
     gerber =
       { bid = Auction.Bid 4 (Just Card.Clubs)
       , description = Nothing
       , convention = Just (Convention.Start Convention.Gerber)
       , meaning = Bidding.And
-          ( Bidding.GreaterThan (Bidding.Points Nothing) (Bidding.Constant inviteSlamPoints)    -- FIXME: probably should be based on a known fit?
-          :: noVoids
-          ++ noTwoQuickLosers
-          )
+          [ Bidding.GreaterThan (Bidding.Points Nothing) (Bidding.Constant inviteSlamPoints)    -- FIXME: probably should be based on a known fit?
+          , noVoids
+          , noTwoQuickLosers
+          ]
       }
     minorSlam suit =
       { bid = Auction.Bid 6 (Just suit)
@@ -419,6 +406,125 @@ responsesToOneNoTrump =
       ]
   in
     prioritized [priority1, priority2, priority3]
+
+
+{-| Responses to an opening bid of 2NT.
+-}
+responsesToTwoNoTrump : List Bidding.AnnotatedBid
+responsesToTwoNoTrump =
+  let
+    gamePoints = 5
+    inviteSlamPoints = 33 - 20
+    pass =
+      { bid = Auction.Pass
+      , description = Nothing
+      , convention = Nothing
+      , meaning = Bidding.And
+          [ Bidding.LessThan Bidding.HighCardPoints (Bidding.Constant gamePoints)
+          , Bidding.LessThan (Bidding.Length Card.Spades) (Bidding.Constant 5)
+          , Bidding.LessThan (Bidding.Length Card.Hearts) (Bidding.Constant 5)
+          ]
+      }
+    stayman =
+      { bid = Auction.Bid 3 (Just Card.Clubs)
+      , description = Nothing
+      , convention = Just (Convention.Start Convention.Stayman)
+      , meaning = Bidding.And
+          [ Bidding.InRange (Bidding.Points Nothing) gamePoints (inviteSlamPoints - 1)
+          , Bidding.Or
+              [ Bidding.Equal (Bidding.Length Card.Hearts) (Bidding.Constant 4)
+              , Bidding.Equal (Bidding.Length Card.Spades) (Bidding.Constant 4)
+              ]
+          , notFourThreeThreeThree
+          ]
+      }
+    jacobyTransfer target via =
+      { bid = Auction.Bid 3 (Just via)
+      , description = Nothing
+      , convention = Just (Convention.Start Convention.JacobyTransfer)
+      , meaning = Bidding.Minimum (Bidding.Length target) (Bidding.Constant 5)
+      }
+    game =
+      { bid = Auction.Bid 3 Nothing
+      , description = Just "raise to game"
+      , convention = Nothing
+      , meaning = Bidding.And
+          [ Bidding.InRange Bidding.HighCardPoints gamePoints (inviteSlamPoints - 1)
+          , Bidding.Or
+              [ Bidding.And
+                  [ Bidding.LessThan (Bidding.Length Card.Spades) (Bidding.Constant 4)
+                  , Bidding.LessThan (Bidding.Length Card.Hearts) (Bidding.Constant 4)
+                  ]
+              , fourThreeThreeThree
+              ]
+          ]
+      }
+    inviteSlam =
+      { bid = Auction.Bid 4 Nothing
+      , description = Just "quantitative raise"
+      , convention = Nothing
+      , meaning =
+          Bidding.Minimum Bidding.HighCardPoints (Bidding.Constant inviteSlamPoints)
+      }
+    gerber =
+      { bid = Auction.Bid 4 (Just Card.Clubs)
+      , description = Nothing
+      , convention = Just (Convention.Start Convention.Gerber)
+      , meaning = Bidding.And
+          [ Bidding.GreaterThan (Bidding.Points Nothing) (Bidding.Constant inviteSlamPoints)    -- FIXME: probably should be based on a known fit?
+          , noVoids
+          , noTwoQuickLosers
+          ]
+      }
+    priority1 =
+      [ gerber
+      ]
+    priority2 =
+      [ pass
+      , stayman
+      , jacobyTransfer Card.Spades Card.Hearts
+      , jacobyTransfer Card.Hearts Card.Diamonds
+      , game
+      , inviteSlam
+      ]
+  in
+    prioritized [priority1, priority2]
+
+
+{-| Require having 4-3-3-3 distribution.
+-}
+fourThreeThreeThree : Bidding.Meaning
+fourThreeThreeThree =
+  Bidding.And <| List.map (\suit -> Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 3)) suits
+
+
+{-| Deny having 4-3-3-3 distribution.
+-}
+notFourThreeThreeThree : Bidding.Meaning
+notFourThreeThreeThree =
+  Bidding.Or <| List.map (\suit -> Bidding.Maximum (Bidding.Length suit) (Bidding.Constant 2)) suits
+
+
+{-| Require that a hand contain no voids.
+-}
+noVoids : Bidding.Meaning
+noVoids =
+  let
+    noVoidIn suit =
+      Bidding.GreaterThan (Bidding.Length suit) (Bidding.Constant 0)
+  in
+    Bidding.And <| List.map noVoidIn suits
+
+
+{-| Require that a hand have no suit with two quick losers.
+-}
+noTwoQuickLosers : Bidding.Meaning
+noTwoQuickLosers =
+  let
+    noTwoQuickLosersIn suit =
+      Bidding.LessThan (Bidding.QuickLosers suit) (Bidding.Constant 2)
+  in
+    Bidding.And <| List.map noTwoQuickLosersIn suits
 
 
 {-| Flatten a prioritized list of bids, such that the nth set of choices
