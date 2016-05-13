@@ -12466,6 +12466,41 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
    }();
    var notFourThreeThreeThree = $Bidding.Or(A2($List.map,function (suit) {    return A2($Bidding.Maximum,$Bidding.Length(suit),$Bidding.Constant(2));},suits));
    var fourThreeThreeThree = $Bidding.And(A2($List.map,function (suit) {    return A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(3));},suits));
+   var responsesToThreeNoTrump = function () {
+      var stayman = {bid: A2($Auction.Bid,4,$Maybe.Just($Card.Clubs))
+                    ,description: $Maybe.Nothing
+                    ,convention: $Maybe.Just($Convention.Start($Convention.Stayman))
+                    ,meaning: $Bidding.And(_U.list([$Bidding.Or(_U.list([A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Constant(4))
+                                                                        ,A2($Bidding.Minimum,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))]))
+                                                   ,$Bidding.Or(_U.list([A2($Bidding.LessThan,$Bidding.Length($Card.Spades),$Bidding.Constant(5))
+                                                                        ,A2($Bidding.Minimum,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))]))
+                                                   ,$Bidding.Or(_U.list([A2($Bidding.LessThan,$Bidding.Length($Card.Hearts),$Bidding.Constant(5))
+                                                                        ,A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Constant(4))]))
+                                                   ,notFourThreeThreeThree]))};
+      var pass = {bid: $Auction.Pass
+                 ,description: $Maybe.Nothing
+                 ,convention: $Maybe.Nothing
+                 ,meaning: $Bidding.Or(_U.list([$Bidding.And(_U.list([A2($Bidding.LessThan,$Bidding.Length($Card.Spades),$Bidding.Constant(4))
+                                                                     ,A2($Bidding.LessThan,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))]))
+                                               ,fourThreeThreeThree]))};
+      var otherMajor = function (major) {
+         var _p3 = major;
+         switch (_p3.ctor)
+         {case "Spades": return $Card.Hearts;
+            case "Hearts": return $Card.Spades;
+            default: return _U.crashCase("Bidding.StandardAmerican",{start: {line: 501,column: 7},end: {line: 504,column: 96}},_p3)(A2($Basics._op["++"],
+              $Basics.toString(major),
+              " is not a major suit, so it has no \'other major\'"));}
+      };
+      var jacobyTransfer = F2(function (target,via) {
+         return {bid: A2($Auction.Bid,4,$Maybe.Just(via))
+                ,description: $Maybe.Nothing
+                ,convention: $Maybe.Just($Convention.Start($Convention.JacobyTransfer))
+                ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(target),$Bidding.Constant(5))
+                                               ,A2($Bidding.LessThan,$Bidding.Length(otherMajor(target)),$Bidding.Constant(4))]))};
+      });
+      return _U.list([pass,A2(jacobyTransfer,$Card.Spades,$Card.Hearts),A2(jacobyTransfer,$Card.Hearts,$Card.Diamonds),stayman]);
+   }();
    var responsesToTwoNoTrump = function () {
       var jacobyTransfer = F2(function (target,via) {
          return {bid: A2($Auction.Bid,3,$Maybe.Just(via))
@@ -12604,22 +12639,23 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
    }();
    var responseBids = function (history) {
       var firstResponse = function () {
-         var _p3 = A2($List.map,function (_) {    return _.bid;},history);
-         if (_p3.ctor === "::" && _p3._0.ctor === "Pass" && _p3._1.ctor === "::") {
-               return A2($List.all,F2(function (x,y) {    return _U.eq(x,y);})($Auction.Pass),_p3._1._1) ? $Maybe.Just(_p3._1._0) : $Maybe.Nothing;
+         var _p5 = A2($List.map,function (_) {    return _.bid;},history);
+         if (_p5.ctor === "::" && _p5._0.ctor === "Pass" && _p5._1.ctor === "::") {
+               return A2($List.all,F2(function (x,y) {    return _U.eq(x,y);})($Auction.Pass),_p5._1._1) ? $Maybe.Just(_p5._1._0) : $Maybe.Nothing;
             } else {
                return $Maybe.Nothing;
             }
       }();
-      var _p4 = firstResponse;
-      _v2_2: do {
-         if (_p4.ctor === "Just" && _p4._0.ctor === "Bid" && _p4._0._1.ctor === "Nothing") {
-               switch (_p4._0._0)
+      var _p6 = firstResponse;
+      _v3_3: do {
+         if (_p6.ctor === "Just" && _p6._0.ctor === "Bid" && _p6._0._1.ctor === "Nothing") {
+               switch (_p6._0._0)
                {case 1: return responsesToOneNoTrump;
                   case 2: return responsesToTwoNoTrump;
-                  default: break _v2_2;}
+                  case 3: return responsesToThreeNoTrump;
+                  default: break _v3_3;}
             } else {
-               break _v2_2;
+               break _v3_3;
             }
       } while (false);
       return _U.list([]);
@@ -12633,7 +12669,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                                                ,A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(7))]))};
       };
       var preemptTricks = function (level) {
-         var margin = function () {    var _p5 = favorability;switch (_p5.ctor) {case "Unfavorable": return 2;case "Equal": return 3;default: return 4;}}();
+         var margin = function () {    var _p7 = favorability;switch (_p7.ctor) {case "Unfavorable": return 2;case "Equal": return 3;default: return 4;}}();
          return $Bidding.Constant(6 + level - margin);
       };
       var preempt = F3(function (level,suit,trickCondition) {
@@ -12738,8 +12774,8 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       var twoNoTrump = A3(noTrump,2,20,21);
       var threeNoTrump = A3(noTrump,3,25,27);
       var fourthSeat = function () {
-         var _p6 = history;
-         if (_p6.ctor === "::" && _p6._1.ctor === "::" && _p6._1._1.ctor === "::" && _p6._1._1._1.ctor === "[]") {
+         var _p8 = history;
+         if (_p8.ctor === "::" && _p8._1.ctor === "::" && _p8._1._1.ctor === "::" && _p8._1._1._1.ctor === "[]") {
                return true;
             } else {
                return false;
@@ -12766,8 +12802,8 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                                  ,_U.list([pass])]));
    });
    var suggest = F2(function (favorability,history) {
-      var _p7 = $Bidding.role(history);
-      switch (_p7.ctor)
+      var _p9 = $Bidding.role(history);
+      switch (_p9.ctor)
       {case "Openable": return A2(openingBids,favorability,history);
          case "Responder": return responseBids(history);
          default: return _U.list([]);}
