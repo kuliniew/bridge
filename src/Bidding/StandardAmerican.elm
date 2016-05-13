@@ -254,6 +254,7 @@ responseBids history =
     case firstResponse of
       Just (Auction.Bid 1 Nothing) -> responsesToOneNoTrump
       Just (Auction.Bid 2 Nothing) -> responsesToTwoNoTrump
+      Just (Auction.Bid 3 Nothing) -> responsesToThreeNoTrump
       _ -> []
 
 
@@ -489,6 +490,65 @@ responsesToTwoNoTrump =
       ]
   in
     prioritized [priority1, priority2]
+
+
+{-| Responses to an opening bid of 3NT.
+-}
+responsesToThreeNoTrump : List Bidding.AnnotatedBid
+responsesToThreeNoTrump =
+  let
+    otherMajor major =
+      case major of
+        Card.Spades -> Card.Hearts
+        Card.Hearts -> Card.Spades
+        _ -> Debug.crash (toString major ++ " is not a major suit, so it has no 'other major'")
+    pass =
+      { bid = Auction.Pass
+      , description = Nothing
+      , convention = Nothing
+      , meaning = Bidding.Or
+          [ Bidding.And
+              [ Bidding.LessThan (Bidding.Length Card.Spades) (Bidding.Constant 4)
+              , Bidding.LessThan (Bidding.Length Card.Hearts) (Bidding.Constant 4)
+              ]
+          , fourThreeThreeThree
+          ]
+      }
+    jacobyTransfer target via =
+      { bid = Auction.Bid 4 (Just via)
+      , description = Nothing
+      , convention = Just (Convention.Start Convention.JacobyTransfer)
+      , meaning = Bidding.And
+          [ Bidding.Minimum (Bidding.Length target) (Bidding.Constant 5)
+          , Bidding.LessThan (Bidding.Length (otherMajor target)) (Bidding.Constant 4)
+          ]
+      }
+    stayman =
+      { bid = Auction.Bid 4 (Just Card.Clubs)
+      , description = Nothing
+      , convention = Just (Convention.Start Convention.Stayman)
+      , meaning = Bidding.And
+          [ Bidding.Or
+              [ Bidding.Minimum (Bidding.Length Card.Spades) (Bidding.Constant 4)
+              , Bidding.Minimum (Bidding.Length Card.Hearts) (Bidding.Constant 4)
+              ]
+          , Bidding.Or
+              [ Bidding.LessThan (Bidding.Length Card.Spades) (Bidding.Constant 5)
+              , Bidding.Minimum (Bidding.Length Card.Hearts) (Bidding.Constant 4)
+              ]
+          , Bidding.Or
+              [ Bidding.LessThan (Bidding.Length Card.Hearts) (Bidding.Constant 5)
+              , Bidding.Minimum (Bidding.Length Card.Spades) (Bidding.Constant 4)
+              ]
+          , notFourThreeThreeThree
+          ]
+      }
+  in
+    [ pass
+    , jacobyTransfer Card.Spades Card.Hearts
+    , jacobyTransfer Card.Hearts Card.Diamonds
+    , stayman
+    ]
 
 
 {-| Require having 4-3-3-3 distribution.

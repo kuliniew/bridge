@@ -22,6 +22,7 @@ all =
     [ openingSuite
     , oneNoTrumpResponseSuite
     , twoNoTrumpResponseSuite
+    , threeNoTrumpResponseSuite
     ]
 
 
@@ -1184,6 +1185,120 @@ twoNoTrumpResponseSuite =
         ]
   in
     ElmTest.suite "response to 2NT" (existenceTest :: unitTests)
+
+
+{- FIXME: suggestionsExist crashes when trying to generate hands that
+satisfy a 3NT opening.  Need to write a smarter producer that doesn't
+have to brute-force the 52! / (13!)^4 search space.
+-}
+threeNoTrumpResponseSuite : ElmTest.Test
+threeNoTrumpResponseSuite =
+  let
+    history = [ Auction.Pass, Auction.Bid 3 Nothing ]
+    unitTests =
+      List.map testBid
+        [ { name = "5 spades, 3 hearts"
+          , expected = [Auction.Bid 4 (Just Card.Hearts)]
+          , favorability = Vulnerability.Equal
+          , history = history
+          , spades = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Ten, Card.Nine ]
+          }
+
+        , { name = "3 spades, 5 hearts"
+          , expected = [Auction.Bid 4 (Just Card.Diamonds)]
+          , favorability = Vulnerability.Equal
+          , history = history
+          , spades = [ Card.Ten, Card.Nine, Card.Eight ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Ten, Card.Nine ]
+          }
+
+        , { name = "4 spades, 4 hearts"
+          , expected = [Auction.Bid 4 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = history
+          , spades = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Ten, Card.Nine ]
+          }
+
+        , { name = "5 spades, 4 hearts"
+          , expected = [Auction.Bid 4 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = history
+          , spades = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          , diamonds = [ Card.Ten, Card.Nine ]
+          , clubs = [ Card.Ten, Card.Nine ]
+          }
+
+        , { name = "4 spades, 5 hearts"
+          , expected = [Auction.Bid 4 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = history
+          , spades = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven, Card.Six ]
+          , diamonds = [ Card.Ten, Card.Nine ]
+          , clubs = [ Card.Ten, Card.Nine ]
+          }
+
+        , { name = "4 spades, 3 hearts, not 4-3-3-3 distribution"
+          , expected = [Auction.Bid 4 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = history
+          , spades = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          , clubs = [ Card.Ten, Card.Nine ]
+          }
+
+        , { name = "3 spades, 4 hearts, not 4-3-3-3 distribution"
+          , expected = [Auction.Bid 4 (Just Card.Clubs)]
+          , favorability = Vulnerability.Equal
+          , history = history
+          , spades = [ Card.Ten, Card.Nine, Card.Eight ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          , clubs = [ Card.Ten, Card.Nine ]
+          }
+
+        , { name = "4 spades, 3 hearts, 4-3-3-3 distribution"
+          , expected = [Auction.Pass]
+          , favorability = Vulnerability.Equal
+          , history = history
+          , spades = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Ten, Card.Nine, Card.Eight ]
+          }
+
+        , { name = "3 spades, 4 hearts, 4-3-3-3 distribution"
+          , expected = [Auction.Pass]
+          , favorability = Vulnerability.Equal
+          , history = history
+          , spades = [ Card.Ten, Card.Nine, Card.Eight ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Ten, Card.Nine, Card.Eight ]
+          }
+
+        , { name = "3 spades, 3 hearts"
+          , expected = [Auction.Pass]
+          , favorability = Vulnerability.Equal
+          , history = history
+          , spades = [ Card.Ten, Card.Nine, Card.Eight ]
+          , hearts = [ Card.Ten, Card.Nine, Card.Eight ]
+          , diamonds = [ Card.Ten, Card.Nine, Card.Eight ]
+          , clubs = [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+          }
+        ]
+  in
+    ElmTest.suite "response to 3NT" unitTests
 
 
 {-| Test that bids are suggested regardless of the hand or vulnerability.
