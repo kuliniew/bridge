@@ -3,17 +3,13 @@ module Bidding.StandardAmericanTests (all) where
 import Auction
 import Bidding
 import Bidding.StandardAmerican
+import Bidding.TestUtils
 import Card exposing (Card)
-import Card.Producer
 import TestUtils
 import Vulnerability
-import Vulnerability.Producer
 
-import Check
-import Check.Producer
 import ElmTest
 import List.Extra
-import Random
 
 
 all : ElmTest.Test
@@ -26,25 +22,13 @@ all =
     ]
 
 
-type alias BidTest =
-  { name : String
-  , expected : List Auction.Bid
-  , favorability : Vulnerability.Favorability
-  , history : List Auction.Bid
-  , spades : List Card.Rank
-  , hearts : List Card.Rank
-  , diamonds : List Card.Rank
-  , clubs : List Card.Rank
-  }
-
-
 openingSuite : ElmTest.Test
 openingSuite =
   let
     existenceTests =
-      List.map suggestionsExist <| List.Extra.inits (List.repeat 3 Auction.Pass)
+      List.map (Bidding.TestUtils.suggestionsExist Bidding.StandardAmerican.system) <| List.Extra.inits (List.repeat 3 Auction.Pass)
     unitTests =
-      List.map testBid
+      List.map (Bidding.TestUtils.testBid Bidding.StandardAmerican.system)
         [ { name = "4 HCP, 7 hearts, 5 tricks, unfavorable vulnerability"
           , expected = [Auction.Pass]
           , favorability = Vulnerability.Unfavorable
@@ -533,9 +517,9 @@ oneNoTrumpResponseSuite : ElmTest.Test
 oneNoTrumpResponseSuite =
   let
     existenceTest =
-      suggestionsExist [ Auction.Pass, Auction.Bid 1 Nothing ]
+      Bidding.TestUtils.suggestionsExist Bidding.StandardAmerican.system [ Auction.Pass, Auction.Bid 1 Nothing ]
     unitTests =
-      List.map testBid
+      List.map (Bidding.TestUtils.testBid Bidding.StandardAmerican.system)
         [ { name = "0 HCP, 4 spades, 4 hearts"
           , expected = [Auction.Pass]
           , favorability = Vulnerability.Equal
@@ -998,9 +982,9 @@ twoNoTrumpResponseSuite =
   let
     history = [ Auction.Pass, Auction.Bid 2 Nothing ]
     existenceTest =
-      suggestionsExist history
+      Bidding.TestUtils.suggestionsExist Bidding.StandardAmerican.system history
     unitTests =
-      List.map testBid
+      List.map (Bidding.TestUtils.testBid Bidding.StandardAmerican.system)
         [ { name = "0 HCP, 4 spades, 4 hearts"
           , expected = [Auction.Pass]
           , favorability = Vulnerability.Equal
@@ -1196,7 +1180,7 @@ threeNoTrumpResponseSuite =
   let
     history = [ Auction.Pass, Auction.Bid 3 Nothing ]
     unitTests =
-      List.map testBid
+      List.map (Bidding.TestUtils.testBid Bidding.StandardAmerican.system)
         [ { name = "5 spades, 3 hearts"
           , expected = [Auction.Bid 4 (Just Card.Hearts)]
           , favorability = Vulnerability.Equal
@@ -1299,75 +1283,3 @@ threeNoTrumpResponseSuite =
         ]
   in
     ElmTest.suite "response to 3NT" unitTests
-
-
-{-| Test that bids are suggested regardless of the hand or vulnerability.
--}
-suggestionsExist : List Auction.Bid -> ElmTest.Test
-suggestionsExist history =
-  let
-    rotate xs =
-      case (List.head xs, List.tail xs) of
-        (Just h, Just t) -> t ++ [h]
-        _ -> Debug.crash "tried to rotate an empty list somehow!"
-    head' xs =
-      case List.head xs of
-        Just x -> x
-        Nothing -> Debug.crash "Card.Producer.deal produced an empty list of hands!"
-    injectOutOfSystem suggestions =
-      if List.isEmpty suggestions
-         then [ { bid = Auction.Pass, meaning = Bidding.OutOfSystem, description = Nothing, convention = Nothing } ]
-         else suggestions
-    consistent favorability annHist hands =
-      case annHist of
-        [] -> True
-        bid :: rest ->
-          if List.member bid (injectOutOfSystem <| Bidding.viableChoices Bidding.StandardAmerican.system favorability rest (head' hands))
-            then consistent favorability rest (rotate hands)
-            else False
-    plausibleSetup =
-      Check.Producer.tuple (Vulnerability.Producer.favorability, Card.Producer.deal)
-        |> Check.Producer.filter (\(favorability, hands) -> consistent favorability (annotate favorability history) (rotate hands))
-        |> Check.Producer.map (\(favorability, hands) -> (favorability, head' hands))
-    suggestionsExist' favorability hand =
-      not <| List.isEmpty <| Bidding.viableChoices Bidding.StandardAmerican.system favorability (annotate favorability history) hand
-  in
-    TestUtils.generativeTest <|
-      Check.claim
-        ("bids are always suggested for " ++ toString history)
-      `Check.true`
-        uncurry suggestionsExist'
-      `Check.for`
-        plausibleSetup
-
-
-{-| Test that the expectd bids are suggested in a situation.
--}
-testBid : BidTest -> ElmTest.Test
-testBid test =
-  let
-    chosen =
-      Bidding.viableChoices Bidding.StandardAmerican.system test.favorability (annotate test.favorability test.history) (Card.fromSuits test)
-        |> List.map .bid
-    message = "expected " ++ toString (test.expected) ++ " but got " ++ toString (chosen)
-  in
-    ElmTest.test test.name <|
-      if chosen `List.Extra.isPermutationOf` test.expected
-        then ElmTest.pass
-        else ElmTest.fail message
-
-
-{-| Annotate an entire bidding history.
--}
-annotate : Vulnerability.Favorability -> List Auction.Bid -> List Bidding.AnnotatedBid
-annotate favorability history =
-  let
-    augment (fav, bid) annotatedHistory =
-      Bidding.annotate Bidding.StandardAmerican.system fav annotatedHistory bid :: annotatedHistory
-    tagHistory fav hist =
-      case hist of
-        [] -> []
-        bid :: rest -> (fav, bid) :: tagHistory (Vulnerability.opposing fav) rest
-    taggedHistory = tagHistory (Vulnerability.opposing favorability) history
-  in
-    List.foldr augment [] taggedHistory
