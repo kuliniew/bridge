@@ -7,7 +7,6 @@ import Auction
 import Bidding
 import Bidding.Stayman
 import Card
-import Convention
 import Vulnerability
 
 
@@ -285,7 +284,7 @@ responsesToOneNoTrump =
     jacobyTransfer target via =
       { bid = Auction.Bid 2 (Just via)
       , description = Nothing
-      , convention = Just (Convention.Start Convention.JacobyTransfer)
+      , convention = Just Bidding.JacobyTransfer
       , meaning = Bidding.And
           [ Bidding.Minimum (Bidding.Length target) (Bidding.Constant 5)
           , Bidding.Deny (inviteSlam target).meaning
@@ -357,7 +356,7 @@ responsesToOneNoTrump =
     gerber =
       { bid = Auction.Bid 4 (Just Card.Clubs)
       , description = Nothing
-      , convention = Just (Convention.Start Convention.Gerber)
+      , convention = Just Bidding.Gerber
       , meaning = Bidding.And
           [ Bidding.GreaterThan (Bidding.Points Nothing) (Bidding.Constant inviteSlamPoints)    -- FIXME: probably should be based on a known fit?
           , noVoids
@@ -421,7 +420,7 @@ responsesToTwoNoTrump =
     jacobyTransfer target via =
       { bid = Auction.Bid 3 (Just via)
       , description = Nothing
-      , convention = Just (Convention.Start Convention.JacobyTransfer)
+      , convention = Just Bidding.JacobyTransfer
       , meaning = Bidding.Minimum (Bidding.Length target) (Bidding.Constant 5)
       }
     game =
@@ -449,7 +448,7 @@ responsesToTwoNoTrump =
     gerber =
       { bid = Auction.Bid 4 (Just Card.Clubs)
       , description = Nothing
-      , convention = Just (Convention.Start Convention.Gerber)
+      , convention = Just Bidding.Gerber
       , meaning = Bidding.And
           [ Bidding.GreaterThan (Bidding.Points Nothing) (Bidding.Constant inviteSlamPoints)    -- FIXME: probably should be based on a known fit?
           , noVoids
@@ -496,7 +495,7 @@ responsesToThreeNoTrump =
     jacobyTransfer target via =
       { bid = Auction.Bid 4 (Just via)
       , description = Nothing
-      , convention = Just (Convention.Start Convention.JacobyTransfer)
+      , convention = Just Bidding.JacobyTransfer
       , meaning = Bidding.And
           [ Bidding.Minimum (Bidding.Length target) (Bidding.Constant 5)
           , Bidding.LessThan (Bidding.Length (otherMajor target)) (Bidding.Constant 4)

@@ -1,5 +1,6 @@
 module Bidding
   ( System
+  , Convention (..)
   , AnnotatedBid
   , Meaning (..)
   , Metric (..)
@@ -18,7 +19,6 @@ common functions used by several different systems.
 
 import Auction
 import Card exposing (Card)
-import Convention
 import Evaluation
 import Vulnerability
 
@@ -37,13 +37,21 @@ type alias System =
   }
 
 
+{-| Identifier of a bidding convention.
+-}
+type Convention
+  = Gerber
+  | JacobyTransfer
+  | Stayman
+
+
 {-| An individual bid, annotated with the significance of the bid.
 -}
 type alias AnnotatedBid =
   { bid : Auction.Bid
   , meaning : Meaning
   , description : Maybe String
-  , convention : Maybe Convention.Usage
+  , convention : Maybe Convention
   }
 
 

@@ -8,7 +8,6 @@ module Bidding.Stayman
 import Auction
 import Bidding
 import Card
-import Convention
 
 import Maybe.Extra
 
@@ -38,8 +37,8 @@ bid level extraConditions =
   in
     { bid = Auction.Bid level (Just Card.Clubs)
     , meaning = Bidding.And conditions
-    , description = Just "at least one four-card major"
-    , convention = Just (Convention.Start Convention.Stayman)
+    , description = Just "ask for four-card major"
+    , convention = Just Bidding.Stayman
     }
 
 

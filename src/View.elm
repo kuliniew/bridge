@@ -9,7 +9,6 @@ module View
 import Auction
 import Bidding
 import Card exposing (Card)
-import Convention exposing (Convention)
 import Game exposing (Action)
 import Seat exposing (Seat)
 import Vulnerability exposing (Vulnerability)
@@ -254,27 +253,23 @@ viewDescription : Bidding.AnnotatedBid -> Html
 viewDescription bid =
   Html.div [] <|
     case (bid.convention, bid.description) of
-      (Just (Convention.Start convention), Just description) ->
+      (Just convention, Just description) ->
         [ viewConvention convention, Html.text ": ", Html.text description ]
-      (Just (Convention.Start convention), Nothing) ->
+      (Just convention, Nothing) ->
         [ viewConvention convention ]
-      (Just (Convention.Finish convention), Just description) ->
-        [ viewConvention convention, Html.text " response: ", Html.text description ]
-      (Just (Convention.Finish convention), Nothing) ->
-        [ viewConvention convention, Html.text " response" ]
       (Nothing, Just description) ->
         [ Html.text description ]
       (Nothing, Nothing) ->
         []
 
 
-viewConvention : Convention -> Html
+viewConvention : Bidding.Convention -> Html
 viewConvention convention =
   Html.text <|
     case convention of
-      Convention.Gerber -> "Gerber"
-      Convention.JacobyTransfer -> "Jacoby Transfer"
-      Convention.Stayman -> "Stayman"
+      Bidding.Gerber -> "Gerber"
+      Bidding.JacobyTransfer -> "Jacoby Transfer"
+      Bidding.Stayman -> "Stayman"
 
 
 viewMeaning : Bidding.Meaning -> Html
