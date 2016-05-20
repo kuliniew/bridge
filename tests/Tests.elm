@@ -2,6 +2,7 @@ module Tests where
 
 import AuctionTests
 import Bidding.StandardAmericanTests
+import Bidding.StaymanTests
 import BiddingTests
 import CardTests
 import EvaluationTests
@@ -16,6 +17,7 @@ all =
   suite "A Test Suite"
     [ AuctionTests.all
     , Bidding.StandardAmericanTests.all
+    , Bidding.StaymanTests.all
     , BiddingTests.all
     , CardTests.all
     , EvaluationTests.all

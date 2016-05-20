@@ -5,6 +5,7 @@ module Bidding.StandardAmerican (system) where
 
 import Auction
 import Bidding
+import Bidding.Stayman
 import Card
 import Convention
 import Vulnerability
@@ -303,18 +304,7 @@ responsesToOneNoTrump =
           ]
       }
     stayman =
-      { bid = Auction.Bid 2 (Just Card.Clubs)
-      , description = Nothing
-      , convention = Just (Convention.Start Convention.Stayman)
-      , meaning = Bidding.And
-          [ Bidding.Minimum (Bidding.Points Nothing) (Bidding.Constant 8)
-          , Bidding.Or
-              [ Bidding.Equal (Bidding.Length Card.Hearts) (Bidding.Constant 4)
-              , Bidding.Equal (Bidding.Length Card.Spades) (Bidding.Constant 4)
-              ]
-          , notFourThreeThreeThree
-          ]
-      }
+      Bidding.Stayman.bid 2 (Just <| Bidding.Minimum (Bidding.Points Nothing) (Bidding.Constant 8))
     inviteGame =
       { bid = Auction.Bid 2 Nothing
       , description = Just "Game invite"
@@ -427,18 +417,7 @@ responsesToTwoNoTrump =
           ]
       }
     stayman =
-      { bid = Auction.Bid 3 (Just Card.Clubs)
-      , description = Nothing
-      , convention = Just (Convention.Start Convention.Stayman)
-      , meaning = Bidding.And
-          [ Bidding.InRange (Bidding.Points Nothing) gamePoints (inviteSlamPoints - 1)
-          , Bidding.Or
-              [ Bidding.Equal (Bidding.Length Card.Hearts) (Bidding.Constant 4)
-              , Bidding.Equal (Bidding.Length Card.Spades) (Bidding.Constant 4)
-              ]
-          , notFourThreeThreeThree
-          ]
-      }
+      Bidding.Stayman.bid 3 (Just <| Bidding.InRange (Bidding.Points Nothing) gamePoints (inviteSlamPoints - 1))
     jacobyTransfer target via =
       { bid = Auction.Bid 3 (Just via)
       , description = Nothing
@@ -524,25 +503,7 @@ responsesToThreeNoTrump =
           ]
       }
     stayman =
-      { bid = Auction.Bid 4 (Just Card.Clubs)
-      , description = Nothing
-      , convention = Just (Convention.Start Convention.Stayman)
-      , meaning = Bidding.And
-          [ Bidding.Or
-              [ Bidding.Minimum (Bidding.Length Card.Spades) (Bidding.Constant 4)
-              , Bidding.Minimum (Bidding.Length Card.Hearts) (Bidding.Constant 4)
-              ]
-          , Bidding.Or
-              [ Bidding.LessThan (Bidding.Length Card.Spades) (Bidding.Constant 5)
-              , Bidding.Minimum (Bidding.Length Card.Hearts) (Bidding.Constant 4)
-              ]
-          , Bidding.Or
-              [ Bidding.LessThan (Bidding.Length Card.Hearts) (Bidding.Constant 5)
-              , Bidding.Minimum (Bidding.Length Card.Spades) (Bidding.Constant 4)
-              ]
-          , notFourThreeThreeThree
-          ]
-      }
+      Bidding.Stayman.bid 4 Nothing
   in
     [ pass
     , jacobyTransfer Card.Spades Card.Hearts
