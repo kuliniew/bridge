@@ -5,6 +5,7 @@ module Bidding.StandardAmerican (system) where
 
 import Auction
 import Bidding
+import Bidding.ConventionResponse
 import Bidding.Stayman
 import Card
 import Vulnerability
@@ -23,10 +24,14 @@ system =
 -}
 suggest : Vulnerability.Favorability -> List Bidding.AnnotatedBid -> List Bidding.AnnotatedBid
 suggest favorability history =
-  case Bidding.role history of
-    Bidding.Openable -> openingBids favorability history
-    Bidding.Responder -> responseBids history
-    _ -> []
+  case Bidding.ConventionResponse.conventionResponse favorability history of
+    Just responses ->
+      responses
+    Nothing ->
+      case Bidding.role history of
+        Bidding.Openable -> openingBids favorability history
+        Bidding.Responder -> responseBids history
+        _ -> []
 
 
 {-| Possible opening bids.

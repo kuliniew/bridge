@@ -2,6 +2,7 @@ module Bidding.StaymanTests (all) where
 
 import Auction
 import Bidding
+import Bidding.ConventionResponse
 import Bidding.Stayman
 import Bidding.TestUtils
 import Card
@@ -17,6 +18,9 @@ all : ElmTest.Test
 all =
   ElmTest.suite "Bidding.StaymanTests"
     [ bidSuite
+    , responseSuite 2
+    , responseSuite 3
+    , responseSuite 4
     ]
 
 
@@ -91,6 +95,47 @@ bidSuite =
     ElmTest.suite "bid" (simpleUnitTests ++ conditionedUnitTests)
 
 
+responseSuite : Int -> ElmTest.Test
+responseSuite level =
+  let
+    name =
+      "response - " ++ toString level ++ " level"
+    diamonds =
+      Just <| Auction.Bid level (Just Card.Diamonds)
+    hearts =
+      Just <| Auction.Bid level (Just Card.Hearts)
+    spades =
+      Just <| Auction.Bid level (Just Card.Spades)
+    validHistory =
+      [Auction.Pass, Auction.Bid level (Just Card.Clubs)]
+    invalidHistory =
+      [Auction.Pass, Auction.Bid level (Just Card.Diamonds), Auction.Pass, Auction.Bid level (Just Card.Clubs)]
+    simpleSystem =
+      { name = "Stayman test (no extra conditions)"
+      , suggestions = \ fav hist ->
+          case Bidding.ConventionResponse.conventionResponse fav hist of
+            Just response ->
+              response
+            Nothing ->
+              case hist of
+                [] -> [Bidding.Stayman.bid level Nothing]
+                _ -> []
+      }
+    unitTests =
+      List.map (Bidding.TestUtils.testBid simpleSystem)
+        [ testCase diamonds validHistory 3 3 4 3
+        , testCase hearts validHistory 4 4 3 2
+        , testCase hearts validHistory 5 4 2 2
+        , testCase hearts validHistory 4 5 2 2
+        , testCase spades validHistory 4 3 3 3
+        , testCase spades validHistory 5 3 3 2
+
+        , testCase Nothing invalidHistory 4 4 3 2
+        ]
+  in
+    ElmTest.suite name unitTests
+
+
 testCase : Maybe Auction.Bid -> List Auction.Bid -> Int -> Int -> Int -> Int -> Bidding.TestUtils.BidTest
 testCase expected history spades hearts diamonds clubs =
   let
@@ -102,7 +147,7 @@ testCase expected history spades hearts diamonds clubs =
     { name = toString spades ++ " spades, " ++ toString hearts ++ " hearts, " ++ distribution ++ " distribution"
     , expected = Maybe.Extra.maybeToList expected
     , favorability = Vulnerability.Equal
-    , history = []
+    , history = history
     , spades = cards spades
     , hearts = cards hearts
     , diamonds = cards diamonds

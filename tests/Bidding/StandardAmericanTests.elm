@@ -19,6 +19,7 @@ all =
     , oneNoTrumpResponseSuite
     , twoNoTrumpResponseSuite
     , threeNoTrumpResponseSuite
+    , conventionResponseSuite
     ]
 
 
@@ -1283,3 +1284,26 @@ threeNoTrumpResponseSuite =
         ]
   in
     ElmTest.suite "response to 3NT" unitTests
+
+
+{- These only check that a convention response is made.  Full testing
+that the convention responses are correct is done in the modules that
+implement those conventions.
+-}
+conventionResponseSuite : ElmTest.Test
+conventionResponseSuite =
+  let
+    unitTests =
+      List.map (Bidding.TestUtils.testBid Bidding.StandardAmerican.system)
+        [ { name = "Stayman"
+          , expected = [Auction.Bid 2 (Just Card.Spades)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 (Just Card.Clubs), Auction.Pass, Auction.Bid 1 Nothing ]
+          , spades = [ Card.Ace, Card.King, Card.Ten, Card.Nine ]
+          , hearts = [ Card.Ace, Card.Ten, Card.Nine ]
+          , diamonds = [ Card.King, Card.Ten, Card.Nine ]
+          , clubs = [ Card.Jack, Card.Ten, Card.Nine ]
+          }
+        ]
+  in
+    ElmTest.suite "response to conventions" unitTests
