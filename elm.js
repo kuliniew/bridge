@@ -9361,6 +9361,83 @@ Elm.List.Extra.make = function (_elm) {
                                    ,lift3: lift3
                                    ,lift4: lift4};
 };
+Elm.Maybe = Elm.Maybe || {};
+Elm.Maybe.Extra = Elm.Maybe.Extra || {};
+Elm.Maybe.Extra.make = function (_elm) {
+   "use strict";
+   _elm.Maybe = _elm.Maybe || {};
+   _elm.Maybe.Extra = _elm.Maybe.Extra || {};
+   if (_elm.Maybe.Extra.values) return _elm.Maybe.Extra.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Array = Elm.Array.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var traverseArray = function (f) {
+      var step = F2(function (e,acc) {
+         var _p0 = f(e);
+         if (_p0.ctor === "Nothing") {
+               return $Maybe.Nothing;
+            } else {
+               return A2($Maybe.map,$Array.push(_p0._0),acc);
+            }
+      });
+      return A2($Array.foldl,step,$Maybe.Just($Array.empty));
+   };
+   var combineArray = traverseArray($Basics.identity);
+   var traverse = function (f) {
+      var step = F2(function (e,acc) {
+         var _p1 = f(e);
+         if (_p1.ctor === "Nothing") {
+               return $Maybe.Nothing;
+            } else {
+               return A2($Maybe.map,F2(function (x,y) {    return A2($List._op["::"],x,y);})(_p1._0),acc);
+            }
+      });
+      return A2($List.foldr,step,$Maybe.Just(_U.list([])));
+   };
+   var combine = traverse($Basics.identity);
+   var maybeToArray = function (m) {    var _p2 = m;if (_p2.ctor === "Nothing") {    return $Array.empty;} else {    return A2($Array.repeat,1,_p2._0);}};
+   var maybeToList = function (m) {    var _p3 = m;if (_p3.ctor === "Nothing") {    return _U.list([]);} else {    return _U.list([_p3._0]);}};
+   var or = F2(function (ma,mb) {    var _p4 = ma;if (_p4.ctor === "Nothing") {    return mb;} else {    return ma;}});
+   var andMap = F2(function (f,x) {
+      return A2($Maybe.andThen,x,function (x$) {    return A2($Maybe.andThen,f,function (f$) {    return $Maybe.Just(f$(x$));});});
+   });
+   var map5 = F6(function (f,a,b,c,d,e) {    return A2(andMap,A2(andMap,A2(andMap,A2(andMap,A2($Maybe.map,f,a),b),c),d),e);});
+   var map4 = F5(function (f,a,b,c,d) {    return A2(andMap,A2(andMap,A2(andMap,A2($Maybe.map,f,a),b),c),d);});
+   var map3 = F4(function (f,a,b,c) {    return A2(andMap,A2(andMap,A2($Maybe.map,f,a),b),c);});
+   var map2 = F3(function (f,a,b) {    return A2(andMap,A2($Maybe.map,f,a),b);});
+   var next = map2($Basics.flip($Basics.always));
+   var prev = map2($Basics.always);
+   var mapDefault = F3(function (d,f,m) {    return A2($Maybe.withDefault,d,A2($Maybe.map,f,m));});
+   var isJust = function (m) {    var _p5 = m;if (_p5.ctor === "Nothing") {    return false;} else {    return true;}};
+   var isNothing = function (m) {    var _p6 = m;if (_p6.ctor === "Nothing") {    return true;} else {    return false;}};
+   var join = function (mx) {    var _p7 = mx;if (_p7.ctor === "Just") {    return _p7._0;} else {    return $Maybe.Nothing;}};
+   _op["?"] = F2(function (mx,x) {    return A2($Maybe.withDefault,x,mx);});
+   return _elm.Maybe.Extra.values = {_op: _op
+                                    ,join: join
+                                    ,isNothing: isNothing
+                                    ,isJust: isJust
+                                    ,map2: map2
+                                    ,map3: map3
+                                    ,map4: map4
+                                    ,map5: map5
+                                    ,mapDefault: mapDefault
+                                    ,andMap: andMap
+                                    ,next: next
+                                    ,prev: prev
+                                    ,or: or
+                                    ,maybeToList: maybeToList
+                                    ,maybeToArray: maybeToArray
+                                    ,traverse: traverse
+                                    ,combine: combine
+                                    ,traverseArray: traverseArray
+                                    ,combineArray: combineArray};
+};
 Elm.Native.Effects = {};
 Elm.Native.Effects.make = function(localRuntime) {
 
@@ -11958,26 +12035,6 @@ Elm.Auction.make = function (_elm) {
    };
    return _elm.Auction.values = {_op: _op,isOpen: isOpen,legalBids: legalBids,level: level,Pass: Pass,Double: Double,Redouble: Redouble,Bid: Bid};
 };
-Elm.Convention = Elm.Convention || {};
-Elm.Convention.make = function (_elm) {
-   "use strict";
-   _elm.Convention = _elm.Convention || {};
-   if (_elm.Convention.values) return _elm.Convention.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var Finish = function (a) {    return {ctor: "Finish",_0: a};};
-   var Start = function (a) {    return {ctor: "Start",_0: a};};
-   var Stayman = {ctor: "Stayman"};
-   var JacobyTransfer = {ctor: "JacobyTransfer"};
-   var Gerber = {ctor: "Gerber"};
-   return _elm.Convention.values = {_op: _op,Gerber: Gerber,JacobyTransfer: JacobyTransfer,Stayman: Stayman,Start: Start,Finish: Finish};
-};
 Elm.Evaluation = Elm.Evaluation || {};
 Elm.Evaluation.make = function (_elm) {
    "use strict";
@@ -12287,7 +12344,6 @@ Elm.Bidding.make = function (_elm) {
    $Auction = Elm.Auction.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Card = Elm.Card.make(_elm),
-   $Convention = Elm.Convention.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Evaluation = Elm.Evaluation.make(_elm),
    $List = Elm.List.make(_elm),
@@ -12311,7 +12367,7 @@ Elm.Bidding.make = function (_elm) {
          case 1: return Defender;
          case 2: return Responder;
          case 3: return Defender;
-         default: return _U.crashCase("Bidding",{start: {line: 198,column: 5},end: {line: 203,column: 106}},_p0)(A2($Basics._op["++"],
+         default: return _U.crashCase("Bidding",{start: {line: 206,column: 5},end: {line: 211,column: 106}},_p0)(A2($Basics._op["++"],
            "bidsFromOpening % 4 wound up being ",
            A2($Basics._op["++"],$Basics.toString(bidsFromOpening)," somehow!")));}
    };
@@ -12386,6 +12442,9 @@ Elm.Bidding.make = function (_elm) {
       return $Random.generate(A2($Random$Extra.selectWithDefault,fallback,A4(viableChoices,system,favorability,history,hand)));
    });
    var AnnotatedBid = F4(function (a,b,c,d) {    return {bid: a,meaning: b,description: c,convention: d};});
+   var Stayman = {ctor: "Stayman"};
+   var JacobyTransfer = {ctor: "JacobyTransfer"};
+   var Gerber = {ctor: "Gerber"};
    var System = F2(function (a,b) {    return {name: a,suggestions: b};});
    return _elm.Bidding.values = {_op: _op
                                 ,annotate: annotate
@@ -12395,6 +12454,9 @@ Elm.Bidding.make = function (_elm) {
                                 ,role$: role$
                                 ,System: System
                                 ,AnnotatedBid: AnnotatedBid
+                                ,Gerber: Gerber
+                                ,JacobyTransfer: JacobyTransfer
+                                ,Stayman: Stayman
                                 ,OutOfSystem: OutOfSystem
                                 ,InRange: InRange
                                 ,Equal: Equal
@@ -12419,6 +12481,118 @@ Elm.Bidding.make = function (_elm) {
                                 ,Defender: Defender};
 };
 Elm.Bidding = Elm.Bidding || {};
+Elm.Bidding.Stayman = Elm.Bidding.Stayman || {};
+Elm.Bidding.Stayman.make = function (_elm) {
+   "use strict";
+   _elm.Bidding = _elm.Bidding || {};
+   _elm.Bidding.Stayman = _elm.Bidding.Stayman || {};
+   if (_elm.Bidding.Stayman.values) return _elm.Bidding.Stayman.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Auction = Elm.Auction.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bidding = Elm.Bidding.make(_elm),
+   $Card = Elm.Card.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Maybe$Extra = Elm.Maybe.Extra.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Vulnerability = Elm.Vulnerability.make(_elm);
+   var _op = {};
+   var suits = _U.list([$Card.Spades,$Card.Hearts,$Card.Diamonds,$Card.Clubs]);
+   var notFourThreeThreeThree = $Bidding.Or(A2($List.map,function (suit) {    return A2($Bidding.Maximum,$Bidding.Length(suit),$Bidding.Constant(2));},suits));
+   var response = F2(function (_p0,history) {
+      var show = function (suit) {    return A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(4));};
+      var hearts = function (level) {
+         return {bid: A2($Auction.Bid,level,$Maybe.Just($Card.Hearts))
+                ,meaning: show($Card.Hearts)
+                ,description: $Maybe.Just("show four or more hearts")
+                ,convention: $Maybe.Just($Bidding.Stayman)};
+      };
+      var deny = function (suit) {    return A2($Bidding.LessThan,$Bidding.Length(suit),$Bidding.Constant(4));};
+      var negative = function (level) {
+         return {bid: A2($Auction.Bid,level,$Maybe.Just($Card.Diamonds))
+                ,meaning: $Bidding.And(_U.list([deny($Card.Hearts),deny($Card.Spades)]))
+                ,description: $Maybe.Just("deny four-card majors")
+                ,convention: $Maybe.Just($Bidding.Stayman)};
+      };
+      var spades = function (level) {
+         return {bid: A2($Auction.Bid,level,$Maybe.Just($Card.Spades))
+                ,meaning: $Bidding.And(_U.list([deny($Card.Hearts),show($Card.Spades)]))
+                ,description: $Maybe.Just("deny four hearts, show four or more spades")
+                ,convention: $Maybe.Just($Bidding.Stayman)};
+      };
+      var responses = function (level) {    return _U.list([negative(level),hearts(level),spades(level)]);};
+      var _p1 = A2($List.map,function (_) {    return _.bid;},history);
+      if (_p1.ctor === "::" && _p1._0.ctor === "Pass" && _p1._1.ctor === "::" && _p1._1._0.ctor === "Bid" && _p1._1._0._1.ctor === "Just" && _p1._1._0._1._0.ctor === "Clubs")
+      {
+            return $Maybe.Just(responses(_p1._1._0._0));
+         } else {
+            return $Maybe.Nothing;
+         }
+   });
+   var bid = F2(function (level,extraConditions) {
+      var baseConditions = _U.list([$Bidding.Or(_U.list([A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Constant(4))
+                                                        ,A2($Bidding.Minimum,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))]))
+                                   ,$Bidding.Or(_U.list([A2($Bidding.LessThan,$Bidding.Length($Card.Spades),$Bidding.Constant(5))
+                                                        ,A2($Bidding.Minimum,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))]))
+                                   ,$Bidding.Or(_U.list([A2($Bidding.LessThan,$Bidding.Length($Card.Hearts),$Bidding.Constant(5))
+                                                        ,A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Constant(4))]))
+                                   ,notFourThreeThreeThree]);
+      var conditions = A2($Basics._op["++"],baseConditions,$Maybe$Extra.maybeToList(extraConditions));
+      return {bid: A2($Auction.Bid,level,$Maybe.Just($Card.Clubs))
+             ,meaning: $Bidding.And(conditions)
+             ,description: $Maybe.Just("ask for four-card major")
+             ,convention: $Maybe.Just($Bidding.Stayman)};
+   });
+   return _elm.Bidding.Stayman.values = {_op: _op,bid: bid,response: response};
+};
+Elm.Bidding = Elm.Bidding || {};
+Elm.Bidding.ConventionResponse = Elm.Bidding.ConventionResponse || {};
+Elm.Bidding.ConventionResponse.make = function (_elm) {
+   "use strict";
+   _elm.Bidding = _elm.Bidding || {};
+   _elm.Bidding.ConventionResponse = _elm.Bidding.ConventionResponse || {};
+   if (_elm.Bidding.ConventionResponse.values) return _elm.Bidding.ConventionResponse.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bidding = Elm.Bidding.make(_elm),
+   $Bidding$Stayman = Elm.Bidding.Stayman.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Vulnerability = Elm.Vulnerability.make(_elm);
+   var _op = {};
+   var conventionResponse = F2(function (favorability,history) {
+      var dispatch = function (convention) {
+         var _p0 = convention;
+         if (_p0.ctor === "Stayman") {
+               return A2($Bidding$Stayman.response,favorability,history);
+            } else {
+               return $Maybe.Nothing;
+            }
+      };
+      var _p1 = A2($List.map,function (_) {    return _.convention;},history);
+      if (_p1.ctor === "::" && _p1._1.ctor === "::" && _p1._1._0.ctor === "Just") {
+            return dispatch(_p1._1._0._0);
+         } else {
+            return $Maybe.Nothing;
+         }
+   });
+   var withConventionResponse = F3(function (suggestions,favorability,history) {
+      var _p2 = A2(conventionResponse,favorability,history);
+      if (_p2.ctor === "Just") {
+            return _p2._0;
+         } else {
+            return A2(suggestions,favorability,history);
+         }
+   });
+   return _elm.Bidding.ConventionResponse.values = {_op: _op,conventionResponse: conventionResponse,withConventionResponse: withConventionResponse};
+};
+Elm.Bidding = Elm.Bidding || {};
 Elm.Bidding.StandardAmerican = Elm.Bidding.StandardAmerican || {};
 Elm.Bidding.StandardAmerican.make = function (_elm) {
    "use strict";
@@ -12429,8 +12603,9 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
    $Auction = Elm.Auction.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bidding = Elm.Bidding.make(_elm),
+   $Bidding$ConventionResponse = Elm.Bidding.ConventionResponse.make(_elm),
+   $Bidding$Stayman = Elm.Bidding.Stayman.make(_elm),
    $Card = Elm.Card.make(_elm),
-   $Convention = Elm.Convention.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
@@ -12467,16 +12642,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
    var notFourThreeThreeThree = $Bidding.Or(A2($List.map,function (suit) {    return A2($Bidding.Maximum,$Bidding.Length(suit),$Bidding.Constant(2));},suits));
    var fourThreeThreeThree = $Bidding.And(A2($List.map,function (suit) {    return A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(3));},suits));
    var responsesToThreeNoTrump = function () {
-      var stayman = {bid: A2($Auction.Bid,4,$Maybe.Just($Card.Clubs))
-                    ,description: $Maybe.Nothing
-                    ,convention: $Maybe.Just($Convention.Start($Convention.Stayman))
-                    ,meaning: $Bidding.And(_U.list([$Bidding.Or(_U.list([A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Constant(4))
-                                                                        ,A2($Bidding.Minimum,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))]))
-                                                   ,$Bidding.Or(_U.list([A2($Bidding.LessThan,$Bidding.Length($Card.Spades),$Bidding.Constant(5))
-                                                                        ,A2($Bidding.Minimum,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))]))
-                                                   ,$Bidding.Or(_U.list([A2($Bidding.LessThan,$Bidding.Length($Card.Hearts),$Bidding.Constant(5))
-                                                                        ,A2($Bidding.Minimum,$Bidding.Length($Card.Spades),$Bidding.Constant(4))]))
-                                                   ,notFourThreeThreeThree]))};
+      var stayman = A2($Bidding$Stayman.bid,4,$Maybe.Nothing);
       var pass = {bid: $Auction.Pass
                  ,description: $Maybe.Nothing
                  ,convention: $Maybe.Nothing
@@ -12488,14 +12654,14 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
          switch (_p3.ctor)
          {case "Spades": return $Card.Hearts;
             case "Hearts": return $Card.Spades;
-            default: return _U.crashCase("Bidding.StandardAmerican",{start: {line: 501,column: 7},end: {line: 504,column: 96}},_p3)(A2($Basics._op["++"],
+            default: return _U.crashCase("Bidding.StandardAmerican",{start: {line: 480,column: 7},end: {line: 483,column: 96}},_p3)(A2($Basics._op["++"],
               $Basics.toString(major),
               " is not a major suit, so it has no \'other major\'"));}
       };
       var jacobyTransfer = F2(function (target,via) {
          return {bid: A2($Auction.Bid,4,$Maybe.Just(via))
                 ,description: $Maybe.Nothing
-                ,convention: $Maybe.Just($Convention.Start($Convention.JacobyTransfer))
+                ,convention: $Maybe.Just($Bidding.JacobyTransfer)
                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(target),$Bidding.Constant(5))
                                                ,A2($Bidding.LessThan,$Bidding.Length(otherMajor(target)),$Bidding.Constant(4))]))};
       });
@@ -12505,7 +12671,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       var jacobyTransfer = F2(function (target,via) {
          return {bid: A2($Auction.Bid,3,$Maybe.Just(via))
                 ,description: $Maybe.Nothing
-                ,convention: $Maybe.Just($Convention.Start($Convention.JacobyTransfer))
+                ,convention: $Maybe.Just($Bidding.JacobyTransfer)
                 ,meaning: A2($Bidding.Minimum,$Bidding.Length(target),$Bidding.Constant(5))};
       });
       var inviteSlamPoints = 33 - 20;
@@ -12515,7 +12681,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                        ,meaning: A2($Bidding.Minimum,$Bidding.HighCardPoints,$Bidding.Constant(inviteSlamPoints))};
       var gerber = {bid: A2($Auction.Bid,4,$Maybe.Just($Card.Clubs))
                    ,description: $Maybe.Nothing
-                   ,convention: $Maybe.Just($Convention.Start($Convention.Gerber))
+                   ,convention: $Maybe.Just($Bidding.Gerber)
                    ,meaning: $Bidding.And(_U.list([A2($Bidding.GreaterThan,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(inviteSlamPoints))
                                                   ,noVoids
                                                   ,noTwoQuickLosers]))};
@@ -12527,13 +12693,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                  ,meaning: $Bidding.And(_U.list([A2($Bidding.LessThan,$Bidding.HighCardPoints,$Bidding.Constant(gamePoints))
                                                 ,A2($Bidding.LessThan,$Bidding.Length($Card.Spades),$Bidding.Constant(5))
                                                 ,A2($Bidding.LessThan,$Bidding.Length($Card.Hearts),$Bidding.Constant(5))]))};
-      var stayman = {bid: A2($Auction.Bid,3,$Maybe.Just($Card.Clubs))
-                    ,description: $Maybe.Nothing
-                    ,convention: $Maybe.Just($Convention.Start($Convention.Stayman))
-                    ,meaning: $Bidding.And(_U.list([A3($Bidding.InRange,$Bidding.Points($Maybe.Nothing),gamePoints,inviteSlamPoints - 1)
-                                                   ,$Bidding.Or(_U.list([A2($Bidding.Equal,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))
-                                                                        ,A2($Bidding.Equal,$Bidding.Length($Card.Spades),$Bidding.Constant(4))]))
-                                                   ,notFourThreeThreeThree]))};
+      var stayman = A2($Bidding$Stayman.bid,3,$Maybe.Just(A3($Bidding.InRange,$Bidding.Points($Maybe.Nothing),gamePoints,inviteSlamPoints - 1)));
       var game = {bid: A2($Auction.Bid,3,$Maybe.Nothing)
                  ,description: $Maybe.Just("raise to game")
                  ,convention: $Maybe.Nothing
@@ -12572,13 +12732,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(suit),$Bidding.Constant(6))
                                                ,A3($Bidding.InRange,$Bidding.HighCardPoints,7,9)]))};
       };
-      var stayman = {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Clubs))
-                    ,description: $Maybe.Nothing
-                    ,convention: $Maybe.Just($Convention.Start($Convention.Stayman))
-                    ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(8))
-                                                   ,$Bidding.Or(_U.list([A2($Bidding.Equal,$Bidding.Length($Card.Hearts),$Bidding.Constant(4))
-                                                                        ,A2($Bidding.Equal,$Bidding.Length($Card.Spades),$Bidding.Constant(4))]))
-                                                   ,notFourThreeThreeThree]))};
+      var stayman = A2($Bidding$Stayman.bid,2,$Maybe.Just(A2($Bidding.Minimum,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(8))));
       var minorTransfer = {bid: A2($Auction.Bid,2,$Maybe.Just($Card.Spades))
                           ,description: $Maybe.Just("Minor Transfer")
                           ,convention: $Maybe.Nothing
@@ -12612,7 +12766,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
       var jacobyTransfer = F2(function (target,via) {
          return {bid: A2($Auction.Bid,2,$Maybe.Just(via))
                 ,description: $Maybe.Nothing
-                ,convention: $Maybe.Just($Convention.Start($Convention.JacobyTransfer))
+                ,convention: $Maybe.Just($Bidding.JacobyTransfer)
                 ,meaning: $Bidding.And(_U.list([A2($Bidding.Minimum,$Bidding.Length(target),$Bidding.Constant(5)),$Bidding.Deny(inviteSlam(target).meaning)]))};
       });
       var priority3 = _U.list([pass
@@ -12630,7 +12784,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
                                                              ,$Bidding.Or(_U.list([$Bidding.Balanced,$Bidding.SemiBalanced]))]))};
       var gerber = {bid: A2($Auction.Bid,4,$Maybe.Just($Card.Clubs))
                    ,description: $Maybe.Nothing
-                   ,convention: $Maybe.Just($Convention.Start($Convention.Gerber))
+                   ,convention: $Maybe.Just($Bidding.Gerber)
                    ,meaning: $Bidding.And(_U.list([A2($Bidding.GreaterThan,$Bidding.Points($Maybe.Nothing),$Bidding.Constant(inviteSlamPoints))
                                                   ,noVoids
                                                   ,noTwoQuickLosers]))};
@@ -12808,7 +12962,7 @@ Elm.Bidding.StandardAmerican.make = function (_elm) {
          case "Responder": return responseBids(history);
          default: return _U.list([]);}
    });
-   var system = {name: "Standard American Yellow Card",suggestions: suggest};
+   var system = {name: "Standard American Yellow Card",suggestions: $Bidding$ConventionResponse.withConventionResponse(suggest)};
    return _elm.Bidding.StandardAmerican.values = {_op: _op,system: system};
 };
 Elm.Game = Elm.Game || {};
@@ -12927,7 +13081,6 @@ Elm.View.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Bidding = Elm.Bidding.make(_elm),
    $Card = Elm.Card.make(_elm),
-   $Convention = Elm.Convention.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Game = Elm.Game.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -12948,7 +13101,7 @@ Elm.View.make = function (_elm) {
          {case "And": return _p0._0;
             case "Or": return _p0._0;
             default: return _U.crashCase("View",
-              {start: {line: 412,column: 7},end: {line: 415,column: 82}},
+              {start: {line: 407,column: 7},end: {line: 410,column: 82}},
               _p0)("tried to take grandchildren over non-conjunction nodes");}
       };
       var isOr = function (meaning) {    var _p2 = meaning;if (_p2.ctor === "Or") {    return true;} else {    return false;}};
@@ -13014,18 +13167,10 @@ Elm.View.make = function (_elm) {
       function () {
          var _p10 = {ctor: "_Tuple2",_0: bid.convention,_1: bid.description};
          if (_p10._0.ctor === "Just") {
-               if (_p10._0._0.ctor === "Start") {
-                     if (_p10._1.ctor === "Just") {
-                           return _U.list([viewConvention(_p10._0._0._0),$Html.text(": "),$Html.text(_p10._1._0)]);
-                        } else {
-                           return _U.list([viewConvention(_p10._0._0._0)]);
-                        }
+               if (_p10._1.ctor === "Just") {
+                     return _U.list([viewConvention(_p10._0._0),$Html.text(": "),$Html.text(_p10._1._0)]);
                   } else {
-                     if (_p10._1.ctor === "Just") {
-                           return _U.list([viewConvention(_p10._0._0._0),$Html.text(" response: "),$Html.text(_p10._1._0)]);
-                        } else {
-                           return _U.list([viewConvention(_p10._0._0._0),$Html.text(" response")]);
-                        }
+                     return _U.list([viewConvention(_p10._0._0)]);
                   }
             } else {
                if (_p10._1.ctor === "Just") {
