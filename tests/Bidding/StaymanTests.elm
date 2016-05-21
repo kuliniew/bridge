@@ -112,14 +112,11 @@ responseSuite level =
       [Auction.Pass, Auction.Bid level (Just Card.Diamonds), Auction.Pass, Auction.Bid level (Just Card.Clubs)]
     simpleSystem =
       { name = "Stayman test (no extra conditions)"
-      , suggestions = \ fav hist ->
-          case Bidding.ConventionResponse.conventionResponse fav hist of
-            Just response ->
-              response
-            Nothing ->
-              case hist of
-                [] -> [Bidding.Stayman.bid level Nothing]
-                _ -> []
+      , suggestions = Bidding.ConventionResponse.withConventionResponse <|
+          \ fav hist ->
+            case hist of
+              [] -> [Bidding.Stayman.bid level Nothing]
+              _ -> []
       }
     unitTests =
       List.map (Bidding.TestUtils.testBid simpleSystem)

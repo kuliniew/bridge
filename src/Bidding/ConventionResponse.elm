@@ -1,5 +1,6 @@
 module Bidding.ConventionResponse
   ( conventionResponse
+  , withConventionResponse
   ) where
 
 import Bidding
@@ -20,3 +21,13 @@ conventionResponse favorability history =
     case List.map .convention history of
       _ :: Just convention :: _ -> dispatch convention
       _ -> Nothing
+
+
+{-| Add convention responses to an existing suggestion function.
+-}
+withConventionResponse : (Vulnerability.Favorability -> List Bidding.AnnotatedBid -> List Bidding.AnnotatedBid) ->
+                         (Vulnerability.Favorability -> List Bidding.AnnotatedBid -> List Bidding.AnnotatedBid)
+withConventionResponse suggestions favorability history =
+  case conventionResponse favorability history of
+    Just responses -> responses
+    Nothing -> suggestions favorability history

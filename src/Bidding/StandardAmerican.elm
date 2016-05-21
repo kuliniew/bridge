@@ -16,7 +16,7 @@ import Vulnerability
 system : Bidding.System
 system =
   { name = "Standard American Yellow Card"
-  , suggestions = suggest
+  , suggestions = Bidding.ConventionResponse.withConventionResponse suggest
   }
 
 
@@ -24,14 +24,10 @@ system =
 -}
 suggest : Vulnerability.Favorability -> List Bidding.AnnotatedBid -> List Bidding.AnnotatedBid
 suggest favorability history =
-  case Bidding.ConventionResponse.conventionResponse favorability history of
-    Just responses ->
-      responses
-    Nothing ->
-      case Bidding.role history of
-        Bidding.Openable -> openingBids favorability history
-        Bidding.Responder -> responseBids history
-        _ -> []
+  case Bidding.role history of
+    Bidding.Openable -> openingBids favorability history
+    Bidding.Responder -> responseBids history
+    _ -> []
 
 
 {-| Possible opening bids.
