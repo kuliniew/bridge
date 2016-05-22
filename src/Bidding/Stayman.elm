@@ -1,7 +1,7 @@
-module Bidding.Stayman
+module Bidding.Stayman exposing
   ( bid
   , response
-  ) where
+  )
 
 {-| This module implements the Stayman convention.
 -}

@@ -1,4 +1,4 @@
-module Producers (elementOf) where
+module Producers exposing (elementOf)
 
 {-| General utilities for writing new elm-check producers.
 -}

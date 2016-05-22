@@ -1,12 +1,12 @@
-module GeneralTests (totalOrder) where
+module GeneralTests exposing (totalOrder)
+
+{-| Non-type-specific property-based tests.
+-}
 
 import Check
 import Check.Producer
 import Check.Test
 import ElmTest
-
-{-| Non-type-specific property-based tests.
--}
 
 
 {-| Test that a comparison is a total order.

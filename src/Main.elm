@@ -1,24 +1,15 @@
-module Main (main) where
+module Main exposing (main)
 
 import Game
 import View
 
-import Effects
-import Html exposing (Html)
-import StartApp
-import Task exposing (Task)
+import Html.App
 
 
-main : Signal Html
+main : Program Never
 main =
-  app.html
-
-
-port tasks : Signal (Task Effects.Never ())
-port tasks =
-  app.tasks
-
-
-app : StartApp.App Game.Model
-app =
-  StartApp.start { init = Game.init, view = View.view, update = Game.update, inputs = [] }
+  Html.App.program
+    { init = Game.init
+    , update = Game.update
+    , view = View.view
+    , subscriptions = \_ -> Sub.none }

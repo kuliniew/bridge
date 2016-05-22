@@ -1,10 +1,13 @@
-module Card.Producer
+module Card.Producer exposing
   ( suit
   , rank
   , card
   , hand
   , deal
-  ) where
+  )
+
+{-| This module contains elm-check producers for Card.
+-}
 
 import Card
 import Producers
@@ -14,9 +17,6 @@ import Check.Producer exposing (Producer)
 import Random
 import Random.Array
 import Shrink
-
-{-| This module contains elm-check producers for Card.
--}
 
 
 {-| A producer for suits.

@@ -1,4 +1,4 @@
-module Card
+module Card exposing
   ( Suit (..)
   , suits
   , Rank (..)
@@ -9,7 +9,7 @@ module Card
   , rankDescending
   , SampleHand
   , fromSuits
-  ) where
+  )
 
 {-| This module describes a standard deck of playing cards.
 -}

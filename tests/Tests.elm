@@ -1,4 +1,4 @@
-module Tests where
+module Tests exposing (all)
 
 import AuctionTests
 import Bidding.StandardAmericanTests
@@ -9,12 +9,12 @@ import EvaluationTests
 import SeatTests
 import VulnerabilityTests
 
-import ElmTest exposing (Test, suite)
+import ElmTest
 
 
-all : Test
+all : ElmTest.Test
 all =
-  suite "A Test Suite"
+  ElmTest.suite "A Test Suite"
     [ AuctionTests.all
     , Bidding.StandardAmericanTests.all
     , Bidding.StaymanTests.all

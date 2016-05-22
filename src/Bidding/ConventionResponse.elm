@@ -1,7 +1,7 @@
-module Bidding.ConventionResponse
+module Bidding.ConventionResponse exposing
   ( conventionResponse
   , withConventionResponse
-  ) where
+  )
 
 import Bidding
 import Bidding.Stayman

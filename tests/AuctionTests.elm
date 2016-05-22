@@ -1,4 +1,4 @@
-module AuctionTests (all) where
+module AuctionTests exposing (all)
 
 import Auction
 import Auction.Producer

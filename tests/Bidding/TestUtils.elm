@@ -1,9 +1,9 @@
-module Bidding.TestUtils
+module Bidding.TestUtils exposing
   ( BidTest
   , testBid
   , suggestionsExist
   , annotate
-  ) where
+  )
 
 import Auction
 import Bidding

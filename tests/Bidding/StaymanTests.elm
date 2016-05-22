@@ -1,4 +1,4 @@
-module Bidding.StaymanTests (all) where
+module Bidding.StaymanTests exposing (all)
 
 import Auction
 import Bidding

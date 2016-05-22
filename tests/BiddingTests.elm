@@ -1,4 +1,4 @@
-module BiddingTests (all) where
+module BiddingTests exposing (all)
 
 import Auction
 import Bidding

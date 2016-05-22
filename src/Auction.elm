@@ -1,10 +1,10 @@
-module Auction
+module Auction exposing
   ( Trump
   , Bid (..)
   , isOpen
   , legalBids
   , level
-  ) where
+  )
 
 {-| This module models the auction phase of a hand of bridge.
 -}

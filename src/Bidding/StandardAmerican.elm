@@ -1,4 +1,4 @@
-module Bidding.StandardAmerican (system) where
+module Bidding.StandardAmerican exposing (system)
 
 {-| This module implements the Standard American Yellow Card bidding system.
 -}

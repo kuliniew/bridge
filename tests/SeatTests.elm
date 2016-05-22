@@ -1,4 +1,4 @@
-module SeatTests (all) where
+module SeatTests exposing (all)
 
 import Seat
 import Seat.Producer

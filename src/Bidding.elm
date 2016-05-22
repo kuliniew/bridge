@@ -1,4 +1,4 @@
-module Bidding
+module Bidding exposing
   ( System
   , Convention (..)
   , AnnotatedBid
@@ -11,7 +11,7 @@ module Bidding
   , Role (..)
   , role
   , role'
-  ) where
+  )
 
 {-| This module implements the interface for bidding systems, and provides
 common functions used by several different systems.
@@ -108,7 +108,7 @@ choose system favorability history hand =
   let
     fallback = outOfSystem Auction.Pass
   in
-    Random.generate (Random.Extra.selectWithDefault fallback <| viableChoices system favorability history hand)
+    Random.step (Random.Extra.selectWithDefault fallback <| viableChoices system favorability history hand)
 
 
 {-| Annotate a bid outside of the bidding system.

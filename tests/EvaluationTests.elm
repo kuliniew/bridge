@@ -1,4 +1,4 @@
-module EvaluationTests (all) where
+module EvaluationTests exposing (all)
 
 import Card
 import Card.Producer

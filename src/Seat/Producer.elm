@@ -1,4 +1,4 @@
-module Seat.Producer (seat) where
+module Seat.Producer exposing (seat)
 
 {-| This module contains elm-check producers for Seat.
 -}

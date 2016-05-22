@@ -1,4 +1,4 @@
-module Seat (Seat (..), seats, next, Each, lookup) where
+module Seat exposing (Seat (..), seats, next, Each, lookup)
 
 import Array exposing (Array)
 

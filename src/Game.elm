@@ -1,11 +1,11 @@
-module Game
+module Game exposing
   ( Model
   , GameState
-  , Action (..)
+  , Msg (..)
   , init
   , update
   , currentBidder
-  ) where
+  )
 
 import Auction
 import Bidding
@@ -14,8 +14,8 @@ import Card exposing (Card)
 import Seat exposing (Seat)
 import Vulnerability exposing (Vulnerability)
 
-import Effects exposing (Effects)
 import Random
+import Task
 import Time exposing (Time)
 
 
@@ -33,19 +33,19 @@ type alias GameState =
   }
 
 
-type Action
+type Msg
   = Reseed Time
   | NewDeal
   | Bid Auction.Bid
   | Explain (Maybe Bidding.AnnotatedBid)
 
 
-init : (Model, Effects Action)
+init : (Model, Cmd Msg)
 init =
-  ( Nothing, Effects.tick Reseed )
+  ( Nothing, Task.perform Reseed Reseed Time.now )
 
 
-update : Action -> Model -> (Model, Effects Action)
+update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
   case (action, model) of
     (Reseed time, _) ->
@@ -53,34 +53,34 @@ update action model =
         seed = Random.initialSeed (round time)
         state = deal Seat.South Vulnerability.initial seed
       in
-        (Just state, Effects.none)
+        (Just state, Cmd.none)
     (NewDeal, Just oldState) ->
       let
         newVulnerability = Vulnerability.next oldState.vulnerability
         newState = bidForBots <| deal (Seat.next oldState.dealer) (Vulnerability.next oldState.vulnerability) oldState.seed
       in
-        (Just newState, Effects.none)
+        (Just newState, Cmd.none)
     (Bid bid, Just oldState) ->
       let
         favorability = Vulnerability.favorability (currentBidder oldState.dealer oldState.auction) oldState.vulnerability
         annotated = Bidding.annotate oldState.system favorability oldState.auction bid
         newState = bidForBots { oldState | auction = annotated :: oldState.auction }
       in
-        (Just newState, Effects.none)
+        (Just newState, Cmd.none)
     (Explain explained, Just oldState) ->
       let
         newState = { oldState | explained = explained }
       in
-        (Just newState, Effects.none)
+        (Just newState, Cmd.none)
     (_, Nothing) ->
       {- TODO: indicate some kind of error for this impossible state -}
-      (Nothing, Effects.none)
+      (Nothing, Cmd.none)
 
 
 deal : Seat -> Vulnerability -> Random.Seed -> GameState
 deal dealer vulnerability seed =
   let
-    (dealt, seed') = Random.generate Card.deal seed
+    (dealt, seed') = Random.step Card.deal seed
     hands =
       case dealt of
         [west, north, east, south] ->

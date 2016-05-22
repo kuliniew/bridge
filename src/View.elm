@@ -1,15 +1,15 @@
-module View
+module View exposing
   ( view
   , viewState
   , viewHand
   , viewSuit
   , viewAuction
-  ) where
+  )
 
 import Auction
 import Bidding
 import Card exposing (Card)
-import Game exposing (Action)
+import Game exposing (Msg)
 import Seat exposing (Seat)
 import Vulnerability exposing (Vulnerability)
 
@@ -20,15 +20,15 @@ import Html.Events as Events
 import List.Extra
 
 
-view : Signal.Address Action -> Game.Model -> Html
-view address model =
+view : Game.Model -> Html Msg
+view model =
   case model of
-    Just state -> viewState address state
+    Just state -> viewState state
     Nothing -> Html.div [] []
 
 
-viewState : Signal.Address Action -> Game.GameState -> Html
-viewState address state =
+viewState : Game.GameState -> Html Msg
+viewState state =
   let
     emptyCell = Html.td [] []
     seatCell seat = Html.td [] [viewHand seat (Seat.lookup seat state.hands)]
@@ -40,13 +40,13 @@ viewState address state =
           , Html.tr [] [ seatCell Seat.West, emptyCell, seatCell Seat.East ]
           , Html.tr [] [ emptyCell, seatCell Seat.South, emptyCell ]
           ]
-      , viewAuction address state.dealer state.system state.vulnerability state.auction
-      , Html.button [ Events.onClick address Game.NewDeal ] [ Html.text "Rage Quit" ]
+      , viewAuction state.dealer state.system state.vulnerability state.auction
+      , Html.button [ Events.onClick Game.NewDeal ] [ Html.text "Rage Quit" ]
       , viewExplanation state.explained
       ]
 
 
-viewHand : Seat -> List Card -> Html
+viewHand : Seat -> List Card -> Html msg
 viewHand seat hand =
   Html.div []
     [ Html.text (toString seat)
@@ -54,7 +54,7 @@ viewHand seat hand =
     ]
 
 
-viewSuit : List Card -> Card.Suit -> Html
+viewSuit : List Card -> Card.Suit -> Html msg
 viewSuit hand suit =
   let
     cards =
@@ -68,7 +68,7 @@ viewSuit hand suit =
     Html.li [suitClass suit] [ Html.ul [Attr.class "ranks"] contents ]
 
 
-viewRank : Card -> Html
+viewRank : Card -> Html msg
 viewRank card =
   let
     value =
@@ -90,8 +90,8 @@ viewRank card =
     Html.li [] [Html.text value]
 
 
-viewAuction : Signal.Address Action -> Seat -> Bidding.System -> Vulnerability -> List Bidding.AnnotatedBid -> Html
-viewAuction address dealer system vulnerability annotatedAuction =
+viewAuction : Seat -> Bidding.System -> Vulnerability -> List Bidding.AnnotatedBid -> Html Msg
+viewAuction dealer system vulnerability annotatedAuction =
   let
     auction =
       List.map .bid annotatedAuction
@@ -102,8 +102,8 @@ viewAuction address dealer system vulnerability annotatedAuction =
     bidCell bid =
       let
         events =
-          [ Events.onMouseEnter address (Game.Explain <| Just bid)
-          , Events.onMouseLeave address (Game.Explain Nothing)
+          [ Events.onMouseEnter (Game.Explain <| Just bid)
+          , Events.onMouseLeave (Game.Explain Nothing)
           ]
       in
         Html.td events (viewBid bid.bid)
@@ -119,7 +119,7 @@ viewAuction address dealer system vulnerability annotatedAuction =
         Seat.South -> [nullCell, nullCell, nullCell]
     makeBidCells =
       if Auction.isOpen auction
-        then [makeBidCell address system favorability annotatedAuction]
+        then [makeBidCell system favorability annotatedAuction]
         else []
     allCells = nullCells ++ List.reverse (List.map bidCell annotatedAuction) ++ makeBidCells
     row cells =
@@ -133,8 +133,8 @@ viewAuction address dealer system vulnerability annotatedAuction =
       ]
 
 
-makeBidCell : Signal.Address Action -> Bidding.System -> Vulnerability.Favorability -> List Bidding.AnnotatedBid -> Html
-makeBidCell address system favorability history =
+makeBidCell : Bidding.System -> Vulnerability.Favorability -> List Bidding.AnnotatedBid -> Html Msg
+makeBidCell system favorability history =
   let
     legalBids =
       Auction.legalBids (List.map .bid history)
@@ -143,9 +143,9 @@ makeBidCell address system favorability history =
     button bid =
       let
         events =
-          [ Events.onClick address (Game.Bid bid.bid)
-          , Events.onMouseEnter address (Game.Explain <| Just bid)
-          , Events.onMouseLeave address (Game.Explain Nothing)
+          [ Events.onClick (Game.Bid bid.bid)
+          , Events.onMouseEnter (Game.Explain <| Just bid)
+          , Events.onMouseLeave (Game.Explain Nothing)
           ]
       in
         Html.button events (viewBid bid.bid)
@@ -168,7 +168,7 @@ makeBidCell address system favorability history =
     Html.td [Attr.class "choices"] buttons
 
 
-suitClass : Card.Suit -> Html.Attribute
+suitClass : Card.Suit -> Html.Attribute msg
 suitClass suit =
   let
     class =
@@ -181,7 +181,7 @@ suitClass suit =
     Attr.class class
 
 
-viewBid : Auction.Bid -> List Html
+viewBid : Auction.Bid -> List (Html msg)
 viewBid bid =
   let
     viewTrump trump =
@@ -205,7 +205,7 @@ suitText suit =
     Card.Spades -> "♠"
 
 
-suitSymbol : Card.Suit -> Html
+suitSymbol : Card.Suit -> Html msg
 suitSymbol suit =
   Html.span [suitClass suit] [Html.text <| suitText suit]
 
@@ -221,7 +221,7 @@ cluster filler count elems =
       chunk -> pad chunk :: cluster filler count (List.drop count elems)
 
 
-viewVulnerability : Vulnerability -> Html
+viewVulnerability : Vulnerability -> Html msg
 viewVulnerability vuln =
   let
     message =
@@ -234,7 +234,7 @@ viewVulnerability vuln =
     Html.text message
 
 
-viewExplanation : Maybe Bidding.AnnotatedBid -> Html
+viewExplanation : Maybe Bidding.AnnotatedBid -> Html msg
 viewExplanation target =
   let
     content =
@@ -249,7 +249,7 @@ viewExplanation target =
     Html.div [] content
 
 
-viewDescription : Bidding.AnnotatedBid -> Html
+viewDescription : Bidding.AnnotatedBid -> Html msg
 viewDescription bid =
   Html.div [] <|
     case (bid.convention, bid.description) of
@@ -263,7 +263,7 @@ viewDescription bid =
         []
 
 
-viewConvention : Bidding.Convention -> Html
+viewConvention : Bidding.Convention -> Html msg
 viewConvention convention =
   Html.text <|
     case convention of
@@ -272,7 +272,7 @@ viewConvention convention =
       Bidding.Stayman -> "Stayman"
 
 
-viewMeaning : Bidding.Meaning -> Html
+viewMeaning : Bidding.Meaning -> Html msg
 viewMeaning meaning =
   let
     list description meanings =
@@ -331,7 +331,7 @@ viewMeaning meaning =
         list "Deny:" [sub]
 
 
-viewMetric : Bidding.Metric -> Html
+viewMetric : Bidding.Metric -> Html msg
 viewMetric metric =
   case metric of
     Bidding.Constant val ->

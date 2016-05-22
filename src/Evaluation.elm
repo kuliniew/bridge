@@ -1,4 +1,4 @@
-module Evaluation
+module Evaluation exposing
   ( highCardPoints
   , lengthPoints
   , shortnessPoints
@@ -13,7 +13,7 @@ module Evaluation
   , playingTricksAny
 
   , quickLosers
-  ) where
+  )
 
 {-| This module implements various hand evaluation functions.
 -}

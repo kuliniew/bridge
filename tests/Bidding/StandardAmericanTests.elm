@@ -1,4 +1,4 @@
-module Bidding.StandardAmericanTests (all) where
+module Bidding.StandardAmericanTests exposing (all)
 
 import Auction
 import Bidding

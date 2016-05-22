@@ -1,4 +1,4 @@
-module Auction.Producer (auction) where
+module Auction.Producer exposing (auction)
 
 {-| This module contains elm-check producers for Auction.
 -}

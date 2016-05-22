@@ -1,4 +1,4 @@
-module TestUtils (generativeTest) where
+module TestUtils exposing (generativeTest)
 
 import Check
 import Check.Test
