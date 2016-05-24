@@ -18,13 +18,7 @@ To compile:
 ./build.sh
 ```
 
-To run:
-
-```
-elm reactor
-```
-
-Then open http://localhost:8000/ in your favorite browser.
+To run, open `index.html` in your favorite browser.
 
 To test (requires [elm-test](https://www.npmjs.com/package/elm-test)):
 
