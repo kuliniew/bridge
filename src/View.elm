@@ -41,7 +41,7 @@ viewState state =
           , Html.tr [] [ emptyCell, seatCell Seat.South, emptyCell ]
           ]
       , viewAuction state.dealer state.system state.vulnerability state.auction
-      , Html.button [ Events.onClick Game.NewDeal ] [ Html.text "Rage Quit" ]
+      , Html.button [ Events.onClick Game.RageQuit ] [ Html.text "Rage Quit" ]
       , viewExplanation state.explained
       ]
 
@@ -143,7 +143,7 @@ makeBidCell system favorability history =
     button bid =
       let
         events =
-          [ Events.onClick (Game.Bid bid.bid)
+          [ Events.onClick (Game.BidFromHuman bid.bid)
           , Events.onMouseEnter (Game.Explain <| Just bid)
           , Events.onMouseLeave (Game.Explain Nothing)
           ]

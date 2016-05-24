@@ -34,7 +34,7 @@ chooseSuite =
   ElmTest.suite "choose"
     [ ElmTest.test "picks one of the bids suggested by the system" <|
         let
-          (choice, _) = Bidding.choose testSystem Vulnerability.Equal [] [] (Random.initialSeed 0)
+          (choice, _) = Random.step (Bidding.choose testSystem Vulnerability.Equal [] []) (Random.initialSeed 0)
         in
           ElmTest.assert (choice == oneNoTrump || choice == twoNoTrump)
 
@@ -43,7 +43,7 @@ chooseSuite =
           nullSystem =
             { name = "Null System", suggestions = \_ _ -> [] }
           (choice, _) =
-            Bidding.choose nullSystem Vulnerability.Equal [] [] (Random.initialSeed 0)
+            Random.step (Bidding.choose nullSystem Vulnerability.Equal [] []) (Random.initialSeed 0)
         in
           ElmTest.assertEqual Auction.Pass choice.bid
     ]

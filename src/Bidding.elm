@@ -103,12 +103,12 @@ lookup bid =
 suggestions is chosen at random.  If the system makes no suggestion, the
 result will be Pass for reason of being OutOfSystem.
 -}
-choose : System -> Vulnerability.Favorability -> List AnnotatedBid -> List Card -> Random.Seed -> (AnnotatedBid, Random.Seed)
+choose : System -> Vulnerability.Favorability -> List AnnotatedBid -> List Card -> Random.Generator AnnotatedBid
 choose system favorability history hand =
   let
     fallback = outOfSystem Auction.Pass
   in
-    Random.step (Random.Extra.selectWithDefault fallback <| viableChoices system favorability history hand)
+    Random.Extra.selectWithDefault fallback <| viableChoices system favorability history hand
 
 
 {-| Annotate a bid outside of the bidding system.

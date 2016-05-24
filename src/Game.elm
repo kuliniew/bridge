@@ -15,8 +15,6 @@ import Seat exposing (Seat)
 import Vulnerability exposing (Vulnerability)
 
 import Random
-import Task
-import Time exposing (Time)
 
 
 type alias Model = Maybe GameState
@@ -28,59 +26,57 @@ type alias GameState =
   , dealer : Seat
   , vulnerability : Vulnerability
   , auction : List Bidding.AnnotatedBid
-  , seed : Random.Seed
   , explained : Maybe Bidding.AnnotatedBid
   }
 
 
 type Msg
-  = Reseed Time
-  | NewDeal
-  | Bid Auction.Bid
+  = NewDeal (List (List Card))
+  | BidFromBot Bidding.AnnotatedBid
+  | BidFromHuman Auction.Bid
   | Explain (Maybe Bidding.AnnotatedBid)
+  | RageQuit
 
 
 init : (Model, Cmd Msg)
 init =
-  ( Nothing, Task.perform Reseed Reseed Time.now )
+  ( Nothing, Random.generate NewDeal Card.deal )
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
   case (action, model) of
-    (Reseed time, _) ->
+    (NewDeal hands, Nothing) ->
+      bidForBot <| deal Seat.South Vulnerability.initial hands
+    (NewDeal hands, Just oldState) ->
+      bidForBot <| deal (Seat.next oldState.dealer) (Vulnerability.next oldState.vulnerability) hands
+    (BidFromBot bid, Just oldState) ->
       let
-        seed = Random.initialSeed (round time)
-        state = deal Seat.South Vulnerability.initial seed
+        newState = { oldState | auction = bid :: oldState.auction }
       in
-        (Just state, Cmd.none)
-    (NewDeal, Just oldState) ->
-      let
-        newVulnerability = Vulnerability.next oldState.vulnerability
-        newState = bidForBots <| deal (Seat.next oldState.dealer) (Vulnerability.next oldState.vulnerability) oldState.seed
-      in
-        (Just newState, Cmd.none)
-    (Bid bid, Just oldState) ->
+        bidForBot newState
+    (BidFromHuman bid, Just oldState) ->
       let
         favorability = Vulnerability.favorability (currentBidder oldState.dealer oldState.auction) oldState.vulnerability
         annotated = Bidding.annotate oldState.system favorability oldState.auction bid
-        newState = bidForBots { oldState | auction = annotated :: oldState.auction }
+        newState = { oldState | auction = annotated :: oldState.auction }
       in
-        (Just newState, Cmd.none)
+        bidForBot newState
     (Explain explained, Just oldState) ->
       let
         newState = { oldState | explained = explained }
       in
         (Just newState, Cmd.none)
+    (RageQuit, _) ->
+      (model, Random.generate NewDeal Card.deal)
     (_, Nothing) ->
       {- TODO: indicate some kind of error for this impossible state -}
       (Nothing, Cmd.none)
 
 
-deal : Seat -> Vulnerability -> Random.Seed -> GameState
-deal dealer vulnerability seed =
+deal : Seat -> Vulnerability -> List (List Card) -> GameState
+deal dealer vulnerability dealt =
   let
-    (dealt, seed') = Random.step Card.deal seed
     hands =
       case dealt of
         [west, north, east, south] ->
@@ -96,28 +92,25 @@ deal dealer vulnerability seed =
       , dealer = dealer
       , vulnerability = vulnerability
       , auction = []
-      , seed = seed'
       , explained = Nothing
       }
   in
     state
 
 
-bidForBots : GameState -> GameState
-bidForBots oldState =
+bidForBot : GameState -> (Model, Cmd Msg)
+bidForBot state =
   let
-    nextBidder = currentBidder oldState.dealer oldState.auction
+    nextBidder = currentBidder state.dealer state.auction
   in
-    if nextBidder /= Seat.South && Auction.isOpen (List.map .bid oldState.auction)
+    if nextBidder /= Seat.South && Auction.isOpen (List.map .bid state.auction)
       then
         let
-          favorability = Vulnerability.favorability nextBidder oldState.vulnerability
-          (newBid, newSeed) =
-            Bidding.choose oldState.system favorability oldState.auction (Seat.lookup nextBidder oldState.hands) oldState.seed
-          newAuction = newBid :: oldState.auction
+          favorability = Vulnerability.favorability nextBidder state.vulnerability
         in
-          bidForBots { oldState | auction = newAuction, seed = newSeed }
-      else oldState
+          (Just state, Random.generate BidFromBot <| Bidding.choose state.system favorability state.auction (Seat.lookup nextBidder state.hands))
+      else
+        (Just state, Cmd.none)
 
 
 currentBidder : Seat -> List Bidding.AnnotatedBid -> Seat
