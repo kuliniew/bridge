@@ -4,7 +4,6 @@ module Auction.Producer exposing (auction)
 -}
 
 import Auction
-import Producers
 
 import Check.Producer exposing (Producer)
 import Random

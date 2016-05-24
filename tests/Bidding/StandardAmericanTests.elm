@@ -1,11 +1,9 @@
 module Bidding.StandardAmericanTests exposing (all)
 
 import Auction
-import Bidding
 import Bidding.StandardAmerican
 import Bidding.TestUtils
 import Card exposing (Card)
-import TestUtils
 import Vulnerability
 
 import ElmTest

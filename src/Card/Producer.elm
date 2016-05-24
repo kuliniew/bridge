@@ -12,10 +12,7 @@ module Card.Producer exposing
 import Card
 import Producers
 
-import Array
 import Check.Producer exposing (Producer)
-import Random
-import Random.Array
 import Shrink
 
 
