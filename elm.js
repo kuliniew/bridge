@@ -7207,11 +7207,24 @@ function render(vNode, eventNode)
 			return render(vNode.node, eventNode);
 
 		case 'tagger':
+			var subNode = vNode.node;
+			var tagger = vNode.tagger;
+		
+			while (subNode.type === 'tagger')
+			{
+				typeof tagger !== 'object'
+					? tagger = [tagger, subNode.tagger]
+					: tagger.push(subNode.tagger);
+
+				subNode = subNode.node;
+			}
+            
 			var subEventRoot = {
-				tagger: vNode.tagger,
+				tagger: tagger,
 				parent: eventNode
 			};
-			var domNode = render(vNode.node, subEventRoot);
+			
+			var domNode = render(subNode, subEventRoot);
 			domNode.elm_event_node_ref = subEventRoot;
 			return domNode;
 
@@ -7306,6 +7319,7 @@ function applyEvents(domNode, eventNode, events)
 		if (typeof value === 'undefined')
 		{
 			domNode.removeEventListener(key, handler);
+			allHandlers[key] = undefined;
 		}
 		else if (typeof handler === 'undefined')
 		{
@@ -7621,10 +7635,7 @@ function diffFacts(a, b, category)
 				(category === STYLE_KEY)
 					? ''
 					:
-				(category === EVENT_KEY)
-					? null
-					:
-				(category === ATTR_KEY)
+				(category === EVENT_KEY || category === ATTR_KEY)
 					? undefined
 					:
 				{ namespace: a[aKey].namespace, value: undefined };
@@ -7739,7 +7750,14 @@ function addDomNodesHelp(domNode, vNode, patches, i, low, high, eventNode)
 	switch (vNode.type)
 	{
 		case 'tagger':
-			return addDomNodesHelp(domNode, vNode.node, patches, i, low + 1, high, domNode.elm_event_node_ref);
+			var subNode = vNode.node;
+            
+			while (subNode.type === "tagger")
+			{
+				subNode = subNode.node;
+			}
+            
+			return addDomNodesHelp(domNode, subNode, patches, i, low + 1, high, domNode.elm_event_node_ref);
 
 		case 'node':
 			var vChildren = vNode.children;
@@ -7851,10 +7869,9 @@ function redraw(domNode, vNode, eventNode)
 	var parentNode = domNode.parentNode;
 	var newNode = render(vNode, eventNode);
 
-	var ref = domNode.elm_event_node_ref
-	if (typeof ref !== 'undefined')
+	if (typeof newNode.elm_event_node_ref === 'undefined')
 	{
-		newNode.elm_event_node_ref = ref;
+		newNode.elm_event_node_ref = domNode.elm_event_node_ref;
 	}
 
 	if (parentNode && newNode !== domNode)
@@ -9841,9 +9858,8 @@ var _user$project$Card$Clubs = {ctor: 'Clubs'};
 var _user$project$Card$Diamonds = {ctor: 'Diamonds'};
 var _user$project$Card$Hearts = {ctor: 'Hearts'};
 var _user$project$Card$Spades = {ctor: 'Spades'};
-var _user$project$Card$suits = _elm_lang$core$Array$fromList(
-	_elm_lang$core$Native_List.fromArray(
-		[_user$project$Card$Spades, _user$project$Card$Hearts, _user$project$Card$Diamonds, _user$project$Card$Clubs]));
+var _user$project$Card$suits = _elm_lang$core$Native_List.fromArray(
+	[_user$project$Card$Spades, _user$project$Card$Hearts, _user$project$Card$Diamonds, _user$project$Card$Clubs]);
 var _user$project$Card$fromSuits = function (sample) {
 	var addSuit = F2(
 		function (suit, rank) {
@@ -9873,8 +9889,8 @@ var _user$project$Card$fromSuits = function (sample) {
 	return _elm_lang$core$Native_Utils.eq(length, 13) ? cards : _elm_lang$core$Native_Utils.crash(
 		'Card',
 		{
-			start: {line: 152, column: 12},
-			end: {line: 152, column: 23}
+			start: {line: 151, column: 12},
+			end: {line: 151, column: 23}
 		})(
 		A2(
 			_elm_lang$core$Basics_ops['++'],
@@ -9897,9 +9913,8 @@ var _user$project$Card$Jack = {ctor: 'Jack'};
 var _user$project$Card$Queen = {ctor: 'Queen'};
 var _user$project$Card$King = {ctor: 'King'};
 var _user$project$Card$Ace = {ctor: 'Ace'};
-var _user$project$Card$ranks = _elm_lang$core$Array$fromList(
-	_elm_lang$core$Native_List.fromArray(
-		[_user$project$Card$Ace, _user$project$Card$King, _user$project$Card$Queen, _user$project$Card$Jack, _user$project$Card$Ten, _user$project$Card$Nine, _user$project$Card$Eight, _user$project$Card$Seven, _user$project$Card$Six, _user$project$Card$Five, _user$project$Card$Four, _user$project$Card$Three, _user$project$Card$Two]));
+var _user$project$Card$ranks = _elm_lang$core$Native_List.fromArray(
+	[_user$project$Card$Ace, _user$project$Card$King, _user$project$Card$Queen, _user$project$Card$Jack, _user$project$Card$Ten, _user$project$Card$Nine, _user$project$Card$Eight, _user$project$Card$Seven, _user$project$Card$Six, _user$project$Card$Five, _user$project$Card$Four, _user$project$Card$Three, _user$project$Card$Two]);
 var _user$project$Card$deck = function () {
 	var toCard = F2(
 		function (suit, rank) {
@@ -9909,13 +9924,10 @@ var _user$project$Card$deck = function () {
 		return A2(
 			_elm_lang$core$List$map,
 			toCard(suit),
-			_elm_lang$core$Array$toList(_user$project$Card$ranks));
+			_user$project$Card$ranks);
 	};
 	return _elm_lang$core$Array$fromList(
-		A2(
-			_elm_lang$core$List$concatMap,
-			addRanks,
-			_elm_lang$core$Array$toList(_user$project$Card$suits)));
+		A2(_elm_lang$core$List$concatMap, addRanks, _user$project$Card$suits));
 }();
 var _user$project$Card$deal = function () {
 	var cardsPerHand = (_elm_lang$core$Array$length(_user$project$Card$deck) / 4) | 0;
@@ -10116,8 +10128,6 @@ var _user$project$Evaluation$quickLosers = F2(
 			return _elm_lang$core$List$length(ranks);
 		}
 	});
-var _user$project$Evaluation$suits = _elm_lang$core$Native_List.fromArray(
-	[_user$project$Card$Spades, _user$project$Card$Hearts, _user$project$Card$Diamonds, _user$project$Card$Clubs]);
 var _user$project$Evaluation$playingTricks = F2(
 	function (trump, cards) {
 		var offTrumpTricks = function (ranks) {
@@ -10175,7 +10185,7 @@ var _user$project$Evaluation$playingTricks = F2(
 				_elm_lang$core$Maybe$Just(suit)) ? trumpTricks(ranks) : offTrumpTricks(ranks);
 		};
 		return _elm_lang$core$List$sum(
-			A2(_elm_lang$core$List$map, suitTricks, _user$project$Evaluation$suits));
+			A2(_elm_lang$core$List$map, suitTricks, _user$project$Card$suits));
 	});
 var _user$project$Evaluation$playingTricksAny = function (cards) {
 	return A2(
@@ -10275,7 +10285,7 @@ var _user$project$Evaluation$distribution = function (cards) {
 		A2(
 			_elm_lang$core$List$map,
 			A2(_elm_lang$core$Basics$flip, _user$project$Evaluation$length, cards),
-			_user$project$Evaluation$suits));
+			_user$project$Card$suits));
 };
 var _user$project$Evaluation$shortnessPoints = F2(
 	function (trump, cards) {
@@ -10295,7 +10305,7 @@ var _user$project$Evaluation$shortnessPoints = F2(
 						function (suit) {
 							return !_elm_lang$core$Native_Utils.eq(suit, trump);
 						},
-						_user$project$Evaluation$suits))));
+						_user$project$Card$suits))));
 	});
 var _user$project$Evaluation$lengthPoints = function (cards) {
 	return _elm_lang$core$List$sum(
@@ -10309,7 +10319,7 @@ var _user$project$Evaluation$lengthPoints = function (cards) {
 				function (suit) {
 					return A2(_user$project$Evaluation$length, suit, cards) - 4;
 				},
-				_user$project$Evaluation$suits)));
+				_user$project$Card$suits)));
 };
 var _user$project$Evaluation$highCardPoints = function () {
 	var pointsForCard = function (card) {
@@ -10368,9 +10378,8 @@ var _user$project$Seat$South = {ctor: 'South'};
 var _user$project$Seat$East = {ctor: 'East'};
 var _user$project$Seat$North = {ctor: 'North'};
 var _user$project$Seat$West = {ctor: 'West'};
-var _user$project$Seat$seats = _elm_lang$core$Array$fromList(
-	_elm_lang$core$Native_List.fromArray(
-		[_user$project$Seat$West, _user$project$Seat$North, _user$project$Seat$East, _user$project$Seat$South]));
+var _user$project$Seat$seats = _elm_lang$core$Native_List.fromArray(
+	[_user$project$Seat$West, _user$project$Seat$North, _user$project$Seat$East, _user$project$Seat$South]);
 var _user$project$Seat$next = function (seat) {
 	var _p1 = seat;
 	switch (_p1.ctor) {
@@ -10673,8 +10682,6 @@ var _user$project$Bidding$role = function (_p6) {
 			_p6));
 };
 
-var _user$project$Bidding_Stayman$suits = _elm_lang$core$Native_List.fromArray(
-	[_user$project$Card$Spades, _user$project$Card$Hearts, _user$project$Card$Diamonds, _user$project$Card$Clubs]);
 var _user$project$Bidding_Stayman$notFourThreeThreeThree = _user$project$Bidding$Or(
 	A2(
 		_elm_lang$core$List$map,
@@ -10684,7 +10691,7 @@ var _user$project$Bidding_Stayman$notFourThreeThreeThree = _user$project$Bidding
 				_user$project$Bidding$Length(suit),
 				_user$project$Bidding$Constant(2));
 		},
-		_user$project$Bidding_Stayman$suits));
+		_user$project$Card$suits));
 var _user$project$Bidding_Stayman$response = F2(
 	function (_p0, history) {
 		var show = function (suit) {
@@ -10852,8 +10859,6 @@ var _user$project$Bidding_ConventionResponse$withConventionResponse = F3(
 		}
 	});
 
-var _user$project$Bidding_StandardAmerican$suits = _elm_lang$core$Native_List.fromArray(
-	[_user$project$Card$Spades, _user$project$Card$Hearts, _user$project$Card$Diamonds, _user$project$Card$Clubs]);
 var _user$project$Bidding_StandardAmerican$prioritized = function () {
 	var downgrade = F2(
 		function (denials, bid) {
@@ -10906,7 +10911,7 @@ var _user$project$Bidding_StandardAmerican$noTwoQuickLosers = function () {
 			_user$project$Bidding$Constant(2));
 	};
 	return _user$project$Bidding$And(
-		A2(_elm_lang$core$List$map, noTwoQuickLosersIn, _user$project$Bidding_StandardAmerican$suits));
+		A2(_elm_lang$core$List$map, noTwoQuickLosersIn, _user$project$Card$suits));
 }();
 var _user$project$Bidding_StandardAmerican$noVoids = function () {
 	var noVoidIn = function (suit) {
@@ -10916,7 +10921,7 @@ var _user$project$Bidding_StandardAmerican$noVoids = function () {
 			_user$project$Bidding$Constant(0));
 	};
 	return _user$project$Bidding$And(
-		A2(_elm_lang$core$List$map, noVoidIn, _user$project$Bidding_StandardAmerican$suits));
+		A2(_elm_lang$core$List$map, noVoidIn, _user$project$Card$suits));
 }();
 var _user$project$Bidding_StandardAmerican$notFourThreeThreeThree = _user$project$Bidding$Or(
 	A2(
@@ -10927,7 +10932,7 @@ var _user$project$Bidding_StandardAmerican$notFourThreeThreeThree = _user$projec
 				_user$project$Bidding$Length(suit),
 				_user$project$Bidding$Constant(2));
 		},
-		_user$project$Bidding_StandardAmerican$suits));
+		_user$project$Card$suits));
 var _user$project$Bidding_StandardAmerican$fourThreeThreeThree = _user$project$Bidding$And(
 	A2(
 		_elm_lang$core$List$map,
@@ -10937,7 +10942,7 @@ var _user$project$Bidding_StandardAmerican$fourThreeThreeThree = _user$project$B
 				_user$project$Bidding$Length(suit),
 				_user$project$Bidding$Constant(3));
 		},
-		_user$project$Bidding_StandardAmerican$suits));
+		_user$project$Card$suits));
 var _user$project$Bidding_StandardAmerican$responsesToThreeNoTrump = function () {
 	var stayman = A2(_user$project$Bidding_Stayman$bid, 4, _elm_lang$core$Maybe$Nothing);
 	var pass = {
@@ -11141,7 +11146,7 @@ var _user$project$Bidding_StandardAmerican$responsesToOneNoTrump = function () {
 				_user$project$Bidding$Constant(0));
 		};
 		return _user$project$Bidding$Or(
-			A2(_elm_lang$core$List$map, voidIn, _user$project$Bidding_StandardAmerican$suits));
+			A2(_elm_lang$core$List$map, voidIn, _user$project$Card$suits));
 	}();
 	var minorSlam = function (suit) {
 		return {
