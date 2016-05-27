@@ -1,7 +1,5 @@
 module Seat exposing (Seat (..), seats, next, Each, lookup)
 
-import Array exposing (Array)
-
 
 type Seat
   = West
@@ -10,11 +8,11 @@ type Seat
   | South
 
 
-{-| Array of all seats.
+{-| List of all seats.
 -}
-seats : Array Seat
+seats : List Seat
 seats =
-  Array.fromList [West, North, East, South]
+  [West, North, East, South]
 
 
 {-| Return the next seat to act after this one.

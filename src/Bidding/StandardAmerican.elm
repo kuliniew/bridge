@@ -353,7 +353,7 @@ responsesToOneNoTrump =
         voidIn suit =
           Bidding.Equal (Bidding.Length suit) (Bidding.Constant 0)
       in
-        Bidding.Or <| List.map voidIn suits
+        Bidding.Or <| List.map voidIn Card.suits
     gerber =
       { bid = Auction.Bid 4 (Just Card.Clubs)
       , description = Nothing
@@ -516,14 +516,14 @@ responsesToThreeNoTrump =
 -}
 fourThreeThreeThree : Bidding.Meaning
 fourThreeThreeThree =
-  Bidding.And <| List.map (\suit -> Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 3)) suits
+  Bidding.And <| List.map (\suit -> Bidding.Minimum (Bidding.Length suit) (Bidding.Constant 3)) Card.suits
 
 
 {-| Deny having 4-3-3-3 distribution.
 -}
 notFourThreeThreeThree : Bidding.Meaning
 notFourThreeThreeThree =
-  Bidding.Or <| List.map (\suit -> Bidding.Maximum (Bidding.Length suit) (Bidding.Constant 2)) suits
+  Bidding.Or <| List.map (\suit -> Bidding.Maximum (Bidding.Length suit) (Bidding.Constant 2)) Card.suits
 
 
 {-| Require that a hand contain no voids.
@@ -534,7 +534,7 @@ noVoids =
     noVoidIn suit =
       Bidding.GreaterThan (Bidding.Length suit) (Bidding.Constant 0)
   in
-    Bidding.And <| List.map noVoidIn suits
+    Bidding.And <| List.map noVoidIn Card.suits
 
 
 {-| Require that a hand have no suit with two quick losers.
@@ -545,7 +545,7 @@ noTwoQuickLosers =
     noTwoQuickLosersIn suit =
       Bidding.LessThan (Bidding.QuickLosers suit) (Bidding.Constant 2)
   in
-    Bidding.And <| List.map noTwoQuickLosersIn suits
+    Bidding.And <| List.map noTwoQuickLosersIn Card.suits
 
 
 {-| Flatten a prioritized list of bids, such that the nth set of choices
@@ -567,9 +567,3 @@ prioritized =
             downgraded ++ prioritized' denials' rest
   in
     prioritized' []
-
-
-{-| List of all suits.
--}
-suits : List Card.Suit
-suits = [ Card.Spades, Card.Hearts, Card.Diamonds, Card.Clubs ]

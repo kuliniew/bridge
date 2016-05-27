@@ -84,10 +84,4 @@ response _ history =
 -}
 notFourThreeThreeThree : Bidding.Meaning
 notFourThreeThreeThree =
-  Bidding.Or <| List.map (\suit -> Bidding.Maximum (Bidding.Length suit) (Bidding.Constant 2)) suits
-
-
-{-| List of all suits.
--}
-suits : List Card.Suit
-suits = [ Card.Spades, Card.Hearts, Card.Diamonds, Card.Clubs ]
+  Bidding.Or <| List.map (\suit -> Bidding.Maximum (Bidding.Length suit) (Bidding.Constant 2)) Card.suits

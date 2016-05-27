@@ -5,7 +5,6 @@ import Card.Producer
 import Evaluation
 import TestUtils
 
-import Array
 import Check
 import Check.Producer
 import ElmTest
@@ -416,7 +415,7 @@ quickLosersSuite =
       { spades = ranks
       , hearts = []
       , diamonds = []
-      , clubs = Array.toList (Array.slice 0 (13 - List.length ranks) Card.ranks)
+      , clubs = List.take (13 - List.length ranks) Card.ranks
       }
     test name expected ranks =
       ElmTest.test name <| ElmTest.assertEqual expected (Evaluation.quickLosers Card.Spades <| spadesHand ranks)

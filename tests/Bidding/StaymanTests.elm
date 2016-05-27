@@ -8,7 +8,6 @@ import Bidding.TestUtils
 import Card
 import Vulnerability
 
-import Array
 import ElmTest
 import Maybe.Extra
 import String
@@ -153,4 +152,4 @@ testCase expected history spades hearts diamonds clubs =
 
 
 cards : Int -> List Card.Rank
-cards n = List.take n (Array.toList Card.ranks)
+cards n = List.take n Card.ranks

@@ -44,7 +44,7 @@ highCardPoints =
 -}
 lengthPoints : List Card -> Int
 lengthPoints cards =
-  List.map (\suit -> length suit cards - 4) suits
+  List.map (\suit -> length suit cards - 4) Card.suits
     |> List.filter (\pts -> pts > 0)
     |> List.sum
 
@@ -53,7 +53,7 @@ lengthPoints cards =
 -}
 shortnessPoints : Card.Suit -> List Card -> Int
 shortnessPoints trump cards =
-  List.filter (\suit -> suit /= trump) suits
+  List.filter (\suit -> suit /= trump) Card.suits
     |> List.map (\suit -> 3 - length suit cards)
     |> List.filter (\pts -> pts > 0)
     |> List.sum
@@ -80,7 +80,7 @@ length suit cards =
 -}
 distribution : List Card -> List Int
 distribution cards =
-  List.sortBy negate <| List.map (flip length cards) suits
+  List.sortBy negate <| List.map (flip length cards) Card.suits
 
 
 {-| Check if a distribution is balanced.
@@ -102,13 +102,6 @@ semiBalanced dist =
     [5, 4, 2, 2] -> True
     [6, 3, 2, 2] -> True
     _ -> False
-
-
-{-| List of all suits.
--}
-suits : List Card.Suit
-suits =
-  [ Card.Spades, Card.Hearts, Card.Diamonds, Card.Clubs ]
 
 
 {-| Count the playing tricks in a hand, given a trump suit.
@@ -153,7 +146,7 @@ playingTricks trump cards =
       in
         fromAce + fromKing
   in
-    List.sum <| List.map suitTricks suits
+    List.sum <| List.map suitTricks Card.suits
 
 
 {-| Count the playing tricks in a hand, for whichever the best

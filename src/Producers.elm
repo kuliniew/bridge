@@ -3,21 +3,24 @@ module Producers exposing (elementOf)
 {-| General utilities for writing new elm-check producers.
 -}
 
-import Array exposing (Array)
 import Check.Producer exposing (Producer)
+import Random
+import Random.Extra
+import Shrink
 
 
-{-| A producer for elements sampled from an array of choices.
+{-| A producer for elements sampled from a list of choices.
 -}
-elementOf : Array a -> Producer a
+elementOf : List a -> Producer a
 elementOf elements =
   let
-    maxIndex =
-      Array.length elements - 1
-
-    toElement index =
-      case Array.get index elements of
-        Just element -> element
-        Nothing -> Debug.crash "failed to generate an appropriate index into the array!"
+    unwrap result =
+      case result of
+        Just val -> val
+        Nothing -> Debug.crash "gave Producers.elementOf an empty list!"
   in
-    Check.Producer.map toElement (Check.Producer.rangeInt 0 maxIndex)
+    { generator =
+        Random.Extra.select elements |> Random.map unwrap
+    , shrinker =
+        Shrink.noShrink
+    }

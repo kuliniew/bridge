@@ -28,11 +28,11 @@ type Suit
   | Clubs
 
 
-{-| Array of all suits.
+{-| List of all suits.
 -}
-suits : Array Suit
+suits : List Suit
 suits =
-  Array.fromList [Spades, Hearts, Diamonds, Clubs]
+  [Spades, Hearts, Diamonds, Clubs]
 
 
 {-| The rank of a card.
@@ -73,11 +73,11 @@ numericalRank rank =
     Two -> 2
 
 
-{-| Array of all ranks.
+{-| List of all ranks.
 -}
-ranks : Array Rank
+ranks : List Rank
 ranks =
-  Array.fromList [Ace, King, Queen, Jack, Ten, Nine, Eight, Seven, Six, Five, Four, Three, Two]
+  [Ace, King, Queen, Jack, Ten, Nine, Eight, Seven, Six, Five, Four, Three, Two]
 
 
 {-| A playing card.
@@ -94,13 +94,12 @@ deck : Array Card
 deck =
   let
     addRanks suit =
-      Array.toList ranks
-        |> List.map (toCard suit)
+      List.map (toCard suit) ranks
 
     toCard suit rank =
       { suit = suit, rank = rank }
   in
-    Array.toList suits
+    suits
       |> List.concatMap addRanks
       |> Array.fromList
 
