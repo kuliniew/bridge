@@ -6,7 +6,7 @@ import Card
 import Vulnerability
 
 import ElmTest
-import Random
+import Random.Extra
 
 
 all : ElmTest.Test
@@ -34,7 +34,7 @@ chooseSuite =
   ElmTest.suite "choose"
     [ ElmTest.test "picks one of the bids suggested by the system" <|
         let
-          (choice, _) = Random.step (Bidding.choose testSystem Vulnerability.Equal [] []) (Random.initialSeed 0)
+          choice = Random.Extra.quickGenerate <| Bidding.choose testSystem Vulnerability.Equal [] []
         in
           ElmTest.assert (choice == oneNoTrump || choice == twoNoTrump)
 
@@ -42,8 +42,8 @@ chooseSuite =
         let
           nullSystem =
             { name = "Null System", suggestions = \_ _ -> [] }
-          (choice, _) =
-            Random.step (Bidding.choose nullSystem Vulnerability.Equal [] []) (Random.initialSeed 0)
+          choice =
+            Random.Extra.quickGenerate <| Bidding.choose nullSystem Vulnerability.Equal [] []
         in
           ElmTest.assertEqual Auction.Pass choice.bid
     ]
