@@ -8,7 +8,7 @@ module Bidding.Stayman exposing
 
 import Auction
 import Bidding
-import Card exposing (Suit (Clubs))
+import Card
 import Vulnerability
 
 import Maybe.Extra
@@ -74,9 +74,8 @@ response _ history =
     responses level =
       [ negative level, hearts level, spades level ]
   in
-    {- the compiler (at least 0.16?) doesn't accept "Auction.Bid level (Just Card.Clubs)" below -}
     case List.map .bid history of
-      Auction.Pass :: Auction.Bid level (Just Clubs) :: _ -> Just (responses level)
+      Auction.Pass :: Auction.Bid level (Just Card.Clubs) :: _ -> Just (responses level)
       _ -> Nothing
 
 
