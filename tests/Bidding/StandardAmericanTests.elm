@@ -1302,6 +1302,16 @@ conventionResponseSuite =
           , diamonds = [ Card.King, Card.Ten, Card.Nine ]
           , clubs = [ Card.Jack, Card.Ten, Card.Nine ]
           }
+
+        , { name = "Jacoby Transfer"
+          , expected = [Auction.Bid 2 (Just Card.Spades)]
+          , favorability = Vulnerability.Equal
+          , history = [ Auction.Pass, Auction.Bid 2 (Just Card.Hearts), Auction.Pass, Auction.Bid 1 Nothing ]
+          , spades = [ Card.Ace, Card.Two, Card.Three ]
+          , hearts = [ Card.Ace, Card.Two, Card.Three ]
+          , diamonds = [ Card.Ace, Card.Two, Card.Three ]
+          , clubs = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+          }
         ]
   in
     ElmTest.suite "response to conventions" unitTests

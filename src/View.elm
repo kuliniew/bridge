@@ -284,6 +284,8 @@ viewMeaning meaning =
     case meaning of
       Bidding.OutOfSystem ->
         Html.text "(not part of the bidding system)"
+      Bidding.Forced ->
+        Html.text "forced bid"
       Bidding.InRange metric lo hi ->
         Html.span []
           [ viewMetric metric

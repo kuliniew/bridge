@@ -59,6 +59,7 @@ type alias AnnotatedBid =
 -}
 type Meaning
   = OutOfSystem
+  | Forced
   | InRange Metric Int Int
   | Equal Metric Metric
   | Minimum Metric Metric
@@ -138,6 +139,7 @@ satisfiedBy hand bid =
     satisfies meaning =
       case meaning of
         OutOfSystem -> True
+        Forced -> True
         Equal metric val ->
           eval metric hand == eval val hand
         InRange metric lo hi ->

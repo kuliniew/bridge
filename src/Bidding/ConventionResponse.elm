@@ -4,6 +4,7 @@ module Bidding.ConventionResponse exposing
   )
 
 import Bidding
+import Bidding.JacobyTransfer
 import Bidding.Stayman
 import Vulnerability
 
@@ -15,6 +16,7 @@ conventionResponse favorability history =
   let
     dispatch convention =
       case convention of
+        Bidding.JacobyTransfer -> Bidding.JacobyTransfer.response favorability history
         Bidding.Stayman -> Bidding.Stayman.response favorability history
         _ -> Nothing
   in
