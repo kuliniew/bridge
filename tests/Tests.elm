@@ -1,6 +1,7 @@
 module Tests exposing (all)
 
 import AuctionTests
+import Bidding.JacobyTransferTests
 import Bidding.StandardAmericanTests
 import Bidding.StaymanTests
 import BiddingTests
@@ -16,6 +17,7 @@ all : ElmTest.Test
 all =
   ElmTest.suite "A Test Suite"
     [ AuctionTests.all
+    , Bidding.JacobyTransferTests.all
     , Bidding.StandardAmericanTests.all
     , Bidding.StaymanTests.all
     , BiddingTests.all

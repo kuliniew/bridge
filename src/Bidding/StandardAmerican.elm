@@ -6,6 +6,7 @@ module Bidding.StandardAmerican exposing (system)
 import Auction
 import Bidding
 import Bidding.ConventionResponse
+import Bidding.JacobyTransfer
 import Bidding.Stayman
 import Card
 import Vulnerability
@@ -270,6 +271,11 @@ responsesToOneNoTrump =
         [ Bidding.Maximum (Bidding.Length Card.Spades) (Bidding.Constant 3)
         , Bidding.Maximum (Bidding.Length Card.Hearts) (Bidding.Constant 3)
         ]
+    noMajorSlam =
+      Bidding.And
+        [ Bidding.Deny (inviteSlam Card.Spades).meaning
+        , Bidding.Deny (inviteSlam Card.Hearts).meaning
+        ]
     pass =
       { bid = Auction.Pass
       , description = Nothing
@@ -282,15 +288,8 @@ responsesToOneNoTrump =
           , Bidding.LessThan (Bidding.Length Card.Clubs) (Bidding.Constant 6)
           ]
       }
-    jacobyTransfer target via =
-      { bid = Auction.Bid 2 (Just via)
-      , description = Nothing
-      , convention = Just Bidding.JacobyTransfer
-      , meaning = Bidding.And
-          [ Bidding.Minimum (Bidding.Length target) (Bidding.Constant 5)
-          , Bidding.Deny (inviteSlam target).meaning
-          ]
-      }
+    jacobyTransfers =
+      Bidding.JacobyTransfer.bids 2 (Just noMajorSlam)
     minorTransfer =
       { bid = Auction.Bid 2 (Just Card.Spades)
       , description = Just "Minor Transfer"
@@ -388,13 +387,12 @@ responsesToOneNoTrump =
       ]
     priority3 =
       [ pass
-      , jacobyTransfer Card.Hearts Card.Diamonds
-      , jacobyTransfer Card.Spades Card.Hearts
       , minorTransfer
       , stayman
       , inviteGame
       , bidGame
-      ]
+      ] ++
+      jacobyTransfers
   in
     prioritized [priority1, priority2, priority3]
 
@@ -418,12 +416,8 @@ responsesToTwoNoTrump =
       }
     stayman =
       Bidding.Stayman.bid 3 (Just <| Bidding.InRange (Bidding.Points Nothing) gamePoints (inviteSlamPoints - 1))
-    jacobyTransfer target via =
-      { bid = Auction.Bid 3 (Just via)
-      , description = Nothing
-      , convention = Just Bidding.JacobyTransfer
-      , meaning = Bidding.Minimum (Bidding.Length target) (Bidding.Constant 5)
-      }
+    jacobyTransfers =
+      Bidding.JacobyTransfer.bids 3 Nothing
     game =
       { bid = Auction.Bid 3 Nothing
       , description = Just "raise to game"
@@ -462,11 +456,10 @@ responsesToTwoNoTrump =
     priority2 =
       [ pass
       , stayman
-      , jacobyTransfer Card.Spades Card.Hearts
-      , jacobyTransfer Card.Hearts Card.Diamonds
       , game
       , inviteSlam
-      ]
+      ] ++
+      jacobyTransfers
   in
     prioritized [priority1, priority2]
 
@@ -476,6 +469,11 @@ responsesToTwoNoTrump =
 responsesToThreeNoTrump : List Bidding.AnnotatedBid
 responsesToThreeNoTrump =
   let
+    notBothMajors =
+      Bidding.Or
+        [ Bidding.LessThan (Bidding.Length Card.Spades) (Bidding.Constant 4)
+        , Bidding.LessThan (Bidding.Length Card.Hearts) (Bidding.Constant 4)
+        ]
     otherMajor major =
       case major of
         Card.Spades -> Card.Hearts
@@ -493,23 +491,15 @@ responsesToThreeNoTrump =
           , fourThreeThreeThree
           ]
       }
-    jacobyTransfer target via =
-      { bid = Auction.Bid 4 (Just via)
-      , description = Nothing
-      , convention = Just Bidding.JacobyTransfer
-      , meaning = Bidding.And
-          [ Bidding.Minimum (Bidding.Length target) (Bidding.Constant 5)
-          , Bidding.LessThan (Bidding.Length (otherMajor target)) (Bidding.Constant 4)
-          ]
-      }
+    jacobyTransfers =
+      Bidding.JacobyTransfer.bids 4 (Just notBothMajors)
     stayman =
       Bidding.Stayman.bid 4 Nothing
   in
     [ pass
-    , jacobyTransfer Card.Spades Card.Hearts
-    , jacobyTransfer Card.Hearts Card.Diamonds
     , stayman
-    ]
+    ] ++
+    jacobyTransfers
 
 
 {-| Require having 4-3-3-3 distribution.
