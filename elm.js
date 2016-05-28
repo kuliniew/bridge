@@ -10491,6 +10491,8 @@ var _user$project$Bidding$satisfiedBy = F2(
 			switch (_p1.ctor) {
 				case 'OutOfSystem':
 					return true;
+				case 'Forced':
+					return true;
 				case 'Equal':
 					return _elm_lang$core$Native_Utils.eq(
 						A2(_user$project$Bidding$eval, _p1._0, hand),
@@ -10595,6 +10597,7 @@ var _user$project$Bidding$InRange = F3(
 	function (a, b, c) {
 		return {ctor: 'InRange', _0: a, _1: b, _2: c};
 	});
+var _user$project$Bidding$Forced = {ctor: 'Forced'};
 var _user$project$Bidding$OutOfSystem = {ctor: 'OutOfSystem'};
 var _user$project$Bidding$outOfSystem = function (bid) {
 	return {bid: bid, meaning: _user$project$Bidding$OutOfSystem, description: _elm_lang$core$Maybe$Nothing, convention: _elm_lang$core$Maybe$Nothing};
@@ -10659,8 +10662,8 @@ var _user$project$Bidding$role$ = function (history) {
 			return _elm_lang$core$Native_Utils.crashCase(
 				'Bidding',
 				{
-					start: {line: 206, column: 5},
-					end: {line: 211, column: 106}
+					start: {line: 208, column: 5},
+					end: {line: 213, column: 106}
 				},
 				_p4)(
 				A2(
@@ -10681,6 +10684,134 @@ var _user$project$Bidding$role = function (_p6) {
 			},
 			_p6));
 };
+
+var _user$project$Bidding_JacobyTransfer$response = F2(
+	function (_p0, history) {
+		var maySuperaccept = function (target) {
+			return _elm_lang$core$Native_List.fromArray(
+				[
+					{
+					bid: A2(
+						_user$project$Auction$Bid,
+						2,
+						_elm_lang$core$Maybe$Just(target)),
+					meaning: _user$project$Bidding$Or(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_user$project$Bidding$LessThan,
+								_user$project$Bidding$Length(target),
+								_user$project$Bidding$Constant(4)),
+								A2(
+								_user$project$Bidding$LessThan,
+								_user$project$Bidding$Points(
+									_elm_lang$core$Maybe$Just(
+										_elm_lang$core$Maybe$Just(target))),
+								_user$project$Bidding$Constant(17))
+							])),
+					description: _elm_lang$core$Maybe$Just('accept'),
+					convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$JacobyTransfer)
+				},
+					{
+					bid: A2(
+						_user$project$Auction$Bid,
+						3,
+						_elm_lang$core$Maybe$Just(target)),
+					meaning: _user$project$Bidding$And(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_user$project$Bidding$Minimum,
+								_user$project$Bidding$Length(target),
+								_user$project$Bidding$Constant(4)),
+								A2(
+								_user$project$Bidding$Minimum,
+								_user$project$Bidding$Points(
+									_elm_lang$core$Maybe$Just(
+										_elm_lang$core$Maybe$Just(target))),
+								_user$project$Bidding$Constant(17))
+							])),
+					description: _elm_lang$core$Maybe$Just('superaccept'),
+					convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$JacobyTransfer)
+				}
+				]);
+		};
+		var onlyAccept = F2(
+			function (level, target) {
+				return _elm_lang$core$Native_List.fromArray(
+					[
+						{
+						bid: A2(
+							_user$project$Auction$Bid,
+							level,
+							_elm_lang$core$Maybe$Just(target)),
+						meaning: _user$project$Bidding$Forced,
+						description: _elm_lang$core$Maybe$Just('accept'),
+						convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$JacobyTransfer)
+					}
+					]);
+			});
+		var responsesFor = F2(
+			function (level, target) {
+				return _elm_lang$core$Native_Utils.eq(level, 2) ? maySuperaccept(target) : A2(onlyAccept, level, target);
+			});
+		var _p1 = A2(
+			_elm_lang$core$List$map,
+			function (_) {
+				return _.bid;
+			},
+			history);
+		_v0_2:
+		do {
+			if (((((_p1.ctor === '::') && (_p1._0.ctor === 'Pass')) && (_p1._1.ctor === '::')) && (_p1._1._0.ctor === 'Bid')) && (_p1._1._0._1.ctor === 'Just')) {
+				switch (_p1._1._0._1._0.ctor) {
+					case 'Hearts':
+						return _elm_lang$core$Maybe$Just(
+							A2(responsesFor, _p1._1._0._0, _user$project$Card$Spades));
+					case 'Diamonds':
+						return _elm_lang$core$Maybe$Just(
+							A2(responsesFor, _p1._1._0._0, _user$project$Card$Hearts));
+					default:
+						break _v0_2;
+				}
+			} else {
+				break _v0_2;
+			}
+		} while(false);
+		return _elm_lang$core$Maybe$Nothing;
+	});
+var _user$project$Bidding_JacobyTransfer$bid = F4(
+	function (level, extraConditions, via, target) {
+		var baseCondition = A2(
+			_user$project$Bidding$Minimum,
+			_user$project$Bidding$Length(target),
+			_user$project$Bidding$Constant(5));
+		var conditions = A2(
+			_elm_lang$core$List_ops['::'],
+			baseCondition,
+			_elm_community$maybe_extra$Maybe_Extra$maybeToList(extraConditions));
+		return {
+			bid: A2(
+				_user$project$Auction$Bid,
+				level,
+				_elm_lang$core$Maybe$Just(via)),
+			meaning: _user$project$Bidding$And(conditions),
+			description: _elm_lang$core$Maybe$Just(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'transfer to ',
+					_elm_lang$core$Basics$toString(target))),
+			convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$JacobyTransfer)
+		};
+	});
+var _user$project$Bidding_JacobyTransfer$bids = F2(
+	function (level, extraConditions) {
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				A4(_user$project$Bidding_JacobyTransfer$bid, level, extraConditions, _user$project$Card$Hearts, _user$project$Card$Spades),
+				A4(_user$project$Bidding_JacobyTransfer$bid, level, extraConditions, _user$project$Card$Diamonds, _user$project$Card$Hearts)
+			]);
+	});
 
 var _user$project$Bidding_Stayman$notFourThreeThreeThree = _user$project$Bidding$Or(
 	A2(
@@ -10831,10 +10962,13 @@ var _user$project$Bidding_ConventionResponse$conventionResponse = F2(
 	function (favorability, history) {
 		var dispatch = function (convention) {
 			var _p0 = convention;
-			if (_p0.ctor === 'Stayman') {
-				return A2(_user$project$Bidding_Stayman$response, favorability, history);
-			} else {
-				return _elm_lang$core$Maybe$Nothing;
+			switch (_p0.ctor) {
+				case 'JacobyTransfer':
+					return A2(_user$project$Bidding_JacobyTransfer$response, favorability, history);
+				case 'Stayman':
+					return A2(_user$project$Bidding_Stayman$response, favorability, history);
+				default:
+					return _elm_lang$core$Maybe$Nothing;
 			}
 		};
 		var _p1 = A2(
@@ -10978,8 +11112,8 @@ var _user$project$Bidding_StandardAmerican$responsesToThreeNoTrump = function ()
 				return _elm_lang$core$Native_Utils.crashCase(
 					'Bidding.StandardAmerican',
 					{
-						start: {line: 480, column: 7},
-						end: {line: 483, column: 96}
+						start: {line: 478, column: 7},
+						end: {line: 481, column: 96}
 					},
 					_p3)(
 					A2(
@@ -10988,54 +11122,30 @@ var _user$project$Bidding_StandardAmerican$responsesToThreeNoTrump = function ()
 						' is not a major suit, so it has no \'other major\''));
 		}
 	};
-	var jacobyTransfer = F2(
-		function (target, via) {
-			return {
-				bid: A2(
-					_user$project$Auction$Bid,
-					4,
-					_elm_lang$core$Maybe$Just(via)),
-				description: _elm_lang$core$Maybe$Nothing,
-				convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$JacobyTransfer),
-				meaning: _user$project$Bidding$And(
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A2(
-							_user$project$Bidding$Minimum,
-							_user$project$Bidding$Length(target),
-							_user$project$Bidding$Constant(5)),
-							A2(
-							_user$project$Bidding$LessThan,
-							_user$project$Bidding$Length(
-								otherMajor(target)),
-							_user$project$Bidding$Constant(4))
-						]))
-			};
-		});
-	return _elm_lang$core$Native_List.fromArray(
-		[
-			pass,
-			A2(jacobyTransfer, _user$project$Card$Spades, _user$project$Card$Hearts),
-			A2(jacobyTransfer, _user$project$Card$Hearts, _user$project$Card$Diamonds),
-			stayman
-		]);
+	var notBothMajors = _user$project$Bidding$Or(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_user$project$Bidding$LessThan,
+				_user$project$Bidding$Length(_user$project$Card$Spades),
+				_user$project$Bidding$Constant(4)),
+				A2(
+				_user$project$Bidding$LessThan,
+				_user$project$Bidding$Length(_user$project$Card$Hearts),
+				_user$project$Bidding$Constant(4))
+			]));
+	var jacobyTransfers = A2(
+		_user$project$Bidding_JacobyTransfer$bids,
+		4,
+		_elm_lang$core$Maybe$Just(notBothMajors));
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Native_List.fromArray(
+			[pass, stayman]),
+		jacobyTransfers);
 }();
 var _user$project$Bidding_StandardAmerican$responsesToTwoNoTrump = function () {
-	var jacobyTransfer = F2(
-		function (target, via) {
-			return {
-				bid: A2(
-					_user$project$Auction$Bid,
-					3,
-					_elm_lang$core$Maybe$Just(via)),
-				description: _elm_lang$core$Maybe$Nothing,
-				convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$JacobyTransfer),
-				meaning: A2(
-					_user$project$Bidding$Minimum,
-					_user$project$Bidding$Length(target),
-					_user$project$Bidding$Constant(5))
-			};
-		});
+	var jacobyTransfers = A2(_user$project$Bidding_JacobyTransfer$bids, 3, _elm_lang$core$Maybe$Nothing);
 	var inviteSlamPoints = 33 - 20;
 	var inviteSlam = {
 		bid: A2(_user$project$Auction$Bid, 4, _elm_lang$core$Maybe$Nothing),
@@ -11124,15 +11234,11 @@ var _user$project$Bidding_StandardAmerican$responsesToTwoNoTrump = function () {
 						]))
 				]))
 	};
-	var priority2 = _elm_lang$core$Native_List.fromArray(
-		[
-			pass,
-			stayman,
-			A2(jacobyTransfer, _user$project$Card$Spades, _user$project$Card$Hearts),
-			A2(jacobyTransfer, _user$project$Card$Hearts, _user$project$Card$Diamonds),
-			game,
-			inviteSlam
-		]);
+	var priority2 = A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Native_List.fromArray(
+			[pass, stayman, game, inviteSlam]),
+		jacobyTransfers);
 	return _user$project$Bidding_StandardAmerican$prioritized(
 		_elm_lang$core$Native_List.fromArray(
 			[priority1, priority2]));
@@ -11316,37 +11422,23 @@ var _user$project$Bidding_StandardAmerican$responsesToOneNoTrump = function () {
 					]))
 		};
 	};
-	var jacobyTransfer = F2(
-		function (target, via) {
-			return {
-				bid: A2(
-					_user$project$Auction$Bid,
-					2,
-					_elm_lang$core$Maybe$Just(via)),
-				description: _elm_lang$core$Maybe$Nothing,
-				convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$JacobyTransfer),
-				meaning: _user$project$Bidding$And(
-					_elm_lang$core$Native_List.fromArray(
-						[
-							A2(
-							_user$project$Bidding$Minimum,
-							_user$project$Bidding$Length(target),
-							_user$project$Bidding$Constant(5)),
-							_user$project$Bidding$Deny(
-							inviteSlam(target).meaning)
-						]))
-			};
-		});
-	var priority3 = _elm_lang$core$Native_List.fromArray(
-		[
-			pass,
-			A2(jacobyTransfer, _user$project$Card$Hearts, _user$project$Card$Diamonds),
-			A2(jacobyTransfer, _user$project$Card$Spades, _user$project$Card$Hearts),
-			minorTransfer,
-			stayman,
-			inviteGame,
-			bidGame
-		]);
+	var noMajorSlam = _user$project$Bidding$And(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_user$project$Bidding$Deny(
+				inviteSlam(_user$project$Card$Spades).meaning),
+				_user$project$Bidding$Deny(
+				inviteSlam(_user$project$Card$Hearts).meaning)
+			]));
+	var jacobyTransfers = A2(
+		_user$project$Bidding_JacobyTransfer$bids,
+		2,
+		_elm_lang$core$Maybe$Just(noMajorSlam));
+	var priority3 = A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Native_List.fromArray(
+			[pass, minorTransfer, stayman, inviteGame, bidGame]),
+		jacobyTransfers);
 	var priority2 = _elm_lang$core$Native_List.fromArray(
 		[
 			inviteGameWithLongMinor(_user$project$Card$Clubs),
@@ -12013,8 +12105,8 @@ var _user$project$View$collapseRedundancies = function (meaning) {
 				return _elm_lang$core$Native_Utils.crashCase(
 					'View',
 					{
-						start: {line: 407, column: 7},
-						end: {line: 410, column: 82}
+						start: {line: 409, column: 7},
+						end: {line: 412, column: 82}
 					},
 					_p0)('tried to take grandchildren over non-conjunction nodes');
 		}
@@ -12381,6 +12473,8 @@ var _user$project$View$viewMeaning = function (meaning) {
 	switch (_p19.ctor) {
 		case 'OutOfSystem':
 			return _elm_lang$html$Html$text('(not part of the bidding system)');
+		case 'Forced':
+			return _elm_lang$html$Html$text('forced bid');
 		case 'InRange':
 			return A2(
 				_elm_lang$html$Html$span,
