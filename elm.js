@@ -10203,6 +10203,16 @@ var _user$project$Evaluation$playingTricksAny = function (cards) {
 				_elm_lang$core$Native_List.fromArray(
 					[_user$project$Card$Spades, _user$project$Card$Hearts, _user$project$Card$Diamonds, _user$project$Card$Clubs]))));
 };
+var _user$project$Evaluation$countRank = F2(
+	function (rank, cards) {
+		return _elm_lang$core$List$length(
+			A2(
+				_elm_lang$core$List$filter,
+				function (card) {
+					return _elm_lang$core$Native_Utils.eq(card.rank, rank);
+				},
+				cards));
+	});
 var _user$project$Evaluation$semiBalanced = function (dist) {
 	var _p1 = dist;
 	_v1_2:
@@ -10478,6 +10488,8 @@ var _user$project$Bidding$eval = F2(
 				return A2(_user$project$Evaluation$points, _p0._0, hand);
 			case 'Length':
 				return A2(_user$project$Evaluation$length, _p0._0, hand);
+			case 'CountRank':
+				return A2(_user$project$Evaluation$countRank, _p0._0, hand);
 			case 'PlayingTricks':
 				return _user$project$Evaluation$playingTricksAny(hand);
 			default:
@@ -10626,6 +10638,9 @@ var _user$project$Bidding$QuickLosers = function (a) {
 	return {ctor: 'QuickLosers', _0: a};
 };
 var _user$project$Bidding$PlayingTricks = {ctor: 'PlayingTricks'};
+var _user$project$Bidding$CountRank = function (a) {
+	return {ctor: 'CountRank', _0: a};
+};
 var _user$project$Bidding$Length = function (a) {
 	return {ctor: 'Length', _0: a};
 };
@@ -10662,8 +10677,8 @@ var _user$project$Bidding$role$ = function (history) {
 			return _elm_lang$core$Native_Utils.crashCase(
 				'Bidding',
 				{
-					start: {line: 208, column: 5},
-					end: {line: 213, column: 106}
+					start: {line: 210, column: 5},
+					end: {line: 215, column: 106}
 				},
 				_p4)(
 				A2(
@@ -10683,6 +10698,118 @@ var _user$project$Bidding$role = function (_p6) {
 				return _.bid;
 			},
 			_p6));
+};
+
+var _user$project$Bidding_Gerber$noTwoQuickLosers = function () {
+	var noTwoQuickLosersIn = function (suit) {
+		return A2(
+			_user$project$Bidding$LessThan,
+			_user$project$Bidding$QuickLosers(suit),
+			_user$project$Bidding$Constant(2));
+	};
+	return _user$project$Bidding$And(
+		A2(_elm_lang$core$List$map, noTwoQuickLosersIn, _user$project$Card$suits));
+}();
+var _user$project$Bidding_Gerber$noVoids = function () {
+	var noVoidIn = function (suit) {
+		return A2(
+			_user$project$Bidding$GreaterThan,
+			_user$project$Bidding$Length(suit),
+			_user$project$Bidding$Constant(0));
+	};
+	return _user$project$Bidding$And(
+		A2(_elm_lang$core$List$map, noVoidIn, _user$project$Card$suits));
+}();
+var _user$project$Bidding_Gerber$response = F2(
+	function (_p0, history) {
+		var responses = F2(
+			function (level, rank) {
+				return _elm_lang$core$Native_List.fromArray(
+					[
+						{
+						bid: A2(
+							_user$project$Auction$Bid,
+							level,
+							_elm_lang$core$Maybe$Just(_user$project$Card$Diamonds)),
+						meaning: _user$project$Bidding$Or(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									A2(
+									_user$project$Bidding$Equal,
+									_user$project$Bidding$CountRank(rank),
+									_user$project$Bidding$Constant(0)),
+									A2(
+									_user$project$Bidding$Equal,
+									_user$project$Bidding$CountRank(rank),
+									_user$project$Bidding$Constant(4))
+								])),
+						description: _elm_lang$core$Maybe$Just('0 or 4 aces'),
+						convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$Gerber)
+					},
+						{
+						bid: A2(
+							_user$project$Auction$Bid,
+							level,
+							_elm_lang$core$Maybe$Just(_user$project$Card$Hearts)),
+						meaning: A2(
+							_user$project$Bidding$Equal,
+							_user$project$Bidding$CountRank(rank),
+							_user$project$Bidding$Constant(1)),
+						description: _elm_lang$core$Maybe$Just('1 ace'),
+						convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$Gerber)
+					},
+						{
+						bid: A2(
+							_user$project$Auction$Bid,
+							level,
+							_elm_lang$core$Maybe$Just(_user$project$Card$Spades)),
+						meaning: A2(
+							_user$project$Bidding$Equal,
+							_user$project$Bidding$CountRank(rank),
+							_user$project$Bidding$Constant(2)),
+						description: _elm_lang$core$Maybe$Just('2 aces'),
+						convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$Gerber)
+					},
+						{
+						bid: A2(_user$project$Auction$Bid, level, _elm_lang$core$Maybe$Nothing),
+						meaning: A2(
+							_user$project$Bidding$Equal,
+							_user$project$Bidding$CountRank(rank),
+							_user$project$Bidding$Constant(3)),
+						description: _elm_lang$core$Maybe$Just('3 aces'),
+						convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$Gerber)
+					}
+					]);
+			});
+		var _p1 = A2(
+			_elm_lang$core$List$map,
+			function (_) {
+				return _.bid;
+			},
+			history);
+		if (((((((_p1.ctor === '::') && (_p1._0.ctor === 'Pass')) && (_p1._1.ctor === '::')) && (_p1._1._0.ctor === 'Bid')) && (_p1._1._0._0 === 4)) && (_p1._1._0._1.ctor === 'Just')) && (_p1._1._0._1._0.ctor === 'Clubs')) {
+			return _elm_lang$core$Maybe$Just(
+				A2(responses, 4, _user$project$Card$Ace));
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _user$project$Bidding_Gerber$askForAces = function (extraConditions) {
+	var baseConditions = _elm_lang$core$Native_List.fromArray(
+		[_user$project$Bidding_Gerber$noVoids, _user$project$Bidding_Gerber$noTwoQuickLosers]);
+	var conditions = A2(
+		_elm_lang$core$Basics_ops['++'],
+		baseConditions,
+		_elm_community$maybe_extra$Maybe_Extra$maybeToList(extraConditions));
+	return {
+		bid: A2(
+			_user$project$Auction$Bid,
+			4,
+			_elm_lang$core$Maybe$Just(_user$project$Card$Clubs)),
+		meaning: _user$project$Bidding$And(conditions),
+		description: _elm_lang$core$Maybe$Just('ask for aces'),
+		convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$Gerber)
+	};
 };
 
 var _user$project$Bidding_JacobyTransfer$response = F2(
@@ -10963,12 +11090,12 @@ var _user$project$Bidding_ConventionResponse$conventionResponse = F2(
 		var dispatch = function (convention) {
 			var _p0 = convention;
 			switch (_p0.ctor) {
+				case 'Gerber':
+					return A2(_user$project$Bidding_Gerber$response, favorability, history);
 				case 'JacobyTransfer':
 					return A2(_user$project$Bidding_JacobyTransfer$response, favorability, history);
-				case 'Stayman':
-					return A2(_user$project$Bidding_Stayman$response, favorability, history);
 				default:
-					return _elm_lang$core$Maybe$Nothing;
+					return A2(_user$project$Bidding_Stayman$response, favorability, history);
 			}
 		};
 		var _p1 = A2(
@@ -11037,26 +11164,6 @@ var _user$project$Bidding_StandardAmerican$prioritized = function () {
 		_elm_lang$core$Native_List.fromArray(
 			[]));
 }();
-var _user$project$Bidding_StandardAmerican$noTwoQuickLosers = function () {
-	var noTwoQuickLosersIn = function (suit) {
-		return A2(
-			_user$project$Bidding$LessThan,
-			_user$project$Bidding$QuickLosers(suit),
-			_user$project$Bidding$Constant(2));
-	};
-	return _user$project$Bidding$And(
-		A2(_elm_lang$core$List$map, noTwoQuickLosersIn, _user$project$Card$suits));
-}();
-var _user$project$Bidding_StandardAmerican$noVoids = function () {
-	var noVoidIn = function (suit) {
-		return A2(
-			_user$project$Bidding$GreaterThan,
-			_user$project$Bidding$Length(suit),
-			_user$project$Bidding$Constant(0));
-	};
-	return _user$project$Bidding$And(
-		A2(_elm_lang$core$List$map, noVoidIn, _user$project$Card$suits));
-}();
 var _user$project$Bidding_StandardAmerican$notFourThreeThreeThree = _user$project$Bidding$Or(
 	A2(
 		_elm_lang$core$List$map,
@@ -11112,8 +11219,8 @@ var _user$project$Bidding_StandardAmerican$responsesToThreeNoTrump = function ()
 				return _elm_lang$core$Native_Utils.crashCase(
 					'Bidding.StandardAmerican',
 					{
-						start: {line: 478, column: 7},
-						end: {line: 481, column: 96}
+						start: {line: 465, column: 7},
+						end: {line: 468, column: 96}
 					},
 					_p3)(
 					A2(
@@ -11156,24 +11263,12 @@ var _user$project$Bidding_StandardAmerican$responsesToTwoNoTrump = function () {
 			_user$project$Bidding$HighCardPoints,
 			_user$project$Bidding$Constant(inviteSlamPoints))
 	};
-	var gerber = {
-		bid: A2(
-			_user$project$Auction$Bid,
-			4,
-			_elm_lang$core$Maybe$Just(_user$project$Card$Clubs)),
-		description: _elm_lang$core$Maybe$Nothing,
-		convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$Gerber),
-		meaning: _user$project$Bidding$And(
-			_elm_lang$core$Native_List.fromArray(
-				[
-					A2(
-					_user$project$Bidding$GreaterThan,
-					_user$project$Bidding$Points(_elm_lang$core$Maybe$Nothing),
-					_user$project$Bidding$Constant(inviteSlamPoints)),
-					_user$project$Bidding_StandardAmerican$noVoids,
-					_user$project$Bidding_StandardAmerican$noTwoQuickLosers
-				]))
-	};
+	var gerber = _user$project$Bidding_Gerber$askForAces(
+		_elm_lang$core$Maybe$Just(
+			A2(
+				_user$project$Bidding$GreaterThan,
+				_user$project$Bidding$Points(_elm_lang$core$Maybe$Nothing),
+				_user$project$Bidding$Constant(inviteSlamPoints))));
 	var priority1 = _elm_lang$core$Native_List.fromArray(
 		[gerber]);
 	var gamePoints = 5;
@@ -11459,24 +11554,12 @@ var _user$project$Bidding_StandardAmerican$responsesToOneNoTrump = function () {
 						[_user$project$Bidding$Balanced, _user$project$Bidding$SemiBalanced]))
 				]))
 	};
-	var gerber = {
-		bid: A2(
-			_user$project$Auction$Bid,
-			4,
-			_elm_lang$core$Maybe$Just(_user$project$Card$Clubs)),
-		description: _elm_lang$core$Maybe$Nothing,
-		convention: _elm_lang$core$Maybe$Just(_user$project$Bidding$Gerber),
-		meaning: _user$project$Bidding$And(
-			_elm_lang$core$Native_List.fromArray(
-				[
-					A2(
-					_user$project$Bidding$GreaterThan,
-					_user$project$Bidding$Points(_elm_lang$core$Maybe$Nothing),
-					_user$project$Bidding$Constant(inviteSlamPoints)),
-					_user$project$Bidding_StandardAmerican$noVoids,
-					_user$project$Bidding_StandardAmerican$noTwoQuickLosers
-				]))
-	};
+	var gerber = _user$project$Bidding_Gerber$askForAces(
+		_elm_lang$core$Maybe$Just(
+			A2(
+				_user$project$Bidding$GreaterThan,
+				_user$project$Bidding$Points(_elm_lang$core$Maybe$Nothing),
+				_user$project$Bidding$Constant(inviteSlamPoints))));
 	var priority1 = _elm_lang$core$Native_List.fromArray(
 		[
 			inviteSlamNoTrump,
@@ -12105,8 +12188,8 @@ var _user$project$View$collapseRedundancies = function (meaning) {
 				return _elm_lang$core$Native_Utils.crashCase(
 					'View',
 					{
-						start: {line: 409, column: 7},
-						end: {line: 412, column: 82}
+						start: {line: 411, column: 7},
+						end: {line: 414, column: 82}
 					},
 					_p0)('tried to take grandchildren over non-conjunction nodes');
 		}
@@ -12424,6 +12507,22 @@ var _user$project$View$viewMetric = function (metric) {
 					[
 						_elm_lang$html$Html$text('Length of '),
 						_user$project$View$suitSymbol(_p18._0)
+					]));
+		case 'CountRank':
+			return A2(
+				_elm_lang$html$Html$span,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'Number of ',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(_p18._0),
+								's')))
 					]));
 		case 'PlayingTricks':
 			return _elm_lang$html$Html$text('Playing Tricks');
