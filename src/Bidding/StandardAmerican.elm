@@ -6,6 +6,7 @@ module Bidding.StandardAmerican exposing (system)
 import Auction
 import Bidding
 import Bidding.ConventionResponse
+import Bidding.Gerber
 import Bidding.JacobyTransfer
 import Bidding.Stayman
 import Card
@@ -354,15 +355,8 @@ responsesToOneNoTrump =
       in
         Bidding.Or <| List.map voidIn Card.suits
     gerber =
-      { bid = Auction.Bid 4 (Just Card.Clubs)
-      , description = Nothing
-      , convention = Just Bidding.Gerber
-      , meaning = Bidding.And
-          [ Bidding.GreaterThan (Bidding.Points Nothing) (Bidding.Constant inviteSlamPoints)    -- FIXME: probably should be based on a known fit?
-          , noVoids
-          , noTwoQuickLosers
-          ]
-      }
+      -- FIXME: probably should be based on a known fit?
+      Bidding.Gerber.askForAces (Just <| Bidding.GreaterThan (Bidding.Points Nothing) (Bidding.Constant inviteSlamPoints))
     minorSlam suit =
       { bid = Auction.Bid 6 (Just suit)
       , description = Just "Slam"
@@ -441,15 +435,8 @@ responsesToTwoNoTrump =
           Bidding.Minimum Bidding.HighCardPoints (Bidding.Constant inviteSlamPoints)
       }
     gerber =
-      { bid = Auction.Bid 4 (Just Card.Clubs)
-      , description = Nothing
-      , convention = Just Bidding.Gerber
-      , meaning = Bidding.And
-          [ Bidding.GreaterThan (Bidding.Points Nothing) (Bidding.Constant inviteSlamPoints)    -- FIXME: probably should be based on a known fit?
-          , noVoids
-          , noTwoQuickLosers
-          ]
-      }
+      -- FIXME: probably should be based on a known fit?
+      Bidding.Gerber.askForAces (Just <| Bidding.GreaterThan (Bidding.Points Nothing) (Bidding.Constant inviteSlamPoints))
     priority1 =
       [ gerber
       ]
@@ -514,28 +501,6 @@ fourThreeThreeThree =
 notFourThreeThreeThree : Bidding.Meaning
 notFourThreeThreeThree =
   Bidding.Or <| List.map (\suit -> Bidding.Maximum (Bidding.Length suit) (Bidding.Constant 2)) Card.suits
-
-
-{-| Require that a hand contain no voids.
--}
-noVoids : Bidding.Meaning
-noVoids =
-  let
-    noVoidIn suit =
-      Bidding.GreaterThan (Bidding.Length suit) (Bidding.Constant 0)
-  in
-    Bidding.And <| List.map noVoidIn Card.suits
-
-
-{-| Require that a hand have no suit with two quick losers.
--}
-noTwoQuickLosers : Bidding.Meaning
-noTwoQuickLosers =
-  let
-    noTwoQuickLosersIn suit =
-      Bidding.LessThan (Bidding.QuickLosers suit) (Bidding.Constant 2)
-  in
-    Bidding.And <| List.map noTwoQuickLosersIn Card.suits
 
 
 {-| Flatten a prioritized list of bids, such that the nth set of choices
