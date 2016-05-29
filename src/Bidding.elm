@@ -80,6 +80,7 @@ type Metric
   | HighCardPoints
   | Points (Maybe Auction.Trump)
   | Length Card.Suit
+  | CountRank Card.Rank
   | PlayingTricks
   | QuickLosers Card.Suit
 
@@ -178,6 +179,7 @@ eval metric hand =
     HighCardPoints -> Evaluation.highCardPoints hand
     Points trump -> Evaluation.points trump hand
     Length suit -> Evaluation.length suit hand
+    CountRank rank -> Evaluation.countRank rank hand
     PlayingTricks -> Evaluation.playingTricksAny hand
     QuickLosers suit -> Evaluation.quickLosers suit hand
 

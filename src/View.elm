@@ -348,6 +348,8 @@ viewMetric metric =
       Html.span [] [ Html.text "Points (", suitSymbol suit, Html.text ")" ]
     Bidding.Length suit ->
       Html.span [] [ Html.text "Length of ", suitSymbol suit ]
+    Bidding.CountRank rank ->
+      Html.span [] [ Html.text <| "Number of " ++ toString rank ++ "s" ]
     Bidding.PlayingTricks ->
       Html.text "Playing Tricks"
     Bidding.QuickLosers suit ->
