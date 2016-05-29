@@ -9,6 +9,8 @@ module Evaluation exposing
   , balanced
   , semiBalanced
 
+  , countRank
+
   , playingTricks
   , playingTricksAny
 
@@ -102,6 +104,13 @@ semiBalanced dist =
     [5, 4, 2, 2] -> True
     [6, 3, 2, 2] -> True
     _ -> False
+
+
+{-| Count the number of cards of a given rank.
+-}
+countRank : Card.Rank -> List Card -> Int
+countRank rank cards =
+  List.length <| List.filter (\card -> card.rank == rank) cards
 
 
 {-| Count the playing tricks in a hand, given a trump suit.

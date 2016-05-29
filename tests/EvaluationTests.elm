@@ -23,6 +23,8 @@ all =
     , balancedSuite
     , semiBalancedSuite
 
+    , countRankSuite
+
     , playingTricksSuite
 
     , quickLosersSuite
@@ -302,6 +304,24 @@ semiBalancedSuite =
     , ElmTest.test "4-4-4-1 is not semi-balanced" <|
         ElmTest.assert (not <| Evaluation.semiBalanced [4, 4, 4, 1])
     ]
+
+
+countRankSuite : ElmTest.Test
+countRankSuite =
+  let
+    hand = Card.fromSuits
+      { spades = [ Card.Ace, Card.Queen, Card.Ten, Card.Nine ]
+      , hearts = [ Card.Queen, Card.Ten, Card.Nine]
+      , diamonds = [ Card.Ace, Card.Ten, Card.Nine ]
+      , clubs = [ Card.Ten, Card.Nine, Card.Eight ]
+      }
+  in
+    ElmTest.suite "countRank"
+      [ ElmTest.test "have cards of that rank" <|
+          ElmTest.assertEqual 2 (Evaluation.countRank Card.Ace hand)
+      , ElmTest.test "have no cards of that rank" <|
+          ElmTest.assertEqual 0 (Evaluation.countRank Card.King hand)
+      ]
 
 
 playingTricksSuite : ElmTest.Test
