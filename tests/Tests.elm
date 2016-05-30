@@ -7,6 +7,7 @@ import Bidding.StandardAmericanTests
 import Bidding.StaymanTests
 import BiddingTests
 import CardTests
+import ConstraintTests
 import EvaluationTests
 import SeatTests
 import VulnerabilityTests
@@ -24,6 +25,7 @@ all =
     , Bidding.StaymanTests.all
     , BiddingTests.all
     , CardTests.all
+    , ConstraintTests.all
     , EvaluationTests.all
     , SeatTests.all
     , VulnerabilityTests.all
