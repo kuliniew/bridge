@@ -60,22 +60,34 @@ rangeSuite =
 singleConstrainSuite : ElmTest.Test
 singleConstrainSuite =
   let
-    initialState = Constraint.initialize [("x", Constraint.range 1 10)]
+    initialState =
+      Constraint.initialize <| List.map (\var -> (var, Constraint.range 1 10)) ["x", "y", "z"]
   in
     ElmTest.suite "constrain (single)"
-      [ ElmTest.test "LessThan var const" <|
+      [ ElmTest.test "LessThan x 5" <|
           let
             state =
               Constraint.constrain (Constraint.LessThan (Constraint.Variable "x") (Constraint.Constant 5)) initialState
           in
             ElmTest.assertEqual (Constraint.range 1 4) (Constraint.possibleValues "x" state)
 
-      , ElmTest.test "LessThan const var" <|
+      , ElmTest.test "LessThan 5 x" <|
           let
             state =
               Constraint.constrain (Constraint.LessThan (Constraint.Constant 5) (Constraint.Variable "x")) initialState
           in
             ElmTest.assertEqual (Constraint.range 6 10) (Constraint.possibleValues "x" state)
+
+      , ElmTest.suite "LessThan (Sum x y z) 6" <|
+          let
+            variableSum =
+              Constraint.Add <| List.map Constraint.Variable ["x", "y", "z"]
+            state =
+              Constraint.constrain (Constraint.LessThan variableSum (Constraint.Constant 6)) initialState
+            test var =
+              ElmTest.test var <| ElmTest.assertEqual (Constraint.range 1 3) (Constraint.possibleValues var state)
+          in
+            List.map test ["x", "y", "z"]
 
       , ElmTest.test "does not introduce new variables" <|
           let

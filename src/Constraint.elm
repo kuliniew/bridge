@@ -30,17 +30,13 @@ type alias Range = Set Int
 type Term var
   = Constant Int
   | Variable var
+  | Add (List (Term var))
 
 
 {-| An individual constraint over terms.
 -}
 type Constraint var
   = LessThan (Term var) (Term var)
-
-
-{-| Unique identifier for a constraint.
--}
-type alias ConstraintId = Int
 
 
 {-| The collection of variable states and the currently known
@@ -136,15 +132,14 @@ variables constraint =
   let
     terms =
       case constraint of
-        LessThan lhs rhs -> [lhs, rhs]
-    getVar term =
+        LessThan left right -> [left, right]
+    variablesInTerm term =
       case term of
-        Variable var -> Just var
-        _ -> Nothing
-    vars =
-      List.filterMap getVar terms
+        Constant _ -> []
+        Variable var -> [var]
+        Add terms -> List.concatMap variablesInTerm terms
   in
-    DictSet.toList <| DictSet.fromList toString vars
+    List.concatMap variablesInTerm terms
 
 
 {-| Update the possible values of variables given the worklist of
@@ -173,35 +168,88 @@ updateVariables worklist state =
 {-| Enforce a single constraint on the existing state.
 -}
 enforceConstraint : Constraint var -> State var -> State var
-enforceConstraint constraint state =
-  case constraint of
-    LessThan (Constant bound) (Variable var) ->
-      filterRange var (\value -> bound < value) state
-    LessThan (Variable var) (Constant bound) ->
-      filterRange var (\value -> value < bound) state
-    LessThan (Variable left) (Variable right) ->
-      case (smallestValue left state, largestValue right state) of
-        (Just smallestLeft, Just largestRight) ->
-          state
-            |> filterRange left (\value -> value < largestRight)
-            |> filterRange right (\value -> smallestLeft < value)
-        _ ->
-          state
-    _ ->
-      Debug.crash ("not implemented: " ++ toString constraint)
-
-
-{-| Filter the range of a variable.
--}
-filterRange : var -> (Int -> Bool) -> State var -> State var
-filterRange var pred (State st) =
+enforceConstraint constraint (State st) =
   let
-    transform value =
-      case value of
-        Just set -> Just (Set.filter pred set)
-        Nothing -> Nothing
+    vars =
+      variables constraint
+    updatedVariables =
+      st.variables
+        |> EveryDict.filter (\var _ -> List.member var vars)
+        |> cartesianProduct
+        |> List.filter (flip evaluateConstraint constraint)
+        |> unCartesianProduct vars
+        |> flip EveryDict.union st.variables
   in
-    State { st | variables = EveryDict.update var transform st.variables }
+    State { st | variables = updatedVariables }
+
+
+{-| Convert a map of possible variable values to a list of every
+possible variable assignment using those values.
+-}
+cartesianProduct : EveryDict var Range -> List (EveryDict var Int)
+cartesianProduct vars =
+  let
+    expand pairs =
+      case pairs of
+        [] ->
+          []
+        (var, values) :: rest ->
+          let
+            assignments = List.map (\val -> (var, val)) (Set.toList values)
+          in
+            case rest of
+              [] ->
+                List.map (\assn -> [assn]) assignments
+              _ ->
+                List.concatMap (\others -> List.map (\assn -> assn :: others) assignments) (expand rest)
+  in
+    EveryDict.toList vars
+      |> expand
+      |> List.map EveryDict.fromList
+
+
+{-| Convert a list of possible variable assignments to a map
+of possible values for each variable.
+-}
+unCartesianProduct : List var -> List (EveryDict var Int) -> EveryDict var Range
+unCartesianProduct vars assignments =
+  let
+    insert val current =
+      case current of
+        Just vals -> Just <| Set.insert val vals
+        Nothing -> Just <| Set.singleton val
+    joinSingle var val mapping =
+      EveryDict.update var (insert val) mapping
+    join assignment mapping =
+      EveryDict.foldl joinSingle mapping assignment
+    emptyMapping =
+      EveryDict.fromList <| List.map (\var -> (var, Set.empty)) vars
+  in
+    List.foldl join emptyMapping assignments
+
+
+{-| Evaluate a constraint under a given variable assignment.
+-}
+evaluateConstraint : EveryDict var Int -> Constraint var -> Bool
+evaluateConstraint env constraint =
+  case constraint of
+    LessThan left right ->
+      evaluateTerm env left < evaluateTerm env right
+
+
+{-| Evaluate a term under a given variable assignment.
+-}
+evaluateTerm : EveryDict var Int -> Term var -> Int
+evaluateTerm env term =
+  case term of
+    Constant val ->
+      val
+    Variable var ->
+      case EveryDict.get var env of
+        Just val -> val
+        Nothing -> Debug.crash <| "can't evaluate undefined variable " ++ toString var
+    Add terms ->
+      List.sum <| List.map (evaluateTerm env) terms
 
 
 {-| Find the variables that have different ranges between two
