@@ -37,6 +37,7 @@ type Term var
 -}
 type Constraint var
   = LessThan (Term var) (Term var)
+  | Or (List (Constraint var))
 
 
 {-| The collection of variable states and the currently known
@@ -128,18 +129,19 @@ registerConstraint constraint vars (State st) =
 {-| Get the variables present in a constraint, with duplicates removed.
 -}
 variables : Constraint var -> List var
-variables constraint =
+variables =
   let
-    terms =
+    termsInConstraint constraint =
       case constraint of
         LessThan left right -> [left, right]
+        Or subcons -> List.concatMap termsInConstraint subcons
     variablesInTerm term =
       case term of
         Constant _ -> []
         Variable var -> [var]
         Add terms -> List.concatMap variablesInTerm terms
   in
-    List.concatMap variablesInTerm terms
+    List.concatMap variablesInTerm << termsInConstraint
 
 
 {-| Update the possible values of variables given the worklist of
@@ -235,6 +237,8 @@ evaluateConstraint env constraint =
   case constraint of
     LessThan left right ->
       evaluateTerm env left < evaluateTerm env right
+    Or subcons ->
+      List.any (evaluateConstraint env) subcons
 
 
 {-| Evaluate a term under a given variable assignment.

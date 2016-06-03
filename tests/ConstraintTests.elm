@@ -89,6 +89,17 @@ singleConstrainSuite =
           in
             List.map test ["x", "y", "z"]
 
+      , ElmTest.test "Or (LessThan x 3) (LessThan 7 x)" <|
+          let
+            small =
+              Constraint.LessThan (Constraint.Variable "x") (Constraint.Constant 3)
+            large =
+              Constraint.LessThan (Constraint.Constant 7) (Constraint.Variable "x")
+            state =
+              Constraint.constrain (Constraint.Or [small, large]) initialState
+          in
+            ElmTest.assertEqual (Set.fromList [1, 2, 8, 9, 10]) (Constraint.possibleValues "x" state)
+
       , ElmTest.test "does not introduce new variables" <|
           let
             state =
