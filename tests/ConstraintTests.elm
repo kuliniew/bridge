@@ -95,6 +95,11 @@ constrainSuite =
         ( List.map (\var -> (var, Set.fromList [1, 3, 5])) ["x", "y", "z"] )
 
     , constrainTest
+        "x == 3"
+        [ Constraint.Equal (Constraint.Variable "x") (Constraint.Constant 3) ]
+        [ ("x", Set.singleton 3) ]
+
+    , constrainTest
         "missing"
         [ Constraint.LessThan (Constraint.Variable "missing") (Constraint.Constant 5) ]
         [ ("missing", Set.empty) ]
