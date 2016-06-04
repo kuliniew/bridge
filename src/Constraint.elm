@@ -41,6 +41,7 @@ type Constraint var
   | Permutation (List (Term var)) (List (Term var))
   | Or (List (Constraint var))
   | And (List (Constraint var))
+  | Not (Constraint var)
 
 
 {-| The collection of variable states and the currently known
@@ -141,6 +142,7 @@ variables =
         Permutation left right -> left ++ right
         Or subcons -> List.concatMap termsInConstraint subcons
         And subcons -> List.concatMap termsInConstraint subcons
+        Not subcon -> termsInConstraint subcon
     variablesInTerm term =
       case term of
         Constant _ -> []
@@ -251,6 +253,8 @@ evaluateConstraint env constraint =
       List.any (evaluateConstraint env) subcons
     And subcons ->
       List.all (evaluateConstraint env) subcons
+    Not subcon ->
+      not <| evaluateConstraint env subcon
 
 
 {-| Evaluate a term under a given variable assignment.

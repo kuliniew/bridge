@@ -108,6 +108,16 @@ constrainSuite =
         [ ("x", Set.fromList [3, 7, 8]) ]
 
     , constrainTest
+        "!((3 < x) && (x < 7))"
+        [ Constraint.Not <|
+            Constraint.And
+              [ Constraint.LessThan (Constraint.Constant 3) (Constraint.Variable "x")
+              , Constraint.LessThan (Constraint.Variable "x") (Constraint.Constant 7)
+              ]
+        ]
+        [ ("x", Set.fromList [1, 2, 3, 7, 8, 9, 10]) ]
+
+    , constrainTest
         "Permutation [x, y, z] [1, 3, 5]"
         [ Constraint.Permutation
             (List.map Constraint.Variable ["x", "y", "z"])
