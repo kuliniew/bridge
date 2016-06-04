@@ -37,6 +37,7 @@ type Term var
 -}
 type Constraint var
   = LessThan (Term var) (Term var)
+  | Permutation (List (Term var)) (List (Term var))
   | Or (List (Constraint var))
 
 
@@ -134,6 +135,7 @@ variables =
     termsInConstraint constraint =
       case constraint of
         LessThan left right -> [left, right]
+        Permutation left right -> left ++ right
         Or subcons -> List.concatMap termsInConstraint subcons
     variablesInTerm term =
       case term of
@@ -237,6 +239,8 @@ evaluateConstraint env constraint =
   case constraint of
     LessThan left right ->
       evaluateTerm env left < evaluateTerm env right
+    Permutation left right ->
+      List.map (evaluateTerm env) left `List.Extra.isPermutationOf` List.map (evaluateTerm env) right
     Or subcons ->
       List.any (evaluateConstraint env) subcons
 

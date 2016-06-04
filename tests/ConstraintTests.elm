@@ -87,6 +87,14 @@ constrainSuite =
         [ ("x", Set.fromList [1, 2, 8, 9, 10]) ]
 
     , constrainTest
+        "Permutation [x, y, z] [1, 3, 5]"
+        [ Constraint.Permutation
+            (List.map Constraint.Variable ["x", "y", "z"])
+            (List.map Constraint.Constant [1, 3, 5])
+        ]
+        ( List.map (\var -> (var, Set.fromList [1, 3, 5])) ["x", "y", "z"] )
+
+    , constrainTest
         "missing"
         [ Constraint.LessThan (Constraint.Variable "missing") (Constraint.Constant 5) ]
         [ ("missing", Set.empty) ]
@@ -126,7 +134,7 @@ constrainTest name constraints expected =
     state =
       List.foldl Constraint.constrain initialState constraints
     test (var, range) =
-      ElmTest.test var <| ElmTest.assertEqual range (Constraint.possibleValues var state)
+      ElmTest.test var <| ElmTest.assertEqual (Set.toList range) (Set.toList <| Constraint.possibleValues var state)
     tests =
       List.map test expected
   in
