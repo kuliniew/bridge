@@ -70,6 +70,21 @@ constrainSuite =
         [ ("x", Constraint.range 6 10) ]
 
     , constrainTest
+        "x > 5"
+        [ Constraint.GreaterThan (Constraint.Variable "x") (Constraint.Constant 5) ]
+        [ ("x", Constraint.range 6 10) ]
+
+    , constrainTest
+        "x <= 5"
+        [ Constraint.Maximum (Constraint.Variable "x") (Constraint.Constant 5) ]
+        [ ("x", Constraint.range 1 5) ]
+
+    , constrainTest
+        "x >= 5"
+        [ Constraint.Minimum (Constraint.Variable "x") (Constraint.Constant 5) ]
+        [ ("x", Constraint.range 5 10) ]
+
+    , constrainTest
         "x + y + z < 6"
         [ Constraint.LessThan
             (Constraint.Add <| List.map Constraint.Variable ["x", "y", "z"])

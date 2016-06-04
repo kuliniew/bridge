@@ -37,6 +37,9 @@ type Term var
 -}
 type Constraint var
   = LessThan (Term var) (Term var)
+  | GreaterThan (Term var) (Term var)
+  | Minimum (Term var) (Term var)
+  | Maximum (Term var) (Term var)
   | Equal (Term var) (Term var)
   | Permutation (List (Term var)) (List (Term var))
   | Or (List (Constraint var))
@@ -138,6 +141,9 @@ variables =
     termsInConstraint constraint =
       case constraint of
         LessThan left right -> [left, right]
+        GreaterThan left right -> [left, right]
+        Minimum left right -> [left, right]
+        Maximum left right -> [left, right]
         Equal left right -> [left, right]
         Permutation left right -> left ++ right
         Or subcons -> List.concatMap termsInConstraint subcons
@@ -245,6 +251,12 @@ evaluateConstraint env constraint =
   case constraint of
     LessThan left right ->
       evaluateTerm env left < evaluateTerm env right
+    GreaterThan left right ->
+      evaluateTerm env left > evaluateTerm env right
+    Minimum left right ->
+      evaluateTerm env left >= evaluateTerm env right
+    Maximum left right ->
+      evaluateTerm env left <= evaluateTerm env right
     Equal left right ->
       evaluateTerm env left == evaluateTerm env right
     Permutation left right ->
