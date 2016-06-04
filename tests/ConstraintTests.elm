@@ -12,6 +12,7 @@ all =
     [ possibleValuesSuite
     , rangeSuite
     , constrainSuite
+    , guaranteedSuite
     ]
 
 
@@ -195,3 +196,28 @@ constrainTest name constraints expected =
       List.map test expected
   in
     ElmTest.suite name tests
+
+
+guaranteedSuite : ElmTest.Test
+guaranteedSuite =
+  let
+    state =
+      Constraint.initialize [ ("x", Constraint.range 3 7) ]
+    greaterThan val =
+      Constraint.GreaterThan (Constraint.Variable "x") (Constraint.Constant val)
+    exactConstraint =
+      Constraint.And
+        [ Constraint.Minimum (Constraint.Variable "x") (Constraint.Constant 3)
+        , Constraint.Maximum (Constraint.Variable "x") (Constraint.Constant 7)
+        ]
+  in
+    ElmTest.suite "guaranteed"
+      [ ElmTest.test "not even possible" <|
+          ElmTest.assert <| not <| Constraint.guaranteed (greaterThan 8) state
+      , ElmTest.test "possible, but not guaranteed" <|
+          ElmTest.assert <| not <| Constraint.guaranteed (greaterThan 5) state
+      , ElmTest.test "guaranteed exactly" <|
+          ElmTest.assert <| Constraint.guaranteed exactConstraint state
+      , ElmTest.test "guaranteed and overconstrained" <|
+          ElmTest.assert <| Constraint.guaranteed (greaterThan 2) state
+      ]

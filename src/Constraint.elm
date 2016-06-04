@@ -8,6 +8,7 @@ module Constraint exposing
   , range
   , possibleValues
   , constrain
+  , guaranteed
   )
 
 {-| Model for bounded integer variables constrainted by relationships
@@ -306,3 +307,21 @@ takeWorkItem worklist =
       Nothing
     item :: rest ->
       Just (item, DictSet.remove item worklist)
+
+
+{-| Check if a constraint is consistent with existing constraints.
+-}
+possible : Constraint var -> State var -> Bool
+possible constraint state =
+  let
+    (State newSt) = constrain constraint state
+  in
+    List.all (not << Set.isEmpty) <| EveryDict.values newSt.variables
+
+
+{-| Check if a constraint is guaranteed to be satisfied by existing
+constraints.
+-}
+guaranteed : Constraint var -> State var -> Bool
+guaranteed constraint state =
+  not <| possible (Not constraint) state
