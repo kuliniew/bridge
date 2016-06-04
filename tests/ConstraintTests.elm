@@ -174,6 +174,11 @@ constrainSuite =
         [ ("x", Constraint.range 2 7)
         , ("y", Constraint.range 1 6)
         ]
+
+    , constrainTest
+        "true"
+        [ Constraint.Null ]
+        [ ("x", Constraint.range 1 10) ]
     ]
 
 

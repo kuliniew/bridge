@@ -45,6 +45,7 @@ type Constraint var
   | Or (List (Constraint var))
   | And (List (Constraint var))
   | Not (Constraint var)
+  | Null
 
 
 {-| The collection of variable states and the currently known
@@ -149,6 +150,7 @@ variables =
         Or subcons -> List.concatMap termsInConstraint subcons
         And subcons -> List.concatMap termsInConstraint subcons
         Not subcon -> termsInConstraint subcon
+        Null -> []
     variablesInTerm term =
       case term of
         Constant _ -> []
@@ -267,6 +269,8 @@ evaluateConstraint env constraint =
       List.all (evaluateConstraint env) subcons
     Not subcon ->
       not <| evaluateConstraint env subcon
+    Null ->
+      True
 
 
 {-| Evaluate a term under a given variable assignment.
