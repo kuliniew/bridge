@@ -32,6 +32,7 @@ type Term var
   = Constant Int
   | Variable var
   | Add (List (Term var))
+  | Multiply (List (Term var))
   | Negate (Term var)
 
 
@@ -158,6 +159,7 @@ variables =
         Constant _ -> []
         Variable var -> [var]
         Add terms -> List.concatMap variablesInTerm terms
+        Multiply terms -> List.concatMap variablesInTerm terms
         Negate subterm -> variablesInTerm subterm
   in
     List.concatMap variablesInTerm << termsInConstraint
@@ -289,6 +291,8 @@ evaluateTerm env term =
         Nothing -> Debug.crash <| "can't evaluate undefined variable " ++ toString var
     Add terms ->
       List.sum <| List.map (evaluateTerm env) terms
+    Multiply terms ->
+      List.product <| List.map (evaluateTerm env) terms
     Negate subterm ->
       negate <| evaluateTerm env subterm
 

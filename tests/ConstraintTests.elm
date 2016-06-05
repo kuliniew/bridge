@@ -94,6 +94,16 @@ constrainSuite =
         ( List.map (\var -> (var, Constraint.range 1 3)) ["x", "y", "z"] )
 
     , constrainTest
+        "x > 1 ; y > 1 ; x * y < 10"
+        [ Constraint.GreaterThan (Constraint.Variable "x") (Constraint.Constant 1)
+        , Constraint.GreaterThan (Constraint.Variable "y") (Constraint.Constant 1)
+        , Constraint.LessThan
+            (Constraint.Multiply <| List.map Constraint.Variable ["x", "y"])
+            (Constraint.Constant 10)
+        ]
+        ( List.map (\var -> (var, Constraint.range 2 4)) ["x", "y"] )
+
+    , constrainTest
         "(x < 3) || (7 < x)"
         [ Constraint.Or
             [ Constraint.LessThan (Constraint.Variable "x") (Constraint.Constant 3)
