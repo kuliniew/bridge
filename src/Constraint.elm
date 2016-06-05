@@ -32,6 +32,7 @@ type Term var
   = Constant Int
   | Variable var
   | Add (List (Term var))
+  | Negate (Term var)
 
 
 {-| An individual constraint over terms.
@@ -157,6 +158,7 @@ variables =
         Constant _ -> []
         Variable var -> [var]
         Add terms -> List.concatMap variablesInTerm terms
+        Negate subterm -> variablesInTerm subterm
   in
     List.concatMap variablesInTerm << termsInConstraint
 
@@ -287,6 +289,8 @@ evaluateTerm env term =
         Nothing -> Debug.crash <| "can't evaluate undefined variable " ++ toString var
     Add terms ->
       List.sum <| List.map (evaluateTerm env) terms
+    Negate subterm ->
+      negate <| evaluateTerm env subterm
 
 
 {-| Find the variables that have different ranges between two

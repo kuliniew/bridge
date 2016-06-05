@@ -147,6 +147,16 @@ constrainSuite =
         [ ("x", Set.singleton 3) ]
 
     , constrainTest
+        "x == 5 + (-y)"
+        [ Constraint.Equal
+            (Constraint.Variable "x")
+            (Constraint.Add [Constraint.Constant 5, Constraint.Negate <| Constraint.Variable "y"] )
+        ]
+        [ ("x", Constraint.range 1 4)
+        , ("y", Constraint.range 1 4)
+        ]
+
+    , constrainTest
         "missing"
         [ Constraint.LessThan (Constraint.Variable "missing") (Constraint.Constant 5) ]
         [ ("missing", Set.empty) ]
