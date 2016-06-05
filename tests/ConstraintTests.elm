@@ -167,6 +167,14 @@ constrainSuite =
         ]
 
     , constrainTest
+        "x = 3 ; y = 5 ; z = max(x,y)"
+        [ Constraint.Equal (Constraint.Variable "x") (Constraint.Constant 3)
+        , Constraint.Equal (Constraint.Variable "y") (Constraint.Constant 5)
+        , Constraint.Equal (Constraint.Variable "z") (Constraint.Max <| List.map Constraint.Variable ["x", "y"])
+        ]
+        [ ("z", Set.singleton 5) ]
+
+    , constrainTest
         "missing"
         [ Constraint.LessThan (Constraint.Variable "missing") (Constraint.Constant 5) ]
         [ ("missing", Set.empty) ]

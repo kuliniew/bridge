@@ -33,6 +33,7 @@ type Term var
   | Variable var
   | Add (List (Term var))
   | Multiply (List (Term var))
+  | Max (List (Term var))
   | Negate (Term var)
 
 
@@ -160,6 +161,7 @@ variables =
         Variable var -> [var]
         Add terms -> List.concatMap variablesInTerm terms
         Multiply terms -> List.concatMap variablesInTerm terms
+        Max terms -> List.concatMap variablesInTerm terms
         Negate subterm -> variablesInTerm subterm
   in
     List.concatMap variablesInTerm << termsInConstraint
@@ -293,6 +295,10 @@ evaluateTerm env term =
       List.sum <| List.map (evaluateTerm env) terms
     Multiply terms ->
       List.product <| List.map (evaluateTerm env) terms
+    Max terms ->
+      case List.maximum <| List.map (evaluateTerm env) terms of
+        Just result -> result
+        Nothing -> Debug.crash "tried to take Max of an empty list"
     Negate subterm ->
       negate <| evaluateTerm env subterm
 
