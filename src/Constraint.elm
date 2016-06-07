@@ -224,20 +224,14 @@ cartesianProduct vars =
     expand pairs =
       case pairs of
         [] ->
-          []
+          [EveryDict.empty]
         (var, values) :: rest ->
           let
             assignments = List.map (\val -> (var, val)) (Set.toList values)
           in
-            case rest of
-              [] ->
-                List.map (\assn -> [assn]) assignments
-              _ ->
-                List.concatMap (\others -> List.map (\assn -> assn :: others) assignments) (expand rest)
+            List.concatMap (\others -> List.map (\(var, val) -> EveryDict.insert var val others) assignments) (expand rest)
   in
-    EveryDict.toList vars
-      |> expand
-      |> List.map EveryDict.fromList
+    expand <| EveryDict.toList vars
 
 
 {-| Convert a list of possible variable assignments to a map
