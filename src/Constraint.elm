@@ -201,15 +201,15 @@ enforceConstraint constraint (State st) =
       in
         xs
     vars =
-      variables (Debug.log "enforcing" constraint)
+      DictSet.fromList toString <| variables (Debug.log "enforcing" constraint)
     updatedVariables =
       st.variables
-        |> EveryDict.filter (\var _ -> List.member var vars)
+        |> EveryDict.filter (\var _ -> DictSet.member var vars)
         |> cartesianProduct
         |> spy "before filtering"
         |> List.filter (flip evaluateConstraint constraint)
         |> spy "after filtering"
-        |> unCartesianProduct vars
+        |> unCartesianProduct (DictSet.toList vars)
         |> flip EveryDict.union st.variables
   in
     State { st | variables = updatedVariables }
