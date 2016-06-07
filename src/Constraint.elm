@@ -205,6 +205,7 @@ enforceConstraint constraint (State st) =
     updatedVariables =
       st.variables
         |> EveryDict.filter (\var _ -> DictSet.member var vars)
+        |> Debug.log "taking cartesian product of"
         |> cartesianProduct
         |> spy "before filtering"
         |> List.filter (flip evaluateConstraint constraint)
