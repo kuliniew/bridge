@@ -308,8 +308,14 @@ snapshots of the state.
 -}
 changedVariables : State var -> State var -> List var
 changedVariables (State oldSt) (State newSt) =
-  EveryDict.keys oldSt.variables
-    |> List.filter (\var -> EveryDict.get var oldSt.variables /= EveryDict.get var newSt.variables)
+  let
+    values var state =
+      case EveryDict.get var state.variables of
+        Just set -> Set.toList set
+        Nothing -> []
+  in
+    EveryDict.keys oldSt.variables
+      |> List.filter (\var -> values var oldSt /= values var newSt)
 
 
 {-| Take an arbitrary item out of a work list.
