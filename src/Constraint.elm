@@ -112,7 +112,7 @@ constraintsWith var (State st) =
 constrain : Constraint var -> State var -> State var
 constrain constraint (State st) =
   let
-    vars = variables constraint
+    vars = variables (Debug.log "new constraint" constraint)
     worklist = DictSet.singleton toString constraint
   in
     if
@@ -180,7 +180,7 @@ updateVariables worklist state =
         state' =
           enforceConstraint item state
         changes =
-          changedVariables state state'
+          Debug.log "changed variables" <| changedVariables state state'
         worklist' =
           List.map (\var -> constraintsWith var state') changes
             |> List.foldl DictSet.union (DictSet.empty toString)
@@ -195,13 +195,20 @@ updateVariables worklist state =
 enforceConstraint : Constraint var -> State var -> State var
 enforceConstraint constraint (State st) =
   let
+    spy tag xs =
+      let
+        _ = Debug.log tag (List.length xs)
+      in
+        xs
     vars =
-      variables constraint
+      variables (Debug.log "enforcing" constraint)
     updatedVariables =
       st.variables
         |> EveryDict.filter (\var _ -> List.member var vars)
         |> cartesianProduct
+        |> spy "before filtering"
         |> List.filter (flip evaluateConstraint constraint)
+        |> spy "after filtering"
         |> unCartesianProduct vars
         |> flip EveryDict.union st.variables
   in

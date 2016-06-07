@@ -1,4 +1,13 @@
-module Seat exposing (Seat (..), seats, next, Each, lookup)
+module Seat exposing
+  ( Seat (..)
+  , seats
+  , next
+  , Each
+  , lookup
+
+  , Relative (..)
+  , relatives
+  )
 
 
 type Seat
@@ -41,3 +50,19 @@ lookup seat each =
     North -> each.north
     East -> each.east
     South -> each.south
+
+
+{-| Relative-position seats.
+-}
+type Relative
+  = Self
+  | LeftOpponent
+  | Partner
+  | RightOpponent
+
+
+{-| List of all relative-position seats.
+-}
+relatives : List Relative
+relatives =
+  [ Self, LeftOpponent, Partner, RightOpponent ]
