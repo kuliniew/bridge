@@ -207,7 +207,7 @@ enforceConstraint constraint state =
         then Just found
         else Nothing
   in
-    case constraint of
+    case Debug.log "enforcing" constraint of
       Equal (Constant sum) (Add terms) ->
         case allVars terms of
           Just vars -> enforceVariableSumEquality sum vars state
@@ -254,7 +254,7 @@ enforceConstraintNaive constraint (State st) =
       in
         xs
     vars =
-      DictSet.fromList toString <| variables (Debug.log "enforcing" constraint)
+      DictSet.fromList toString <| variables constraint
     updatedVariables =
       st.variables
         |> EveryDict.filter (\var _ -> DictSet.member var vars)
