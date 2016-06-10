@@ -193,7 +193,60 @@ updateVariables worklist state =
 {-| Enforce a single constraint on the existing state.
 -}
 enforceConstraint : Constraint var -> State var -> State var
-enforceConstraint constraint (State st) =
+enforceConstraint constraint state =
+  let
+    extractVar term =
+      case term of
+        Variable var -> Just var
+        _ -> Nothing
+    allVars terms =
+      let
+        found = List.filterMap extractVar terms
+      in
+        if List.length found == List.length terms
+        then Just found
+        else Nothing
+  in
+    case constraint of
+      Equal (Constant sum) (Add terms) ->
+        case allVars terms of
+          Just vars -> enforceVariableSumEquality sum vars state
+          Nothing -> enforceConstraintNaive constraint state
+      Equal (Add terms) (Constant sum) ->
+        case allVars terms of
+          Just vars -> enforceVariableSumEquality sum vars state
+          Nothing -> enforceConstraintNaive constraint state
+      _ ->
+        enforceConstraintNaive constraint state
+
+
+{-| Enforce a list of variables to add up to a specific value.
+-}
+enforceVariableSumEquality : Int -> List var -> State var -> State var
+enforceVariableSumEquality sum vars state =
+  let
+    minSum =
+      List.sum <| List.filterMap (flip smallestValue state) vars
+    maxSum =
+      List.sum <| List.filterMap (flip largestValue state) vars
+    (State st) =
+      state
+    keep smallest largest value =
+      value + (minSum - smallest) <= sum && value + (maxSum - largest) >= sum
+    updateVar var vars =
+      case (possibleValues var state, smallestValue var state, largestValue var state) of
+        (range, Just smallest, Just largest) ->
+          EveryDict.insert var (Set.filter (keep smallest largest) range) vars
+        _ ->
+          vars
+  in
+    State { st | variables = List.foldl updateVar st.variables vars }
+
+
+{-| Enforce a single constraint using a naive but general algorithm.
+-}
+enforceConstraintNaive : Constraint var -> State var -> State var
+enforceConstraintNaive constraint (State st) =
   let
     spy tag xs =
       let

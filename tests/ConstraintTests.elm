@@ -4,6 +4,7 @@ import Constraint
 
 import ElmTest
 import Set exposing (Set)
+import String
 
 
 all : ElmTest.Test
@@ -60,32 +61,32 @@ rangeSuite =
 constrainSuite : ElmTest.Test
 constrainSuite =
   ElmTest.suite "constrain"
-    [ constrainTest
+    [ standardConstrainTest
         "x < 5"
         [ Constraint.LessThan (Constraint.Variable "x") (Constraint.Constant 5) ]
         [  ("x", Constraint.range 1 4) ]
 
-    , constrainTest
+    , standardConstrainTest
         "5 < x"
         [ Constraint.LessThan (Constraint.Constant 5) (Constraint.Variable "x") ]
         [ ("x", Constraint.range 6 10) ]
 
-    , constrainTest
+    , standardConstrainTest
         "x > 5"
         [ Constraint.GreaterThan (Constraint.Variable "x") (Constraint.Constant 5) ]
         [ ("x", Constraint.range 6 10) ]
 
-    , constrainTest
+    , standardConstrainTest
         "x <= 5"
         [ Constraint.Maximum (Constraint.Variable "x") (Constraint.Constant 5) ]
         [ ("x", Constraint.range 1 5) ]
 
-    , constrainTest
+    , standardConstrainTest
         "x >= 5"
         [ Constraint.Minimum (Constraint.Variable "x") (Constraint.Constant 5) ]
         [ ("x", Constraint.range 5 10) ]
 
-    , constrainTest
+    , standardConstrainTest
         "x + y + z < 6"
         [ Constraint.LessThan
             (Constraint.Add <| List.map Constraint.Variable ["x", "y", "z"])
@@ -93,7 +94,7 @@ constrainSuite =
         ]
         ( List.map (\var -> (var, Constraint.range 1 3)) ["x", "y", "z"] )
 
-    , constrainTest
+    , standardConstrainTest
         "x > 1 ; y > 1 ; x * y < 10"
         [ Constraint.GreaterThan (Constraint.Variable "x") (Constraint.Constant 1)
         , Constraint.GreaterThan (Constraint.Variable "y") (Constraint.Constant 1)
@@ -103,7 +104,7 @@ constrainSuite =
         ]
         ( List.map (\var -> (var, Constraint.range 2 4)) ["x", "y"] )
 
-    , constrainTest
+    , standardConstrainTest
         "(x < 3) || (7 < x)"
         [ Constraint.Or
             [ Constraint.LessThan (Constraint.Variable "x") (Constraint.Constant 3)
@@ -112,7 +113,7 @@ constrainSuite =
         ]
         [ ("x", Set.fromList [1, 2, 8, 9, 10]) ]
 
-    , constrainTest
+    , standardConstrainTest
         "(3 < x) && (x < 7)"
         [ Constraint.And
             [ Constraint.LessThan (Constraint.Constant 3) (Constraint.Variable "x")
@@ -121,7 +122,7 @@ constrainSuite =
         ]
         [ ("x", Set.fromList [4, 5, 6]) ]
 
-    , constrainTest
+    , standardConstrainTest
         "(x == 3) || (6 < x && x < 9)"
         [ Constraint.Or
             [ Constraint.Equal (Constraint.Variable "x") (Constraint.Constant 3)
@@ -133,7 +134,7 @@ constrainSuite =
         ]
         [ ("x", Set.fromList [3, 7, 8]) ]
 
-    , constrainTest
+    , standardConstrainTest
         "!((3 < x) && (x < 7))"
         [ Constraint.Not <|
             Constraint.And
@@ -143,7 +144,7 @@ constrainSuite =
         ]
         [ ("x", Set.fromList [1, 2, 3, 7, 8, 9, 10]) ]
 
-    , constrainTest
+    , standardConstrainTest
         "Permutation [x, y, z] [1, 3, 5]"
         [ Constraint.Permutation
             (List.map Constraint.Variable ["x", "y", "z"])
@@ -151,12 +152,12 @@ constrainSuite =
         ]
         ( List.map (\var -> (var, Set.fromList [1, 3, 5])) ["x", "y", "z"] )
 
-    , constrainTest
+    , standardConstrainTest
         "x == 3"
         [ Constraint.Equal (Constraint.Variable "x") (Constraint.Constant 3) ]
         [ ("x", Set.singleton 3) ]
 
-    , constrainTest
+    , standardConstrainTest
         "x == 5 + (-y)"
         [ Constraint.Equal
             (Constraint.Variable "x")
@@ -166,7 +167,7 @@ constrainSuite =
         , ("y", Constraint.range 1 4)
         ]
 
-    , constrainTest
+    , standardConstrainTest
         "x = 3 ; y = 5 ; z = max(x,y)"
         [ Constraint.Equal (Constraint.Variable "x") (Constraint.Constant 3)
         , Constraint.Equal (Constraint.Variable "y") (Constraint.Constant 5)
@@ -174,19 +175,19 @@ constrainSuite =
         ]
         [ ("z", Set.singleton 5) ]
 
-    , constrainTest
+    , standardConstrainTest
         "missing"
         [ Constraint.LessThan (Constraint.Variable "missing") (Constraint.Constant 5) ]
         [ ("missing", Set.empty) ]
 
-    , constrainTest
+    , standardConstrainTest
         "(3 < x) ; (x < 8)"
         [ Constraint.LessThan (Constraint.Constant 3) (Constraint.Variable "x")
         , Constraint.LessThan (Constraint.Variable "x") (Constraint.Constant 8)
         ]
         [ ("x", Constraint.range 4 7) ]
 
-    , constrainTest
+    , standardConstrainTest
         "(x < 8) ; (y < x)"
         [ Constraint.LessThan (Constraint.Variable "x") (Constraint.Constant 8)
         , Constraint.LessThan (Constraint.Variable "y") (Constraint.Variable "x")
@@ -195,7 +196,7 @@ constrainSuite =
         , ("y", Constraint.range 1 6)
         ]
 
-    , constrainTest
+    , standardConstrainTest
         "(y < x) ; (x < 8)"
         [ Constraint.LessThan (Constraint.Variable "y") (Constraint.Variable "x")
         , Constraint.LessThan (Constraint.Variable "x") (Constraint.Constant 8)
@@ -204,18 +205,77 @@ constrainSuite =
         , ("y", Constraint.range 1 6)
         ]
 
-    , constrainTest
+    , standardConstrainTest
         "true"
         [ Constraint.Null ]
         [ ("x", Constraint.range 1 10) ]
+
+    , largeConstrainTest
+        "100 = sum(a .. z)"
+        [ Constraint.Equal
+            (Constraint.Constant 100)
+            (Constraint.Add largeConstrainTestVars)
+        ]
+        (List.map (\var -> (var, Constraint.range 1 75)) largeConstrainTestVarNames)
+
+    , largeConstrainTest
+        "sum(a .. z) = 100"
+        [ Constraint.Equal
+            (Constraint.Add largeConstrainTestVars)
+            (Constraint.Constant 100)
+        ]
+        (List.map (\var -> (var, Constraint.range 1 75)) largeConstrainTestVarNames)
+
+    , largeConstrainTest
+        "(100 = sum(a .. z)) ; (a = 15)"
+        [ Constraint.Equal
+            (Constraint.Constant 100)
+            (Constraint.Add largeConstrainTestVars)
+        , Constraint.Equal
+            (Constraint.Variable "a")
+            (Constraint.Constant 15)
+        ]
+        (("a", Set.singleton 15) :: List.map (\var -> (var, Constraint.range 1 61)) (Maybe.withDefault [] <| List.tail largeConstrainTestVarNames))
+
+    , largeConstrainTest
+        "2590 = sum(a .. z)"
+        [ Constraint.Equal
+            (Constraint.Constant 2590)
+            (Constraint.Add largeConstrainTestVars)
+        ]
+        (List.map (\var -> (var, Constraint.range 90 100)) largeConstrainTestVarNames)
+
+    , largeConstrainTest
+        "sum(a .. z) = 2590"
+        [ Constraint.Equal
+            (Constraint.Add largeConstrainTestVars)
+            (Constraint.Constant 2590)
+        ]
+        (List.map (\var -> (var, Constraint.range 90 100)) largeConstrainTestVarNames)
     ]
 
 
-constrainTest : String -> List (Constraint.Constraint String) -> List (String, Constraint.Range) -> ElmTest.Test
-constrainTest name constraints expected =
+standardConstrainTest : String -> List (Constraint.Constraint String) -> List (String, Constraint.Range) -> ElmTest.Test
+standardConstrainTest = constrainTest "xyz" (Constraint.range 1 10)
+
+
+largeConstrainTest : String -> List (Constraint.Constraint String) -> List (String, Constraint.Range) -> ElmTest.Test
+largeConstrainTest = constrainTest (String.join "" largeConstrainTestVarNames) (Constraint.range 1 100)
+
+
+largeConstrainTestVars : List (Constraint.Term String)
+largeConstrainTestVars = List.map Constraint.Variable largeConstrainTestVarNames
+
+
+largeConstrainTestVarNames : List String
+largeConstrainTestVarNames = String.split "" "abcdefghijklmnopqrstuvwxyz"
+
+
+constrainTest : String -> Constraint.Range -> String -> List (Constraint.Constraint String) -> List (String, Constraint.Range) -> ElmTest.Test
+constrainTest vars initialRange name constraints expected =
   let
     initialState =
-      Constraint.initialize <| List.map (\var -> (var, Constraint.range 1 10)) ["x", "y", "z"]
+      Constraint.initialize <| List.map (\var -> (var, initialRange)) (String.split "" vars)
     state =
       List.foldl Constraint.constrain initialState constraints
     test (var, range) =
