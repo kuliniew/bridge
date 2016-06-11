@@ -46,15 +46,21 @@ type alias Knowledge =
 baseKnowledge : Knowledge
 baseKnowledge =
   let
+    maxHighCardPoints =
+      37   {- 4 aces, 4 kings, 4 queens, 1 jack -}
+    maxLengthPoints =
+      9    {- 13 cards in one suit -}
+    maxShortnessPoints =
+      9    {- 3 void suits -}
     basicMetrics =
-      [ (HighCardPoints, Constraint.range 0 40)
-      , (LengthPoints, Constraint.range 0 9)
-      , (UncommittedPoints, Constraint.range 0 49)
+      [ (HighCardPoints, Constraint.range 0 maxHighCardPoints)
+      , (LengthPoints, Constraint.range 0 maxLengthPoints)
+      , (UncommittedPoints, Constraint.range 0 (maxHighCardPoints + maxLengthPoints))
       , (PlayingTricks, Constraint.range 0 13)
       ]
     suitMetrics =
-      [ (ShortnessPointsWithTrump, Constraint.range 0 9)
-      , (PointsWithTrump, Constraint.range 0 9)
+      [ (ShortnessPointsWithTrump, Constraint.range 0 maxShortnessPoints)
+      , (PointsWithTrump, Constraint.range 0 (maxHighCardPoints + maxShortnessPoints))
       , (Length, Constraint.range 0 13)
       , (QuickLosers, Constraint.range 0 13)
       ]
@@ -176,7 +182,7 @@ highCardPointsDefinition seat =
       , (1, Card.Jack)
       ]
     component (factor, rank) =
-      Constraint.Multiply [Constraint.Constant 4, Constraint.Variable <| Var seat (CountRank rank)]
+      Constraint.Multiply [Constraint.Constant factor, Constraint.Variable <| Var seat (CountRank rank)]
   in
     Constraint.Equal
       (Constraint.Add <| List.map component factors)
