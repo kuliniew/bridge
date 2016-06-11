@@ -252,6 +252,22 @@ constrainSuite =
             (Constraint.Constant 2590)
         ]
         (List.map (\var -> (var, Constraint.range 90 100)) largeConstrainTestVarNames)
+
+    , largeConstrainTest
+        "-100 = sum(-a .. -z)"
+        [ Constraint.Equal
+            (Constraint.Constant (-100))
+            (Constraint.Add <| List.map Constraint.Negate largeConstrainTestVars)
+        ]
+        (List.map (\var -> (var, Constraint.range 1 75)) largeConstrainTestVarNames)
+
+    , largeConstrainTest
+        "sum(-a .. -z) = -100"
+        [ Constraint.Equal
+            (Constraint.Add <| List.map Constraint.Negate largeConstrainTestVars)
+            (Constraint.Constant (-100))
+        ]
+        (List.map (\var -> (var, Constraint.range 1 75)) largeConstrainTestVarNames)
     ]
 
 

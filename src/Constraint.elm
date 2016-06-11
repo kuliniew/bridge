@@ -210,53 +210,94 @@ debugChanges vars oldState newState  =
 -}
 enforceConstraint : Constraint var -> State var -> State var
 enforceConstraint constraint state =
-  let
-    extractVar term =
-      case term of
-        Variable var -> Just var
-        _ -> Nothing
-    allVars terms =
-      let
-        found = List.filterMap extractVar terms
-      in
-        if List.length found == List.length terms
-        then Just found
-        else Nothing
-  in
-    case Debug.log "enforcing" constraint of
-      Equal (Constant sum) (Add terms) ->
-        case allVars terms of
-          Just vars -> enforceVariableSumEquality sum vars state
-          Nothing -> enforceConstraintNaive constraint state
-      Equal (Add terms) (Constant sum) ->
-        case allVars terms of
-          Just vars -> enforceVariableSumEquality sum vars state
-          Nothing -> enforceConstraintNaive constraint state
-      _ ->
-        enforceConstraintNaive constraint state
+  case Debug.log "enforcing" constraint of
+    Equal (Constant sum) (Add terms) ->
+      if List.all isSingleVariableTerm terms
+      then enforceSumEquality sum terms state
+      else enforceConstraintNaive constraint state
+    Equal (Add terms) (Constant sum) ->
+      if List.all isSingleVariableTerm terms
+      then enforceSumEquality sum terms state
+      else enforceConstraintNaive constraint state
+    _ ->
+      enforceConstraintNaive constraint state
 
 
-{-| Enforce a list of variables to add up to a specific value.
+{-| Check if a term is over a single variable.
 -}
-enforceVariableSumEquality : Int -> List var -> State var -> State var
-enforceVariableSumEquality sum vars state =
+isSingleVariableTerm : Term var -> Bool
+isSingleVariableTerm term =
+  case term of
+    Variable _ ->
+      True
+    Negate subterm ->
+      isSingleVariableTerm subterm
+    _ ->
+      False
+
+
+{-| Get the current bounds of a single-variable term.
+-}
+getSingleVariableTermBounds : State var -> Term var -> (Int, Int)
+getSingleVariableTermBounds state term =
+  case term of
+    Variable var ->
+      case (smallestValue var state, largestValue var state) of
+        (Just lower, Just upper) -> (lower, upper)
+        _ -> Debug.crash <| "couldn't get bounds for variable " ++ toString var
+    Negate subterm ->
+      let
+        (subtermMin, subtermMax) = getSingleVariableTermBounds state subterm
+      in
+        (-subtermMax, -subtermMin)
+    _ ->
+      Debug.crash <| "not a single-term variable: " ++ toString term
+
+
+{-| Enforce the bounds of a single-variable term.
+-}
+enforceSingleVariableTermBounds : (Int, Int) -> Term var -> EveryDict var Range -> EveryDict var Range
+enforceSingleVariableTermBounds (newLowerBound, newUpperBound) term vars =
+  case term of
+    Variable var ->
+      let
+        update old =
+          case old of
+            Just oldRange ->
+              Just <| Set.filter (\val -> newLowerBound <= val && val <= newUpperBound) oldRange
+            Nothing ->
+              Nothing
+      in
+        EveryDict.update var update vars
+    Negate subterm ->
+      enforceSingleVariableTermBounds (-newUpperBound, -newLowerBound) subterm vars
+    _ ->
+      Debug.crash <| "not a single-term variable: " ++ toString term
+
+
+{-| Enforce a list of single-variable terms to add up to a specific value.
+-}
+enforceSumEquality : Int -> List (Term var) -> State var -> State var
+enforceSumEquality sum terms state =
   let
-    minSum =
-      List.sum <| List.filterMap (flip smallestValue state) vars
-    maxSum =
-      List.sum <| List.filterMap (flip largestValue state) vars
     (State st) =
       state
-    keep smallest largest value =
-      value + (minSum - smallest) <= sum && value + (maxSum - largest) >= sum
-    updateVar var vars =
-      case (possibleValues var state, smallestValue var state, largestValue var state) of
-        (range, Just smallest, Just largest) ->
-          EveryDict.insert var (Set.filter (keep smallest largest) range) vars
-        _ ->
-          vars
+    addPairwise (x1, y1) (x2, y2) =
+      (x1 + x2, y1 + y2)
+    (minSum, maxSum) =
+      List.foldl addPairwise (0, 0) <| List.map (getSingleVariableTermBounds state) terms
+    updateTerm term vars =
+      let
+        (oldLowerBound, oldUpperBound) =
+          getSingleVariableTermBounds state term
+        newLowerBound =
+          sum - (maxSum - oldUpperBound)
+        newUpperBound =
+          sum - (minSum - oldLowerBound)
+      in
+        enforceSingleVariableTermBounds (newLowerBound, newUpperBound) term vars
   in
-    State { st | variables = List.foldl updateVar st.variables vars }
+    State { st | variables = List.foldl updateTerm st.variables terms }
 
 
 {-| Enforce a single constraint using a naive but general algorithm.
