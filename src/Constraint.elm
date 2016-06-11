@@ -180,7 +180,9 @@ updateVariables worklist state =
         state' =
           enforceConstraint item state
         changes =
-          Debug.log "changed variables" <| changedVariables state state'
+          changedVariables state state'
+        _ =
+          debugChanges changes state state'
         worklist' =
           List.map (\var -> constraintsWith var state') changes
             |> List.foldl DictSet.union (DictSet.empty toString)
@@ -188,6 +190,20 @@ updateVariables worklist state =
             |> DictSet.union rest
       in
         updateVariables worklist' state'
+
+
+debugChanges : List var -> State var -> State var -> State var
+debugChanges vars oldState newState  =
+  case vars of
+    [] ->
+      newState
+    var :: rest ->
+      let
+        _ = Debug.log "  new" <| possibleValues var newState
+        _ = Debug.log "  old" <| possibleValues var oldState
+        _ = Debug.log "var" var
+      in
+        debugChanges rest oldState newState
 
 
 {-| Enforce a single constraint on the existing state.
