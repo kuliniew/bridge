@@ -1,6 +1,5 @@
 module Tests exposing (all)
 
-{-
 import AuctionTests
 import Bidding.GerberTests
 import Bidding.JacobyTransferTests
@@ -10,12 +9,10 @@ import BiddingTests
 import CardTests
 import ConstraintTests
 import EvaluationTests
--}
+import IntervalTests
 import KnowledgeTests
-{-
 import SeatTests
 import VulnerabilityTests
--}
 
 import ElmTest
 
@@ -23,7 +20,7 @@ import ElmTest
 all : ElmTest.Test
 all =
   ElmTest.suite "A Test Suite"
-    [ {- AuctionTests.all
+    [ AuctionTests.all
     , Bidding.GerberTests.all
     , Bidding.JacobyTransferTests.all
     , Bidding.StandardAmericanTests.all
@@ -32,7 +29,8 @@ all =
     , CardTests.all
     , ConstraintTests.all
     , EvaluationTests.all
-    , -} KnowledgeTests.all {-
+    , IntervalTests.all
+    , KnowledgeTests.all
     , SeatTests.all
     , VulnerabilityTests.all
-    -} ]
+    ]

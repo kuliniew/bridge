@@ -15,6 +15,8 @@ module Constraint exposing
 with one another, such that new constraints can be added incrementally.
 -}
 
+import Interval exposing (Interval)
+
 import DictSet exposing (DictSet)
 import EveryDict exposing (EveryDict)
 import List.Extra
@@ -238,41 +240,36 @@ isSingleVariableTerm term =
 
 {-| Get the current bounds of a single-variable term.
 -}
-getSingleVariableTermBounds : State var -> Term var -> (Int, Int)
-getSingleVariableTermBounds state term =
+getSingleVariableTermInterval : State var -> Term var -> Interval
+getSingleVariableTermInterval state term =
   case term of
     Variable var ->
-      case (smallestValue var state, largestValue var state) of
-        (Just lower, Just upper) -> (lower, upper)
-        _ -> Debug.crash <| "couldn't get bounds for variable " ++ toString var
+      Interval.fromSet <| possibleValues var state
     Negate subterm ->
-      let
-        (subtermMin, subtermMax) = getSingleVariableTermBounds state subterm
-      in
-        (-subtermMax, -subtermMin)
+      Interval.negate <| getSingleVariableTermInterval state subterm
     _ ->
-      Debug.crash <| "not a single-term variable: " ++ toString term
+      Debug.crash <| "not a single-variable term: " ++ toString term
 
 
 {-| Enforce the bounds of a single-variable term.
 -}
-enforceSingleVariableTermBounds : (Int, Int) -> Term var -> EveryDict var Range -> EveryDict var Range
-enforceSingleVariableTermBounds (newLowerBound, newUpperBound) term vars =
+enforceSingleVariableTermInterval : Interval -> Term var -> EveryDict var Range -> EveryDict var Range
+enforceSingleVariableTermInterval interval term vars =
   case term of
     Variable var ->
       let
         update old =
           case old of
             Just oldRange ->
-              Just <| Set.filter (\val -> newLowerBound <= val && val <= newUpperBound) oldRange
+              Just <| Set.filter (flip Interval.member interval) oldRange
             Nothing ->
               Nothing
       in
         EveryDict.update var update vars
     Negate subterm ->
-      enforceSingleVariableTermBounds (-newUpperBound, -newLowerBound) subterm vars
+      enforceSingleVariableTermInterval (Interval.negate interval) subterm vars
     _ ->
-      Debug.crash <| "not a single-term variable: " ++ toString term
+      Debug.crash <| "not a single-variable term: " ++ toString term
 
 
 {-| Enforce a list of single-variable terms to add up to a specific value.
@@ -282,22 +279,18 @@ enforceSumEquality sum terms state =
   let
     (State st) =
       state
-    addPairwise (x1, y1) (x2, y2) =
-      (x1 + x2, y1 + y2)
-    (minSum, maxSum) =
-      List.foldl addPairwise (0, 0) <| List.map (getSingleVariableTermBounds state) terms
-    updateTerm term vars =
+    updateTerm (term, otherTerms) vars =
       let
-        (oldLowerBound, oldUpperBound) =
-          getSingleVariableTermBounds state term
-        newLowerBound =
-          sum - (maxSum - oldUpperBound)
-        newUpperBound =
-          sum - (minSum - oldLowerBound)
+        oldInterval =
+          getSingleVariableTermInterval state term
+        otherTermsSum =
+          List.foldl Interval.add (Interval.singleton 0) <| List.map (getSingleVariableTermInterval state) otherTerms
+        newInterval =
+          Interval.intersect oldInterval <| Interval.subtract (Interval.singleton sum) otherTermsSum
       in
-        enforceSingleVariableTermBounds (newLowerBound, newUpperBound) term vars
+        enforceSingleVariableTermInterval newInterval term vars
   in
-    State { st | variables = List.foldl updateTerm st.variables terms }
+    State { st | variables = List.foldl updateTerm st.variables (List.Extra.select terms) }
 
 
 {-| Enforce a single constraint using a naive but general algorithm.
