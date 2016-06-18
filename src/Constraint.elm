@@ -234,21 +234,47 @@ isSingleVariableTerm term =
       True
     Negate subterm ->
       isSingleVariableTerm subterm
+    Multiply subterms ->
+      List.length (List.filter isSingleVariableTerm subterms) == 1 &&
+      List.length (List.filter isConstantTerm subterms) == List.length subterms - 1
     _ ->
       False
 
 
-{-| Get the current bounds of a single-variable term.
+{-| Check if a term is a constant.
 -}
-getSingleVariableTermInterval : State var -> Term var -> Interval
-getSingleVariableTermInterval state term =
+isConstantTerm : Term var -> Bool
+isConstantTerm term =
   case term of
+    Constant _ -> True
+    Variable _ -> False
+    Add subterms -> List.all isConstantTerm subterms
+    Multiply subterms -> List.all isConstantTerm subterms
+    Max subterms -> List.all isConstantTerm subterms
+    Negate subterm -> isConstantTerm subterm
+
+
+{-| Get the current bounds of a term.
+-}
+getTermInterval : State var -> Term var -> Interval
+getTermInterval state term =
+  case term of
+    Constant val ->
+      Interval.singleton val
     Variable var ->
       Interval.fromSet <| possibleValues var state
+    Add subterms ->
+      List.foldl Interval.add (Interval.singleton 0) <| List.map (getTermInterval state) subterms
+    Multiply subterms ->
+      List.foldl Interval.multiply (Interval.singleton 1) <| List.map (getTermInterval state) subterms
+    Max subterms ->
+      case List.Extra.uncons subterms of
+        Just (first, rest) ->
+          List.foldl Interval.max (getTermInterval state first) <| List.map (getTermInterval state) rest
+        Nothing ->
+          Interval.empty
     Negate subterm ->
-      Interval.negate <| getSingleVariableTermInterval state subterm
-    _ ->
-      Debug.crash <| "not a single-variable term: " ++ toString term
+      Interval.negate <| getTermInterval state subterm
 
 
 {-| Enforce the bounds of a single-variable term.
@@ -268,6 +294,18 @@ enforceSingleVariableTermInterval interval term vars =
         EveryDict.update var update vars
     Negate subterm ->
       enforceSingleVariableTermInterval (Interval.negate interval) subterm vars
+    Multiply subterms ->
+      case (List.filter isSingleVariableTerm subterms, List.filter isConstantTerm subterms) of
+        ([subterm], constants) ->
+          let
+            emptyState =
+              initialize []
+            multiplier =
+              List.foldl Interval.multiply (Interval.singleton 1) <| List.map (getTermInterval emptyState) constants
+          in
+            enforceSingleVariableTermInterval (Interval.divide interval multiplier) subterm vars
+        _ ->
+          Debug.crash <| "not a single-varaible term: " ++ toString term
     _ ->
       Debug.crash <| "not a single-variable term: " ++ toString term
 
@@ -282,9 +320,9 @@ enforceSumEquality sum terms state =
     updateTerm (term, otherTerms) vars =
       let
         oldInterval =
-          getSingleVariableTermInterval state term
+          getTermInterval state term
         otherTermsSum =
-          List.foldl Interval.add (Interval.singleton 0) <| List.map (getSingleVariableTermInterval state) otherTerms
+          List.foldl Interval.add (Interval.singleton 0) <| List.map (getTermInterval state) otherTerms
         newInterval =
           Interval.intersect oldInterval <| Interval.subtract (Interval.singleton sum) otherTermsSum
       in

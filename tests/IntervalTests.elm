@@ -18,8 +18,13 @@ all =
     , toSetSuite
     , addSuite
     , subtractSuite
+    , multiplySuite
+    , divideSuite
+    , minSuite
+    , maxSuite
     , negateSuite
     , intersectSuite
+    , unionSuite
     ]
 
 
@@ -99,12 +104,48 @@ toSetSuite =
 
 addSuite : ElmTest.Test
 addSuite =
-  binaryOperationSuite "add" Interval.add (+)
+  binaryOperationSuite "add" Interval.add (+) []
 
 
 subtractSuite : ElmTest.Test
 subtractSuite =
-  binaryOperationSuite "subtract" Interval.subtract (-)
+  binaryOperationSuite "subtract" Interval.subtract (-) []
+
+
+multiplySuite : ElmTest.Test
+multiplySuite =
+  let
+    knownAnswers =
+      [ (Interval.singleton 1, Interval.singleton 1, Interval.singleton 1)
+      , (Interval.singleton 1, Interval.singleton (-1), Interval.singleton (-1))
+      , (Interval.singleton (-1), Interval.singleton 1, Interval.singleton (-1))
+      , (Interval.singleton (-1), Interval.singleton (-1), Interval.singleton 1)
+      ]
+  in
+    binaryOperationSuite "multiply" Interval.multiply (*) knownAnswers
+
+
+divideSuite : ElmTest.Test
+divideSuite =
+  let
+    knownAnswers =
+      [ (Interval.singleton 1, Interval.singleton 1, Interval.singleton 1)
+      , (Interval.singleton 1, Interval.singleton (-1), Interval.singleton (-1))
+      , (Interval.singleton (-1), Interval.singleton 1, Interval.singleton (-1))
+      , (Interval.singleton (-1), Interval.singleton (-1), Interval.singleton 1)
+      ]
+  in
+    binaryOperationSuite "divide" Interval.divide (//) knownAnswers
+
+
+minSuite : ElmTest.Test
+minSuite =
+  binaryOperationSuite "min" Interval.min min []
+
+
+maxSuite : ElmTest.Test
+maxSuite =
+  binaryOperationSuite "max" Interval.max max []
 
 
 negateSuite : ElmTest.Test
@@ -150,8 +191,25 @@ intersectSuite =
     ElmTest.suite "intersect" (memberTest :: emptyBinaryOperationTests Interval.intersect)
 
 
-binaryOperationSuite : String -> (Interval -> Interval -> Interval) -> (Int -> Int -> Int) -> ElmTest.Test
-binaryOperationSuite name intervalOp valueOp =
+unionSuite : ElmTest.Test
+unionSuite =
+  let
+    memberTest =
+      TestUtils.generativeTest <|
+        Check.claim
+          "contains values in either interval (and possibly others)"
+        `Check.true`
+          (\(interval1, interval2, val) -> Interval.member val (Interval.union interval1 interval2))
+        `Check.for`
+          Check.Producer.filter
+            (\(interval1, interval2, val) -> Interval.member val interval1 || Interval.member val interval2)
+            (Check.Producer.tuple3 (Interval.producer, Interval.producer, Check.Producer.int))
+  in
+    ElmTest.suite "union" [memberTest]
+
+
+binaryOperationSuite : String -> (Interval -> Interval -> Interval) -> (Int -> Int -> Int) -> List (Interval, Interval, Interval) -> ElmTest.Test
+binaryOperationSuite name intervalOp valueOp knownAnswers =
   let
     valueTest =
       TestUtils.generativeTest <|
@@ -161,8 +219,13 @@ binaryOperationSuite name intervalOp valueOp =
           (\((interval1, val1), (interval2, val2)) -> Interval.member (valueOp val1 val2) (intervalOp interval1 interval2))
         `Check.for`
           Check.Producer.tuple (Interval.producerWithElement, Interval.producerWithElement)
+    knownAnswerTest (arg1, arg2, expected) =
+      ElmTest.test (name ++ " " ++ toString arg1 ++ " " ++ toString arg2) <|
+        ElmTest.assertEqual expected (intervalOp arg1 arg2)
+    knownAnswerTests =
+      List.map knownAnswerTest knownAnswers
   in
-    ElmTest.suite name (valueTest :: emptyBinaryOperationTests intervalOp)
+    ElmTest.suite name (valueTest :: emptyBinaryOperationTests intervalOp ++ knownAnswerTests)
 
 
 emptyBinaryOperationTests : (Interval -> Interval -> Interval) -> List ElmTest.Test

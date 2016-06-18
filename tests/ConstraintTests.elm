@@ -268,6 +268,38 @@ constrainSuite =
             (Constraint.Constant (-100))
         ]
         (List.map (\var -> (var, Constraint.range 1 75)) largeConstrainTestVarNames)
+
+    , largeConstrainTest
+        "100000 = sum(1000 * a .. 1000 * z)"
+        [ Constraint.Equal
+            (Constraint.Constant 100000)
+            (Constraint.Add <| List.map (\var -> Constraint.Multiply [Constraint.Constant 1000, var]) largeConstrainTestVars)
+        ]
+        (List.map (\var -> (var, Constraint.range 1 75)) largeConstrainTestVarNames)
+
+    , largeConstrainTest
+        "sum(1000 * a .. 1000 * z) = 100000"
+        [ Constraint.Equal
+            (Constraint.Add <| List.map (\var -> Constraint.Multiply [Constraint.Constant 1000, var]) largeConstrainTestVars)
+            (Constraint.Constant 100000)
+        ]
+        (List.map (\var -> (var, Constraint.range 1 75)) largeConstrainTestVarNames)
+
+    , largeConstrainTest
+        "-100 = sum(-1 * a .. -1 * z)"
+        [ Constraint.Equal
+            (Constraint.Constant (-100))
+            (Constraint.Add <| List.map (\var -> Constraint.Multiply [Constraint.Constant (-1), var]) largeConstrainTestVars)
+        ]
+        (List.map (\var -> (var, Constraint.range 1 75)) largeConstrainTestVarNames)
+
+    , largeConstrainTest
+        "sum(-1 * a .. -1 * z) = -100"
+        [ Constraint.Equal
+            (Constraint.Add <| List.map (\var -> Constraint.Multiply [Constraint.Constant (-1), var]) largeConstrainTestVars)
+            (Constraint.Constant (-100))
+        ]
+        (List.map (\var -> (var, Constraint.range 1 75)) largeConstrainTestVarNames)
     ]
 
 

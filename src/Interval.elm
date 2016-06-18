@@ -8,9 +8,14 @@ module Interval exposing
 
   , add
   , subtract
+  , multiply
+  , divide
+  , min
+  , max
   , negate
 
   , intersect
+  , union
 
   , producer
   , producerWithElement
@@ -96,6 +101,80 @@ subtract interval1 interval2 =
   add interval1 (negate interval2)
 
 
+{-| Compute the interval formed by multiplying all possible pairs between
+the elements of two intervals.
+-}
+multiply : Interval -> Interval -> Interval
+multiply interval1 interval2 =
+  case (interval1, interval2) of
+    (Interval lo1 hi1, Interval lo2 hi2) ->
+      let
+        products = [lo1 * lo2, lo1 * hi2, hi1 * lo2, hi1 * hi2]
+      in
+        case (List.minimum products, List.maximum products) of
+          (Just lo, Just hi) -> Interval lo hi
+          _ -> Debug.crash "the list was supposed to be non-empty"
+    _ -> Empty
+
+
+{-| Compute the interval formed by dividing all possible pairs between
+the elements of two intervals, using integer division.
+-}
+divide : Interval -> Interval -> Interval
+divide interval1 interval2 =
+  let
+    filterPositive iv =
+      case iv of
+        Interval lo hi ->
+          if hi < 0
+          then Empty
+          else Interval (Basics.max lo 1) hi
+        Empty ->
+          Empty
+    filterNegative iv =
+      case iv of
+        Interval lo hi ->
+          if lo > 0
+          then Empty
+          else Interval lo (Basics.min hi (-1))
+        Empty ->
+          Empty
+    oneSideDivide iv1 iv2 =
+      case (iv1, iv2) of
+        (Interval lo1 hi1, Interval lo2 hi2) ->
+          let
+            quotients = [lo1 // lo2, lo1 // hi2, hi1 // lo2, hi1 // hi2]
+          in
+            case (List.minimum quotients, List.maximum quotients) of
+              (Just lo, Just hi) -> Interval lo hi
+              _ -> Empty
+        _ -> Empty
+  in
+    union
+      (oneSideDivide interval1 (filterPositive interval2))
+      (oneSideDivide interval1 (filterNegative interval2))
+
+
+{-| Compute the interval formed by taking the minimum value of all possible
+pairs between the elements of two intervals.
+-}
+min : Interval -> Interval -> Interval
+min interval1 interval2 =
+  case (interval1, interval2) of
+    (Interval lo1 hi1, Interval lo2 hi2) -> Interval (Basics.min lo1 lo2) (Basics.min hi1 hi2)
+    _ -> Empty
+
+
+{-| Compute the interval formed by taking the maximum value of all possible
+pairs between the elements of two intervals.
+-}
+max : Interval -> Interval -> Interval
+max interval1 interval2 =
+  case (interval1, interval2) of
+    (Interval lo1 hi1, Interval lo2 hi2) -> Interval (Basics.max lo1 lo2) (Basics.max hi1 hi2)
+    _ -> Empty
+
+
 {-| Negate the values in an interval.
 -}
 negate : Interval -> Interval
@@ -112,14 +191,27 @@ intersect interval1 interval2 =
   case (interval1, interval2) of
     (Interval lo1 hi1, Interval lo2 hi2) ->
       let
-        lo = max lo1 lo2
-        hi = min hi1 hi2
+        lo = Basics.max lo1 lo2
+        hi = Basics.min hi1 hi2
       in
         if lo <= hi
         then Interval lo hi
         else Empty
     _ ->
       Empty
+
+
+{-| Compute the union of two intervals.
+-}
+union : Interval -> Interval -> Interval
+union interval1 interval2 =
+  case (interval1, interval2) of
+    (Interval lo1 hi1, Interval lo2 hi2) ->
+      Interval (Basics.min lo1 lo2) (Basics.max hi1 hi2)
+    (Empty, _) ->
+      interval2
+    (_, Empty) ->
+      interval1
 
 
 {-| Producer for arbitrary intervals.
@@ -173,7 +265,7 @@ shrinker interval =
 -}
 fromUnorderedEndpoints : Int -> Int -> Interval
 fromUnorderedEndpoints x y =
-  Interval (min x y) (max x y)
+  Interval (Basics.min x y) (Basics.max x y)
 
 
 {-| Deterministically pick a sample element from a non-empty interval and
