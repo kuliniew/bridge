@@ -7,11 +7,12 @@ import Bidding.StandardAmericanTests
 import Bidding.StaymanTests
 import BiddingTests
 import CardTests
-import ConstraintTests
 import EvaluationTests
-import IntervalTests
-import KnowledgeTests
 import SeatTests
+import Solver.EndpointTests
+import Solver.IntervalTests
+import Solver.ProblemTests
+import Solver.RangeTests
 import VulnerabilityTests
 
 import ElmTest
@@ -27,10 +28,11 @@ all =
     , Bidding.StaymanTests.all
     , BiddingTests.all
     , CardTests.all
-    , ConstraintTests.all
     , EvaluationTests.all
-    , IntervalTests.all
-    , KnowledgeTests.all
     , SeatTests.all
+    , Solver.EndpointTests.all
+    , Solver.IntervalTests.all
+    , Solver.ProblemTests.all
+    , Solver.RangeTests.all
     , VulnerabilityTests.all
     ]

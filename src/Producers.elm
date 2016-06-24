@@ -20,7 +20,7 @@ elementOf elements =
         Nothing -> Debug.crash "gave Producers.elementOf an empty list!"
   in
     { generator =
-        Random.Extra.select elements |> Random.map unwrap
+        Random.Extra.sample elements |> Random.map unwrap
     , shrinker =
         Shrink.noShrink
     }

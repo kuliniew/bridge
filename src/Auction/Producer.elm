@@ -40,6 +40,6 @@ extendAuction history needed =
             Just bid -> extendAuction (bid :: history) (needed - 1)
             Nothing -> Random.Extra.constant history
       in
-        Random.Extra.select (Auction.legalBids history) `Random.andThen` wrapUp
+        Random.Extra.sample (Auction.legalBids history) `Random.andThen` wrapUp
     else
       Random.Extra.constant history

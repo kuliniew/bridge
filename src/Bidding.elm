@@ -110,7 +110,7 @@ choose system favorability history hand =
   let
     fallback = outOfSystem Auction.Pass
   in
-    Random.Extra.selectWithDefault fallback <| viableChoices system favorability history hand
+    Random.map (Maybe.withDefault fallback) <| Random.Extra.sample <| viableChoices system favorability history hand
 
 
 {-| Annotate a bid outside of the bidding system.

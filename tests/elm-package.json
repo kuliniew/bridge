@@ -11,10 +11,11 @@
     "dependencies": {
         "eeue56/elm-all-dict": "1.1.2 <= v < 2.0.0",
         "elm-community/elm-check": "1.0.0 <= v < 2.0.0",
-        "elm-community/elm-list-extra": "1.0.0 <= v < 2.0.0",
-        "elm-community/elm-random-extra": "1.0.1 <= v < 2.0.0",
+        "elm-community/elm-lazy-list": "1.0.1 <= v < 2.0.0",
         "elm-community/elm-test": "1.1.0 <= v < 2.0.0",
+        "elm-community/list-extra": "2.0.1 <= v < 3.0.0",
         "elm-community/maybe-extra": "1.0.0 <= v < 2.0.0",
+        "elm-community/random-extra": "1.0.0 <= v < 2.0.0",
         "elm-community/shrink": "1.0.0 <= v < 2.0.0",
         "elm-lang/core": "4.0.0 <= v < 5.0.0",
         "truqu/elm-dictset": "1.0.4 <= v < 2.0.0"
