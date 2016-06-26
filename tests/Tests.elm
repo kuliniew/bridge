@@ -9,10 +9,12 @@ import BiddingTests
 import CardTests
 import EvaluationTests
 import SeatTests
+import Solver.ConstraintTests
 import Solver.EndpointTests
 import Solver.IntervalTests
 import Solver.ProblemTests
 import Solver.RangeTests
+import Solver.TermTests
 import VulnerabilityTests
 
 import ElmTest
@@ -30,9 +32,11 @@ all =
     , CardTests.all
     , EvaluationTests.all
     , SeatTests.all
+    , Solver.ConstraintTests.all
     , Solver.EndpointTests.all
     , Solver.IntervalTests.all
     , Solver.ProblemTests.all
     , Solver.RangeTests.all
+    , Solver.TermTests.all
     , VulnerabilityTests.all
     ]

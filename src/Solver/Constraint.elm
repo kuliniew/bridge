@@ -1,38 +1,18 @@
 module Solver.Constraint exposing
-  ( Term (..)
-  , constant
-  , variable
-
-  , Constraint (..)
+  ( Constraint
   , equal
+
+  , evaluate
   )
 
 {-| Integer constraints over variables.
-
-This module exposes both a low-level (type constructors) and high-level
-(functions) interface for constraints.  It's recommended that clients
-should stick with the high-level interface, which is more flexible.
-The low-level interface is intended for constraint solver implementations.
 -}
 
+import Solver.Range exposing (Range)
+import Solver.Term exposing (Term)
 
-{-| A value term that appears in a constraint.
--}
-type Term var
-  = Constant Int
-  | Variable var
+import EveryDict exposing (EveryDict)
 
-
-{-| A constant value.
--}
-constant : Int -> Term var
-constant = Constant
-
-
-{-| A variable.
--}
-variable : var -> Term var
-variable = Variable
 
 
 {-| A constraint to be satisfied.
@@ -48,3 +28,19 @@ type Constraint var
 -}
 equal : Term var -> Term var -> Constraint var
 equal = Equal
+
+
+{-| Evaluate a constraint over a set of known variable ranges, returning
+a narrower set of variable ranges that satisfies the constraint.
+-}
+evaluate : EveryDict var Range -> Constraint var -> Maybe (EveryDict var Range)
+evaluate variables constraint =
+  case constraint of
+    Equal left right ->
+      let
+        allowed =
+          Solver.Range.intersect (Solver.Term.evaluate variables left) (Solver.Term.evaluate variables right)
+      in
+        if Solver.Range.isEmpty allowed
+        then Nothing
+        else Just variables

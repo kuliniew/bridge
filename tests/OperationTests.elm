@@ -1,5 +1,8 @@
 module OperationTests exposing
   ( totalOrder
+  , boundedLattice
+
+  , commutative
   )
 
 {-| Test suites for various mathematical properties.
@@ -45,3 +48,100 @@ totalOrder operation producer =
         `Check.for`
           Check.Producer.tuple (producer, producer)
     ]
+
+
+{-| Test that a pair of operations form a bounded lattice.
+-}
+boundedLattice : (a -> a -> a) -> a -> (a -> a -> a) -> a -> Check.Producer.Producer a -> ElmTest.Test
+boundedLattice join bottom meet top producer =
+  ElmTest.suite "bounded lattice"
+    [ ElmTest.suite "join"
+        [ commutative join producer
+        , associative join producer
+        , absorption meet join producer
+        , idempotent join producer
+        , leftIdentity join bottom producer
+        ]
+    , ElmTest.suite "meet"
+        [ commutative meet producer
+        , associative meet producer
+        , absorption join meet producer
+        , idempotent meet producer
+        , leftIdentity meet top producer
+        ]
+    ]
+
+
+{-| Test that an operation is commutative.
+-}
+commutative : (a -> a -> b) -> Check.Producer.Producer a -> ElmTest.Test
+commutative operation producer =
+  TestUtils.generativeTest <|
+    Check.claim
+      "commutative"
+    `Check.that`
+      uncurry operation
+    `Check.is`
+      uncurry (flip operation)
+    `Check.for`
+      Check.Producer.tuple (producer, producer)
+
+
+{-| Test that an operation is associative.
+-}
+associative : (a -> a -> a) -> Check.Producer.Producer a -> ElmTest.Test
+associative operation producer =
+  TestUtils.generativeTest <|
+    Check.claim
+      "associative"
+    `Check.that`
+      (\(x, y, z) -> x `operation` (y `operation` z))
+    `Check.is`
+      (\(x, y, z) -> (x `operation` y) `operation` z)
+    `Check.for`
+      Check.Producer.tuple3 (producer, producer, producer)
+
+
+{-| Test that two operations satisfy the absorption law.
+-}
+absorption : (a -> a -> a) -> (a -> a -> a) -> Check.Producer.Producer a -> ElmTest.Test
+absorption firstOperation secondOperation producer =
+  TestUtils.generativeTest <|
+    Check.claim
+      "absorption"
+    `Check.that`
+      (\(x, y) -> x `secondOperation` (x `firstOperation` y))
+    `Check.is`
+      fst
+    `Check.for`
+      Check.Producer.tuple (producer, producer)
+
+
+{-| Test that an operation is idempotent.
+-}
+idempotent : (a -> a -> a) -> Check.Producer.Producer a -> ElmTest.Test
+idempotent operation producer =
+  TestUtils.generativeTest <|
+    Check.claim
+      "idempotent"
+    `Check.that`
+      (\x -> x `operation` x)
+    `Check.is`
+      identity
+    `Check.for`
+      producer
+
+
+{-| Test that an operation has a left-identity.
+-}
+leftIdentity : (a -> a -> a) -> a -> Check.Producer.Producer a -> ElmTest.Test
+leftIdentity operation identityElement producer =
+  TestUtils.generativeTest <|
+    Check.claim
+      "left identity"
+    `Check.that`
+      operation identityElement
+    `Check.is`
+      identity
+    `Check.for`
+      producer
