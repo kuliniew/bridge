@@ -18,6 +18,7 @@ all =
     , constantTautologySuite
     , constantFallacySuite
     , singleVariableEqualitySuite
+    , singleVariableEqualityInconsistentSuite
     ]
 
 
@@ -110,4 +111,28 @@ singleVariableEqualitySuite =
             Check.Producer.filter
               ((/=) "x")
               Check.Producer.string
+      ]
+
+
+singleVariableEqualityInconsistentSuite : ElmTest.Test
+singleVariableEqualityInconsistentSuite =
+  let
+    problem =
+      Solver.Problem.empty
+        |> Solver.Problem.addConstraint (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1)
+        |> Solver.Problem.addConstraint (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 2)
+  in
+    ElmTest.suite "single variable equality inconsistent"
+      [ ElmTest.test "is not solvable" <|
+          ElmTest.assert <| not <| Solver.Problem.isSolvable problem
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "allows no possible values for any variable"
+          `Check.that`
+          flip Solver.Problem.possibleValues problem
+        `Check.is`
+          always Solver.Range.empty
+        `Check.for`
+          Check.Producer.string
       ]
