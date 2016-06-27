@@ -43,4 +43,4 @@ evaluate variables constraint =
       in
         if Solver.Range.isEmpty allowed
         then Nothing
-        else Just variables
+        else Just <| Solver.Term.constrain left allowed <| Solver.Term.constrain right allowed <| variables

@@ -21,6 +21,7 @@ all =
     [ emptySuite
     , fullSuite
     , singletonSuite
+    , subsetSuite
     , fromIntervalsSuite
     , toIntervalsSuite
     , intersectSuite
@@ -81,6 +82,23 @@ singletonSuite =
           Check.Producer.filter
             (uncurry (/=))
             (Check.Producer.tuple (Check.Producer.int, Check.Producer.int))
+    ]
+
+
+subsetSuite : ElmTest.Test
+subsetSuite =
+  ElmTest.suite "subset"
+    [ OperationTests.partialOrder Solver.Range.subset rangeProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "consistent with member"
+        `Check.true`
+          (\(value, _, superset) -> Solver.Range.member value superset)
+        `Check.for`
+          Check.Producer.filter
+            (\(value, subset, superset) -> Solver.Range.member value subset && Solver.Range.subset subset superset)
+            (Check.Producer.tuple3 (Check.Producer.int, rangeProducer, rangeProducer))
     ]
 
 

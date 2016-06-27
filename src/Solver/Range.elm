@@ -8,6 +8,7 @@ module Solver.Range exposing
 
   , member
   , isEmpty
+  , subset
 
   , intersect
   , union
@@ -94,6 +95,13 @@ member value (Range intervals) =
 isEmpty : Range -> Bool
 isEmpty (Range intervals) =
   List.isEmpty intervals
+
+
+{-| Test if the first range is a subset of the second.
+-}
+subset : Range -> Range -> Bool
+subset left right =
+  intersect left right == left
 
 
 {-| Compute the values that appear in both ranges.

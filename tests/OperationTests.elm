@@ -1,5 +1,6 @@
 module OperationTests exposing
-  ( totalOrder
+  ( partialOrder
+  , totalOrder
   , boundedLattice
 
   , commutative
@@ -15,30 +16,31 @@ import Check.Producer
 import ElmTest
 
 
+{-| Test that a relation is a partial order.
+-}
+partialOrder : (a -> a -> Bool) -> Check.Producer.Producer a -> ElmTest.Test
+partialOrder operation producer =
+  ElmTest.suite "partial order"
+    [ antisymmetric operation producer
+    , transitive operation producer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "reflexive"
+        `Check.true`
+          (\a -> a `operation` a)
+        `Check.for`
+          producer
+    ]
+
+
 {-| Test that a relation is a total order.
 -}
 totalOrder : (a -> a -> Bool) -> Check.Producer.Producer a -> ElmTest.Test
 totalOrder operation producer =
   ElmTest.suite "total order"
-    [ TestUtils.generativeTest <|
-        Check.claim
-          "antisymmetric"
-        `Check.true`
-          uncurry (==)
-        `Check.for`
-          Check.Producer.filter
-            (\(a, b) -> a `operation` b && b `operation` a)
-            (Check.Producer.tuple (producer, producer))
-
-    , TestUtils.generativeTest <|
-        Check.claim
-          "transitive"
-        `Check.true`
-          (\(a, _, c) -> a `operation` c)
-        `Check.for`
-          Check.Producer.filter
-            (\(a, b, c) -> a `operation` b && b `operation` c)
-            (Check.Producer.tuple3 (producer, producer, producer))
+    [ antisymmetric operation producer
+    , transitive operation producer
 
     , TestUtils.generativeTest <|
         Check.claim
@@ -48,6 +50,36 @@ totalOrder operation producer =
         `Check.for`
           Check.Producer.tuple (producer, producer)
     ]
+
+
+{-| Test that a relation is antisymmetric.
+-}
+antisymmetric : (a -> a -> Bool) -> Check.Producer.Producer a -> ElmTest.Test
+antisymmetric operation producer =
+  TestUtils.generativeTest <|
+    Check.claim
+      "antisymmetric"
+    `Check.true`
+      uncurry (==)
+    `Check.for`
+      Check.Producer.filter
+        (\(a, b) -> a `operation` b && b `operation` a)
+        (Check.Producer.tuple (producer, producer))
+
+
+{-| Test that a relation is transitive.
+-}
+transitive : (a -> a -> Bool) -> Check.Producer.Producer a -> ElmTest.Test
+transitive operation producer =
+  TestUtils.generativeTest <|
+    Check.claim
+      "transitive"
+    `Check.true`
+      (\(a, _, c) -> a `operation` c)
+    `Check.for`
+      Check.Producer.filter
+        (\(a, b, c) -> a `operation` b && b `operation` c)
+        (Check.Producer.tuple3 (producer, producer, producer))
 
 
 {-| Test that a pair of operations form a bounded lattice.

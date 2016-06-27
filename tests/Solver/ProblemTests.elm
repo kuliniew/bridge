@@ -17,6 +17,7 @@ all =
     [ emptySuite
     , constantTautologySuite
     , constantFallacySuite
+    , singleVariableEqualitySuite
     ]
 
 
@@ -81,4 +82,32 @@ constantFallacySuite =
           always Solver.Range.empty
         `Check.for`
           Check.Producer.string
+      ]
+
+
+singleVariableEqualitySuite : ElmTest.Test
+singleVariableEqualitySuite =
+  let
+    problem =
+      Solver.Problem.empty
+        |> Solver.Problem.addConstraint (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1)
+  in
+    ElmTest.suite "single variable equality"
+      [ ElmTest.test "is solvable" <|
+          ElmTest.assert <| Solver.Problem.isSolvable problem
+
+      , ElmTest.test "constrained variable's value is known" <|
+          ElmTest.assertEqual (Solver.Range.singleton 1) (Solver.Problem.possibleValues "x" problem)
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "other variables are unconstrained"
+          `Check.that`
+            flip Solver.Problem.possibleValues problem
+          `Check.is`
+            always Solver.Range.full
+          `Check.for`
+            Check.Producer.filter
+              ((/=) "x")
+              Check.Producer.string
       ]
