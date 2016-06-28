@@ -3,6 +3,7 @@ module Solver.Constraint exposing
   , equal
 
   , evaluate
+  , boundVariables
   )
 
 {-| Integer constraints over variables.
@@ -44,3 +45,12 @@ evaluate variables constraint =
         if Solver.Range.isEmpty allowed
         then Nothing
         else Just <| Solver.Term.constrain left allowed <| Solver.Term.constrain right allowed <| variables
+
+
+{-| Get a list of bound variables in a constraint.
+-}
+boundVariables : Constraint var -> EveryDict var ()
+boundVariables constraint =
+  case constraint of
+    Equal left right ->
+      EveryDict.union (Solver.Term.boundVariables left) (Solver.Term.boundVariables right)

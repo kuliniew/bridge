@@ -64,10 +64,29 @@ possibleValues variable problem =
 -}
 addConstraint : Constraint var -> Problem var -> Problem var
 addConstraint constraint problem =
-  applyConstraint constraint problem
+  case problem of
+    Unsolvable ->
+      Unsolvable
+    Solvable state ->
+      let
+        bound =
+          Solver.Constraint.boundVariables constraint
+        save variable constraints =
+          EveryDict.update variable add constraints
+        add current =
+          case current of
+            Just constraints -> Just (constraint :: constraints)
+            Nothing -> Just [constraint]
+        newProblem =
+          if EveryDict.size bound > 1
+          then Solvable { state | constraints = List.foldl save state.constraints (EveryDict.keys bound) }
+          else Solvable state
+      in
+        applyConstraint constraint newProblem
 
 
-{-| Apply a constraint to the problem's current set of possible solutions.
+{-| Apply a constraint to the problem's current set of possible solutions,
+and revisit any constraints involving the variables that changed.
 -}
 applyConstraint : Constraint var -> Problem var -> Problem var
 applyConstraint constraint problem =
@@ -75,8 +94,35 @@ applyConstraint constraint problem =
     Solvable state ->
       case Solver.Constraint.evaluate state.variables constraint of
         Just newVariables ->
-          Solvable { state | variables = newVariables }
+          let
+            changed =
+              EveryDict.keys newVariables
+                |> List.filter (\var -> EveryDict.get var newVariables /= EveryDict.get var state.variables)
+            currentProblem =
+              Solvable { state | variables = newVariables }
+            rechecks =
+              List.filter ((/=) constraint) (constraintsInvolving changed currentProblem)
+          in
+            List.foldl applyConstraint currentProblem rechecks
         Nothing ->
           Unsolvable
     Unsolvable ->
       Unsolvable
+
+
+{-| Get all of the saved constraints that involve the affected variables,
+without duplicates.
+-}
+constraintsInvolving : List var -> Problem var -> List (Constraint var)
+constraintsInvolving variables problem =
+  case problem of
+    Unsolvable ->
+      []
+    Solvable state ->
+      List.map (flip EveryDict.get state.constraints) variables
+        |> List.map (Maybe.withDefault [])
+        |> List.concat
+        |> List.map (flip (,) ())
+        |> EveryDict.fromList
+        |> EveryDict.toList
+        |> List.map fst

@@ -19,6 +19,7 @@ all =
     , constantFallacySuite
     , singleVariableEqualitySuite
     , singleVariableEqualityInconsistentSuite
+    , multipleVariableEqualitySuite
     ]
 
 
@@ -135,4 +136,36 @@ singleVariableEqualityInconsistentSuite =
           always Solver.Range.empty
         `Check.for`
           Check.Producer.string
+      ]
+
+
+multipleVariableEqualitySuite : ElmTest.Test
+multipleVariableEqualitySuite =
+  let
+    problem =
+      Solver.Problem.empty
+        |> Solver.Problem.addConstraint (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.variable "y")
+        |> Solver.Problem.addConstraint (Solver.Term.variable "y" `Solver.Constraint.equal` Solver.Term.constant 1)
+  in
+    ElmTest.suite "single variable equality"
+      [ ElmTest.test "is solvable" <|
+          ElmTest.assert <| Solver.Problem.isSolvable problem
+
+      , ElmTest.test "x's value is known" <|
+          ElmTest.assertEqual (Solver.Range.singleton 1) (Solver.Problem.possibleValues "x" problem)
+
+      , ElmTest.test "y's value is known" <|
+          ElmTest.assertEqual (Solver.Range.singleton 1) (Solver.Problem.possibleValues "y" problem)
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "other variables are unconstrained"
+          `Check.that`
+            flip Solver.Problem.possibleValues problem
+          `Check.is`
+            always Solver.Range.full
+          `Check.for`
+            Check.Producer.filter
+              (not << flip List.member ["x", "y"])
+              Check.Producer.string
       ]

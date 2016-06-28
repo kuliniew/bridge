@@ -5,6 +5,7 @@ module Solver.Term exposing
 
   , evaluate
   , constrain
+  , boundVariables
   )
 
 {-| Individual terms found in constraints.
@@ -66,3 +67,14 @@ constrain term range variables =
         if Solver.Range.subset range oldRange
         then EveryDict.insert variable range variables
         else Debug.crash <| "tried to constrain " ++ toString term ++ " from range " ++ toString oldRange ++ " to range " ++ toString range
+
+
+{-| Get a list of bound variables in a term.
+-}
+boundVariables : Term var -> EveryDict var ()
+boundVariables term =
+  case term of
+    Constant _ ->
+      EveryDict.empty
+    Variable variable ->
+      EveryDict.singleton variable ()

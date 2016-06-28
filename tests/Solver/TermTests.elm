@@ -9,6 +9,7 @@ import Check
 import Check.Producer
 import ElmTest
 import EveryDict exposing (EveryDict)
+import List.Extra
 
 
 all : ElmTest.Test
@@ -41,6 +42,16 @@ constantSuite =
           fst
         `Check.for`
           Check.Producer.tuple (variablesProducer, Check.Producer.int)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "has no bound variables"
+        `Check.that`
+          (EveryDict.keys << Solver.Term.boundVariables << Solver.Term.constant)
+        `Check.is`
+          always []
+        `Check.for`
+          Check.Producer.int
     ]
 
 
@@ -90,6 +101,16 @@ variableSuite =
             (Check.Producer.map
               (\(variable, range, mask) -> (variable, range, Solver.Range.intersect range mask))
               (Check.Producer.tuple3 (Check.Producer.string, rangeProducer, rangeProducer)))
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "has itself as a bound variable"
+        `Check.that`
+          (EveryDict.keys << Solver.Term.boundVariables << Solver.Term.variable)
+        `Check.is`
+          List.Extra.singleton
+        `Check.for`
+          Check.Producer.string
     ]
 
 
