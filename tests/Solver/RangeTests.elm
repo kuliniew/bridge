@@ -21,9 +21,13 @@ all =
     [ emptySuite
     , fullSuite
     , singletonSuite
+    , fromLowerBoundSuite
+    , fromUpperBoundSuite
     , subsetSuite
     , fromIntervalsSuite
     , toIntervalsSuite
+    , removeLowerBoundSuite
+    , removeUpperBoundSuite
     , intersectSuite
     , unionSuite
     , latticeSuite
@@ -82,6 +86,52 @@ singletonSuite =
           Check.Producer.filter
             (uncurry (/=))
             (Check.Producer.tuple (Check.Producer.int, Check.Producer.int))
+    ]
+
+
+fromLowerBoundSuite : ElmTest.Test
+fromLowerBoundSuite =
+  ElmTest.suite "fromLowerBound"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "contains its bounding value"
+        `Check.true`
+          (\bound -> Solver.Range.member bound (Solver.Range.fromLowerBound bound))
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains exactly the values greater than or equal to the bound"
+        `Check.that`
+          (\(bound, value) -> Solver.Range.member value (Solver.Range.fromLowerBound bound))
+        `Check.is`
+          (\(bound, value) -> value >= bound)
+        `Check.for`
+          Check.Producer.tuple (Check.Producer.int, Check.Producer.int)
+    ]
+
+
+fromUpperBoundSuite : ElmTest.Test
+fromUpperBoundSuite =
+  ElmTest.suite "fromUpperBound"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "contains its bounding value"
+        `Check.true`
+          (\bound -> Solver.Range.member bound (Solver.Range.fromUpperBound bound))
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains exactly the values less than or equal to the bound"
+        `Check.that`
+          (\(bound, value) -> Solver.Range.member value (Solver.Range.fromUpperBound bound))
+        `Check.is`
+          (\(bound, value) -> value <= bound)
+        `Check.for`
+          Check.Producer.tuple (Check.Producer.int, Check.Producer.int)
     ]
 
 
@@ -160,6 +210,59 @@ toIntervalsSuite =
           (\value -> [Solver.Interval.singleton value])
         `Check.for`
           Check.Producer.int
+    ]
+
+
+removeLowerBoundSuite : ElmTest.Test
+removeLowerBoundSuite =
+  removeBoundSuite "removeLowerBound" Solver.Range.removeLowerBound (<=)
+
+
+removeUpperBoundSuite : ElmTest.Test
+removeUpperBoundSuite =
+  removeBoundSuite "removeUpperBound" Solver.Range.removeUpperBound (>=)
+
+
+removeBoundSuite : String -> (Range -> Range) -> (Int -> Int -> Bool) -> ElmTest.Test
+removeBoundSuite name removeFunc compareFunc =
+  ElmTest.suite name
+    [ OperationTests.unaryIdempotent removeFunc rangeProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "preserves emptiness"
+        `Check.that`
+          (Solver.Range.isEmpty << removeFunc)
+        `Check.is`
+          Solver.Range.isEmpty
+        `Check.for`
+          rangeProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "returns a superset"
+        `Check.true`
+          (\range -> Solver.Range.subset range (removeFunc range))
+        `Check.for`
+          rangeProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "consists of at most one interval"
+        `Check.true`
+          (\range -> List.length (Solver.Range.toIntervals <| removeFunc range) <= 1)
+        `Check.for`
+          rangeProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains the expected values"
+        `Check.true`
+          (\(range, _, otherValue) -> Solver.Range.member otherValue (removeFunc range))
+        `Check.for`
+          Check.Producer.filter
+            (\(range, value, otherValue) -> Solver.Range.member value range && compareFunc otherValue value)
+            (Check.Producer.tuple3 (rangeProducer, Check.Producer.int, Check.Producer.int))
     ]
 
 

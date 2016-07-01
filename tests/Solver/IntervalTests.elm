@@ -25,8 +25,13 @@ all =
     [ emptySuite
     , unboundedSuite
     , singletonSuite
+    , fromLowerBoundSuite
+    , fromUpperBoundSuite
     , fromEndpointsSuite
     , toEndpointsSuite
+    , subsetSuite
+    , removeLowerBoundSuite
+    , removeUpperBoundSuite
     , intersectSuite
     , hullSuite
     , unionSuite
@@ -86,6 +91,52 @@ singletonSuite =
           Check.Producer.filter
             (uncurry (/=))
             (Check.Producer.tuple (Check.Producer.int, Check.Producer.int))
+    ]
+
+
+fromLowerBoundSuite : ElmTest.Test
+fromLowerBoundSuite =
+  ElmTest.suite "fromLowerBound"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "contains its bounding value"
+        `Check.true`
+          (\bound -> Solver.Interval.member bound (Solver.Interval.fromLowerBound bound))
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains exactly the values greater than or equal to the bound"
+        `Check.that`
+          (\(bound, value) -> Solver.Interval.member value (Solver.Interval.fromLowerBound bound))
+        `Check.is`
+          (\(bound, value) -> value >= bound)
+        `Check.for`
+          Check.Producer.tuple (Check.Producer.int, Check.Producer.int)
+    ]
+
+
+fromUpperBoundSuite : ElmTest.Test
+fromUpperBoundSuite =
+  ElmTest.suite "fromUpperBound"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "contains its bounding value"
+        `Check.true`
+          (\bound -> Solver.Interval.member bound (Solver.Interval.fromUpperBound bound))
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains exactly the values less than or equal to the bound"
+        `Check.that`
+          (\(bound, value) -> Solver.Interval.member value (Solver.Interval.fromUpperBound bound))
+        `Check.is`
+          (\(bound, value) -> value <= bound)
+        `Check.for`
+          Check.Producer.tuple (Check.Producer.int, Check.Producer.int)
     ]
 
 
@@ -193,6 +244,68 @@ intervalProducer =
     { generator = generator
     , shrinker = shrinker
     }
+
+
+subsetSuite : ElmTest.Test
+subsetSuite =
+  ElmTest.suite "subset"
+    [ OperationTests.partialOrder Solver.Interval.subset intervalProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "consistent with member"
+        `Check.true`
+          (\(value, _, superset) -> Solver.Interval.member value superset)
+        `Check.for`
+          Check.Producer.filter
+            (\(value, subset, superset) -> Solver.Interval.member value subset && Solver.Interval.subset subset superset)
+            (Check.Producer.tuple3 (Check.Producer.int, intervalProducer, intervalProducer))
+    ]
+
+
+removeLowerBoundSuite : ElmTest.Test
+removeLowerBoundSuite =
+  removeBoundSuite "removeLowerBound" Solver.Interval.removeLowerBound (<=)
+
+
+removeUpperBoundSuite : ElmTest.Test
+removeUpperBoundSuite =
+  removeBoundSuite "removeUpperBound" Solver.Interval.removeUpperBound (>=)
+
+
+removeBoundSuite : String -> (Interval -> Interval) -> (Int -> Int -> Bool) -> ElmTest.Test
+removeBoundSuite name removeFunc compareFunc =
+  ElmTest.suite name
+    [ OperationTests.unaryIdempotent removeFunc intervalProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "preserves emptiness"
+        `Check.that`
+          (Solver.Interval.isEmpty << removeFunc)
+        `Check.is`
+          Solver.Interval.isEmpty
+        `Check.for`
+          intervalProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "returns a superset"
+        `Check.true`
+          (\interval -> Solver.Interval.subset interval (removeFunc interval))
+        `Check.for`
+          intervalProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains the expected values"
+        `Check.true`
+          (\(interval, _, otherValue) -> Solver.Interval.member otherValue (removeFunc interval))
+        `Check.for`
+          Check.Producer.filter
+            (\(interval, value, otherValue) -> Solver.Interval.member value interval && compareFunc otherValue value)
+            (Check.Producer.tuple3 (intervalProducer, Check.Producer.int, Check.Producer.int))
+    ]
 
 
 intersectSuite : ElmTest.Test

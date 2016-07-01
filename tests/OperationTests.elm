@@ -4,6 +4,7 @@ module OperationTests exposing
   , boundedLattice
 
   , commutative
+  , unaryIdempotent
   )
 
 {-| Test suites for various mathematical properties.
@@ -91,14 +92,14 @@ boundedLattice join bottom meet top producer =
         [ commutative join producer
         , associative join producer
         , absorption meet join producer
-        , idempotent join producer
+        , binaryIdempotent join producer
         , leftIdentity join bottom producer
         ]
     , ElmTest.suite "meet"
         [ commutative meet producer
         , associative meet producer
         , absorption join meet producer
-        , idempotent meet producer
+        , binaryIdempotent meet producer
         , leftIdentity meet top producer
         ]
     ]
@@ -149,10 +150,25 @@ absorption firstOperation secondOperation producer =
       Check.Producer.tuple (producer, producer)
 
 
-{-| Test that an operation is idempotent.
+{-| Test that a unary operation is idempotent.
 -}
-idempotent : (a -> a -> a) -> Check.Producer.Producer a -> ElmTest.Test
-idempotent operation producer =
+unaryIdempotent : (a -> a) -> Check.Producer.Producer a -> ElmTest.Test
+unaryIdempotent operation producer =
+  TestUtils.generativeTest <|
+    Check.claim
+      "idempotent"
+    `Check.that`
+      (operation << operation)
+    `Check.is`
+      operation
+    `Check.for`
+      producer
+
+
+{-| Test that a binary operation is idempotent.
+-}
+binaryIdempotent : (a -> a -> a) -> Check.Producer.Producer a -> ElmTest.Test
+binaryIdempotent operation producer =
   TestUtils.generativeTest <|
     Check.claim
       "idempotent"

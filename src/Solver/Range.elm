@@ -3,12 +3,17 @@ module Solver.Range exposing
   , empty
   , full
   , singleton
+  , fromLowerBound
+  , fromUpperBound
   , fromIntervals
   , toIntervals
 
   , member
   , isEmpty
   , subset
+
+  , removeLowerBound
+  , removeUpperBound
 
   , intersect
   , union
@@ -51,6 +56,20 @@ full =
 singleton : Int -> Range
 singleton value =
   Range [Solver.Interval.singleton value]
+
+
+{-| A range formed by a lower bound.
+-}
+fromLowerBound : Int -> Range
+fromLowerBound bound =
+  Range [Solver.Interval.fromLowerBound bound]
+
+
+{-| A range formed by an upper bound.
+-}
+fromUpperBound : Int -> Range
+fromUpperBound bound =
+  Range [Solver.Interval.fromUpperBound bound]
 
 
 {-| A range that includes all the elements of each interval.
@@ -102,6 +121,24 @@ isEmpty (Range intervals) =
 subset : Range -> Range -> Bool
 subset left right =
   intersect left right == left
+
+
+{-| Remove the lower bound from a range, such that the new range will
+contain all values less than or equal to any element of the original
+range.
+-}
+removeLowerBound : Range -> Range
+removeLowerBound (Range intervals) =
+  fromIntervals <| List.map Solver.Interval.removeLowerBound intervals
+
+
+{-| Remove the upper bound from a range, such that the new range will
+contain all values greater than or equal to any element of the original
+range.
+-}
+removeUpperBound : Range -> Range
+removeUpperBound (Range intervals) =
+  fromIntervals <| List.map Solver.Interval.removeUpperBound intervals
 
 
 {-| Compute the values that appear in both ranges.

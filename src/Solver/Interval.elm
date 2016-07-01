@@ -3,11 +3,17 @@ module Solver.Interval exposing
   , empty
   , unbounded
   , singleton
+  , fromLowerBound
+  , fromUpperBound
   , fromEndpoints
   , toEndpoints
 
   , isEmpty
   , member
+  , subset
+
+  , removeLowerBound
+  , removeUpperBound
 
   , intersect
   , hull
@@ -54,6 +60,20 @@ singleton value =
     NonEmpty point point
 
 
+{-| The interval with a given lower bound but no upper bound.
+-}
+fromLowerBound : Int -> Interval
+fromLowerBound bound =
+  NonEmpty (Solver.Endpoint.Point bound) Solver.Endpoint.PositiveInfinity
+
+
+{-| The interval with a given upper bound but no lower bound.
+-}
+fromUpperBound : Int -> Interval
+fromUpperBound bound =
+  NonEmpty Solver.Endpoint.NegativeInfinity (Solver.Endpoint.Point bound)
+
+
 {-| The interval bounded by the given endpoints, if the endpoints form
 a valid interval.
 -}
@@ -94,6 +114,46 @@ member value interval =
       Solver.Endpoint.Point value `Solver.Endpoint.lessThanOrEqual` hi
     Empty ->
       False
+
+
+{-| Check if all of the values in one interval are contained by another
+interval.
+-}
+subset : Interval -> Interval -> Bool
+subset left right =
+  case (left, right) of
+    (NonEmpty leftLo leftHi, NonEmpty rightLo rightHi) ->
+      rightLo `Solver.Endpoint.lessThanOrEqual` leftLo && leftHi `Solver.Endpoint.lessThanOrEqual` rightHi
+    (Empty, _) ->
+      True
+    (_, Empty) ->
+      False
+
+
+{-| Remove the lower bound from an interval, such that the new interval will
+contain all the values less than or equal to any element of the original
+interval.
+-}
+removeLowerBound : Interval -> Interval
+removeLowerBound interval =
+  case interval of
+    NonEmpty _ hi ->
+      NonEmpty Solver.Endpoint.NegativeInfinity hi
+    Empty ->
+      Empty
+
+
+{-| Remove the upper bound from an interval, such that the new interval will
+contain all the values greater than or equal to any element of the original
+interval.
+-}
+removeUpperBound : Interval -> Interval
+removeUpperBound interval =
+  case interval of
+    NonEmpty lo _ ->
+      NonEmpty lo Solver.Endpoint.PositiveInfinity
+    Empty ->
+      Empty
 
 
 {-| Compute the values that appear in both intervals.

@@ -20,6 +20,7 @@ all =
     , singleVariableEqualitySuite
     , singleVariableEqualityInconsistentSuite
     , multipleVariableEqualitySuite
+    , singleVariableLessThanOrEqualSuite
     ]
 
 
@@ -167,5 +168,33 @@ multipleVariableEqualitySuite =
           `Check.for`
             Check.Producer.filter
               (not << flip List.member ["x", "y"])
+              Check.Producer.string
+      ]
+
+
+singleVariableLessThanOrEqualSuite : ElmTest.Test
+singleVariableLessThanOrEqualSuite =
+  let
+    problem =
+      Solver.Problem.empty
+        |> Solver.Problem.addConstraint (Solver.Term.variable "x" `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 1)
+  in
+    ElmTest.suite "single variable less than or equal"
+      [ ElmTest.test "is solvable" <|
+          ElmTest.assert <| Solver.Problem.isSolvable problem
+
+      , ElmTest.test "x's values are known" <|
+          ElmTest.assertEqual (Solver.Range.fromUpperBound 1) (Solver.Problem.possibleValues "x" problem)
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "other variables are unconstrained"
+          `Check.that`
+            flip Solver.Problem.possibleValues problem
+          `Check.is`
+            always Solver.Range.full
+          `Check.for`
+            Check.Producer.filter
+              ((/=) "x")
               Check.Producer.string
       ]
