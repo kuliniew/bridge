@@ -32,6 +32,9 @@ all =
     , subsetSuite
     , removeLowerBoundSuite
     , removeUpperBoundSuite
+    , addSuite
+    , negateSuite
+    , subtractSuite
     , intersectSuite
     , hullSuite
     , unionSuite
@@ -305,6 +308,71 @@ removeBoundSuite name removeFunc compareFunc =
           Check.Producer.filter
             (\(interval, value, otherValue) -> Solver.Interval.member value interval && compareFunc otherValue value)
             (Check.Producer.tuple3 (intervalProducer, Check.Producer.int, Check.Producer.int))
+    ]
+
+
+addSuite : ElmTest.Test
+addSuite =
+  ElmTest.suite "add"
+    [ OperationTests.commutativeMonoid Solver.Interval.add (Solver.Interval.singleton 0) intervalProducer
+
+    , OperationTests.leftAnnihilator Solver.Interval.add Solver.Interval.empty intervalProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains the sums of values from the input intervals"
+        `Check.true`
+          (\(interval1, value1, interval2, value2) -> Solver.Interval.member (value1 + value2) (interval1 `Solver.Interval.add` interval2))
+        `Check.for`
+          Check.Producer.filter
+            (\(interval1, value1, interval2, value2) -> Solver.Interval.member value1 interval1 && Solver.Interval.member value2 interval2)
+            (Check.Producer.tuple4 (intervalProducer, Check.Producer.int, intervalProducer, Check.Producer.int))
+    ]
+
+
+negateSuite : ElmTest.Test
+negateSuite =
+  ElmTest.suite "negate"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "is its own inverse"
+        `Check.that`
+          (Solver.Interval.negate << Solver.Interval.negate)
+        `Check.is`
+          identity
+        `Check.for`
+          intervalProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains exactly negations of values from the input interval"
+        `Check.that`
+          (\(interval, value) -> Solver.Interval.member (negate value) (Solver.Interval.negate interval))
+        `Check.is`
+          (\(interval, value) -> Solver.Interval.member value interval)
+        `Check.for`
+          Check.Producer.tuple (intervalProducer, Check.Producer.int)
+    ]
+
+
+subtractSuite : ElmTest.Test
+subtractSuite =
+  ElmTest.suite "subtract"
+    [ OperationTests.leftAnnihilator Solver.Interval.subtract Solver.Interval.empty intervalProducer
+
+    , OperationTests.rightAnnihilator Solver.Interval.subtract Solver.Interval.empty intervalProducer
+
+    , OperationTests.rightIdentity Solver.Interval.subtract (Solver.Interval.singleton 0) intervalProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains the differences of values from the input intervals"
+        `Check.true`
+          (\(interval1, value1, interval2, value2) -> Solver.Interval.member (value1 - value2) (interval1 `Solver.Interval.subtract` interval2))
+        `Check.for`
+          Check.Producer.filter
+            (\(interval1, value1, interval2, value2) -> Solver.Interval.member value1 interval1 && Solver.Interval.member value2 interval2)
+            (Check.Producer.tuple4 (intervalProducer, Check.Producer.int, intervalProducer, Check.Producer.int))
     ]
 
 

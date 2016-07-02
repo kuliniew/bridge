@@ -15,6 +15,8 @@ module Solver.Range exposing
   , removeLowerBound
   , removeUpperBound
 
+  , add
+  , subtract
   , intersect
   , union
   )
@@ -141,17 +143,25 @@ removeUpperBound (Range intervals) =
   fromIntervals <| List.map Solver.Interval.removeUpperBound intervals
 
 
+{-| Compute the sum of two ranges.
+-}
+add : Range -> Range -> Range
+add =
+  pairwise Solver.Interval.add
+
+
+{-| Compute the difference between two ranges.
+-}
+subtract : Range -> Range -> Range
+subtract =
+  pairwise Solver.Interval.subtract
+
+
 {-| Compute the values that appear in both ranges.
 -}
 intersect : Range -> Range -> Range
-intersect (Range intervals1) (Range intervals2) =
-  let
-    components =
-      intervals1 `List.Extra.andThen` \interval1 ->
-        intervals2 `List.Extra.andThen` \interval2 ->
-          [Solver.Interval.intersect interval1 interval2]
-  in
-    fromIntervals components
+intersect =
+  pairwise Solver.Interval.intersect
 
 
 {-| Compute the values that appear in either range.
@@ -159,3 +169,16 @@ intersect (Range intervals1) (Range intervals2) =
 union : Range -> Range -> Range
 union (Range intervals1) (Range intervals2) =
   fromIntervals (intervals1 ++ intervals2)
+
+
+{-| Apply an operation pairwise between two ranges, and combine the results.
+-}
+pairwise : (Interval -> Interval -> Interval) -> Range -> Range -> Range
+pairwise operation (Range intervals1) (Range intervals2) =
+  let
+    components =
+      intervals1 `List.Extra.andThen` \interval1 ->
+        intervals2 `List.Extra.andThen` \interval2 ->
+          [operation interval1 interval2]
+  in
+    fromIntervals components

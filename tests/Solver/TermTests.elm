@@ -1,5 +1,7 @@
 module Solver.TermTests exposing (all)
 
+import Solver.Endpoint
+import Solver.Interval exposing (Interval)
 import Solver.Range exposing (Range)
 import Solver.RangeTests exposing (rangeProducer)
 import Solver.Term
@@ -17,6 +19,7 @@ all =
   ElmTest.suite "Solver.Term"
     [ constantSuite
     , variableSuite
+    , addSuite
     ]
 
 
@@ -114,6 +117,111 @@ variableSuite =
     ]
 
 
+addSuite : ElmTest.Test
+addSuite =
+  ElmTest.suite "add"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "always evaluates to the sum of its subterms"
+        `Check.that`
+          (\(variables, value1, value2) -> Solver.Term.evaluate variables (Solver.Term.constant value1 `Solver.Term.add` Solver.Term.constant value2))
+        `Check.is`
+          (\(_, value1, value2) -> Solver.Range.singleton (value1 + value2))
+        `Check.for`
+          Check.Producer.tuple3 (variablesProducer, Check.Producer.int, Check.Producer.int)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "can constrain a sum of constants to their actual values"
+        `Check.that`
+          (\(value1, value2) ->
+            Solver.Term.constrain
+              (Solver.Term.constant value1 `Solver.Term.add` Solver.Term.constant value2)
+              (Solver.Range.singleton (value1 + value2))
+              EveryDict.empty
+          )
+        `Check.is`
+          always EveryDict.empty
+        `Check.for`
+          Check.Producer.tuple (Check.Producer.int, Check.Producer.int)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "can constrain a variable added to a constant"
+        `Check.that`
+          (\(variable, addend, sum) ->
+            Solver.Term.constrain
+              (Solver.Term.variable variable `Solver.Term.add` Solver.Term.constant addend)
+              (Solver.Range.singleton sum)
+              EveryDict.empty
+          )
+        `Check.is`
+          (\(variable, addend, sum) -> EveryDict.singleton variable (Solver.Range.singleton (sum - addend)))
+        `Check.for`
+          Check.Producer.tuple3 (Check.Producer.string, Check.Producer.int, Check.Producer.int)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "can constrain a constant added to a variable"
+        `Check.that`
+          (\(variable, addend, sum) ->
+            Solver.Term.constrain
+              (Solver.Term.constant addend `Solver.Term.add` Solver.Term.variable variable)
+              (Solver.Range.singleton sum)
+              EveryDict.empty
+          )
+        `Check.is`
+          (\(variable, addend, sum) -> EveryDict.singleton variable (Solver.Range.singleton (sum - addend)))
+        `Check.for`
+          Check.Producer.tuple3 (Check.Producer.string, Check.Producer.int, Check.Producer.int)
+
+    , ElmTest.test "x:[1 .. 3] + y:[4 .. 6] == [5 .. 5]" <|
+        let
+          variables =
+            EveryDict.fromList
+              [ ("x", Solver.Range.fromIntervals [boundedInterval 1 3])
+              , ("y", Solver.Range.fromIntervals [boundedInterval 4 6])
+              ]
+          constraint =
+            Solver.Term.variable "x" `Solver.Term.add` Solver.Term.variable "y"
+          expected =
+            EveryDict.fromList
+              [ ("x", Solver.Range.singleton 1)
+              , ("y", Solver.Range.singleton 4)
+              ]
+        in
+          ElmTest.assertEqual expected (Solver.Term.constrain constraint (Solver.Range.singleton 5) variables)
+
+    , ElmTest.test "x:[1 .. 3] + y:[4 .. 6] == [6 .. 6]" <|
+        let
+          variables =
+            EveryDict.fromList
+              [ ("x", Solver.Range.fromIntervals [boundedInterval 1 3])
+              , ("y", Solver.Range.fromIntervals [boundedInterval 4 6])
+              ]
+          constraint =
+            Solver.Term.variable "x" `Solver.Term.add` Solver.Term.variable "y"
+          expected =
+            EveryDict.fromList
+              [ ("x", Solver.Range.fromIntervals [boundedInterval 1 2])
+              , ("y", Solver.Range.fromIntervals [boundedInterval 4 5])
+              ]
+        in
+          ElmTest.assertEqual expected (Solver.Term.constrain constraint (Solver.Range.singleton 6) variables)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "has the bound variables of its subterms"
+        `Check.that`
+          (\(variable1, variable2) ->
+            EveryDict.toList <| Solver.Term.boundVariables (Solver.Term.variable variable1 `Solver.Term.add` Solver.Term.variable variable2))
+        `Check.is`
+          (\(variable1, variable2) -> EveryDict.toList <| EveryDict.fromList [(variable1, ()), (variable2, ())])
+        `Check.for`
+          Check.Producer.tuple (Check.Producer.string, Check.Producer.string)
+    ]
+
+
 variablesProducer : Check.Producer.Producer (EveryDict String Range)
 variablesProducer =
   let
@@ -123,3 +231,12 @@ variablesProducer =
       Check.Producer.list assignmentProducer
   in
     Check.Producer.convert EveryDict.fromList EveryDict.toList assignmentsProducer
+
+
+boundedInterval : Int -> Int -> Interval
+boundedInterval lo hi =
+  case Solver.Interval.fromEndpoints (Solver.Endpoint.Point lo) (Solver.Endpoint.Point hi) of
+    Just interval ->
+      interval
+    Nothing ->
+      Debug.crash <| "boundedInterval failed for: " ++ toString lo ++ " " ++ toString hi

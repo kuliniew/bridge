@@ -15,6 +15,9 @@ module Solver.Interval exposing
   , removeLowerBound
   , removeUpperBound
 
+  , add
+  , negate
+  , subtract
   , intersect
   , hull
   , union
@@ -154,6 +157,41 @@ removeUpperBound interval =
       NonEmpty lo Solver.Endpoint.PositiveInfinity
     Empty ->
       Empty
+
+
+{-| Compute the sum of two intervals.
+-}
+add : Interval -> Interval -> Interval
+add interval1 interval2 =
+  case (interval1, interval2) of
+    (NonEmpty lo1 hi1, NonEmpty lo2 hi2) ->
+      let
+        addOrCrash ep1 ep2 =
+          case ep1 `Solver.Endpoint.add` ep2 of
+            Just value -> value
+            Nothing -> Debug.crash <| "tried to add " ++ toString ep1 ++ " and " ++ toString ep2 ++ " during interval addition"
+      in
+        NonEmpty (lo1 `addOrCrash` lo2) (hi1 `addOrCrash` hi2)
+    _ ->
+      Empty
+
+
+{-| Negate an interval.
+-}
+negate : Interval -> Interval
+negate interval =
+  case interval of
+    NonEmpty lo hi ->
+      NonEmpty (Solver.Endpoint.negate hi) (Solver.Endpoint.negate lo)
+    Empty ->
+      Empty
+
+
+{-| Compute the difference of two intervals.
+-}
+subtract : Interval -> Interval -> Interval
+subtract interval1 interval2 =
+  add interval1 (negate interval2)
 
 
 {-| Compute the values that appear in both intervals.

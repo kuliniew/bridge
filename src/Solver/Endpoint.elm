@@ -9,6 +9,8 @@ module Solver.Endpoint exposing
   , max
 
   , adjacent
+  , add
+  , negate
   )
 
 {-| Operations over endpoints of potentially-unbounded integer intervals.
@@ -100,3 +102,44 @@ adjacent endpoint1 endpoint2 =
       value1 + 1 == value2
     _ ->
       False
+
+
+{-| Add two endpoints together.
+
+The sum of NegativeInfinity and PositiveInfinity is undefined, since
+(1) it doesn't make sense in terms of interval endpoints, and (2) any
+value that it could be used as the result breaks associativity in the
+case of "NegativeInfinity + PositiveInfinity + x".
+-}
+add : Endpoint -> Endpoint -> Maybe Endpoint
+add endpoint1 endpoint2 =
+  case (endpoint1, endpoint2) of
+    (Point value1, Point value2) ->
+      Just <| Point (value1 + value2)
+    (PositiveInfinity, NegativeInfinity) ->
+      Nothing
+    (NegativeInfinity, PositiveInfinity) ->
+      Nothing
+    (PositiveInfinity, _) ->
+      Just PositiveInfinity
+    (_, PositiveInfinity) ->
+      Just PositiveInfinity
+    (NegativeInfinity, _) ->
+      Just NegativeInfinity
+    (_, NegativeInfinity) ->
+      Just NegativeInfinity
+
+
+{-| Negate a point.
+
+Negation is also the additive inverse operation.
+-}
+negate : Endpoint -> Endpoint
+negate endpoint =
+  case endpoint of
+    Point value ->
+      Point (Basics.negate value)
+    PositiveInfinity ->
+      NegativeInfinity
+    NegativeInfinity ->
+      PositiveInfinity

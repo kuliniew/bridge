@@ -28,6 +28,8 @@ all =
     , toIntervalsSuite
     , removeLowerBoundSuite
     , removeUpperBoundSuite
+    , addSuite
+    , subtractSuite
     , intersectSuite
     , unionSuite
     , latticeSuite
@@ -263,6 +265,46 @@ removeBoundSuite name removeFunc compareFunc =
           Check.Producer.filter
             (\(range, value, otherValue) -> Solver.Range.member value range && compareFunc otherValue value)
             (Check.Producer.tuple3 (rangeProducer, Check.Producer.int, Check.Producer.int))
+    ]
+
+
+addSuite : ElmTest.Test
+addSuite =
+  ElmTest.suite "add"
+    [ OperationTests.commutativeMonoid Solver.Range.add (Solver.Range.singleton 0) rangeProducer
+
+    , OperationTests.leftAnnihilator Solver.Range.add Solver.Range.empty rangeProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains the sums of values from the input ranges"
+        `Check.true`
+          (\(range1, value1, range2, value2) -> Solver.Range.member (value1 + value2) (range1 `Solver.Range.add` range2))
+        `Check.for`
+          Check.Producer.filter
+            (\(range1, value1, range2, value2) -> Solver.Range.member value1 range1 && Solver.Range.member value2 range2)
+            (Check.Producer.tuple4 (rangeProducer, Check.Producer.int, rangeProducer, Check.Producer.int))
+    ]
+
+
+subtractSuite : ElmTest.Test
+subtractSuite =
+  ElmTest.suite "subtract"
+    [ OperationTests.leftAnnihilator Solver.Range.subtract Solver.Range.empty rangeProducer
+
+    , OperationTests.rightAnnihilator Solver.Range.subtract Solver.Range.empty rangeProducer
+
+    , OperationTests.rightIdentity Solver.Range.subtract (Solver.Range.singleton 0) rangeProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains the differences of values from the input ranges"
+        `Check.true`
+          (\(range1, value1, range2, value2) -> Solver.Range.member (value1 - value2) (range1 `Solver.Range.subtract` range2))
+        `Check.for`
+          Check.Producer.filter
+            (\(range1, value1, range2, value2) -> Solver.Range.member value1 range1 && Solver.Range.member value2 range2)
+            (Check.Producer.tuple4 (rangeProducer, Check.Producer.int, rangeProducer, Check.Producer.int))
     ]
 
 

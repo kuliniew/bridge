@@ -28,6 +28,8 @@ all =
     , maxSuite
     , adjacentSuite
     , latticeSuite
+    , addSuite
+    , negateSuite
     ]
 
 
@@ -283,6 +285,137 @@ latticeSuite : ElmTest.Test
 latticeSuite =
   ElmTest.suite "forms a bounded lattice (max is join, min is meet)"
     [ OperationTests.boundedLattice Solver.Endpoint.max Solver.Endpoint.NegativeInfinity Solver.Endpoint.min Solver.Endpoint.PositiveInfinity endpointProducer
+    ]
+
+
+addSuite : ElmTest.Test
+addSuite =
+  ElmTest.suite "add"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "commutative (all values)"
+        `Check.that`
+          (\(ep1, ep2) -> ep1 `Solver.Endpoint.add` ep2)
+        `Check.is`
+          (\(ep1, ep2) -> ep2 `Solver.Endpoint.add` ep1)
+        `Check.for`
+          Check.Producer.tuple (endpointProducer, endpointProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "associative (propagating failures)"
+        `Check.that`
+          (\(ep1, ep2, ep3) ->
+            case ep1 `Solver.Endpoint.add` ep2 of
+              Just partial -> partial `Solver.Endpoint.add` ep3
+              Nothing -> Nothing)
+        `Check.is`
+          (\(ep1, ep2, ep3) ->
+            case ep2 `Solver.Endpoint.add` ep3 of
+              Just partial -> ep1 `Solver.Endpoint.add` partial
+              Nothing -> Nothing)
+        `Check.for`
+          Check.Producer.tuple3 (endpointProducer, endpointProducer, endpointProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "left identity (all values)"
+        `Check.that`
+          Solver.Endpoint.add (Solver.Endpoint.Point 0)
+        `Check.is`
+          Just
+        `Check.for`
+          endpointProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "inverse (non-infinite only)"
+        `Check.that`
+          (\value -> Solver.Endpoint.Point value `Solver.Endpoint.add` (Solver.Endpoint.negate <| Solver.Endpoint.Point value))
+        `Check.is`
+          (always <| Just <| Solver.Endpoint.Point 0)
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "behaves like integer addition for non-infinite points"
+        `Check.that`
+          (\(value1, value2) -> Solver.Endpoint.Point value1 `Solver.Endpoint.add` Solver.Endpoint.Point value2)
+        `Check.is`
+          (\(value1, value2) -> Just <| Solver.Endpoint.Point (value1 + value2))
+        `Check.for`
+          Check.Producer.tuple (Check.Producer.int, Check.Producer.int)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "PositiveInfinity dominates integers"
+        `Check.that`
+          (\value -> Solver.Endpoint.PositiveInfinity `Solver.Endpoint.add` Solver.Endpoint.Point value)
+        `Check.is`
+          always (Just Solver.Endpoint.PositiveInfinity)
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "NegativeInfinity dominates integers"
+        `Check.that`
+          (\value -> Solver.Endpoint.NegativeInfinity `Solver.Endpoint.add` Solver.Endpoint.Point value)
+        `Check.is`
+          always (Just Solver.Endpoint.NegativeInfinity)
+        `Check.for`
+          Check.Producer.int
+
+    , ElmTest.test "PositiveInfinity + PositiveInfinity" <|
+        ElmTest.assertEqual
+          (Just Solver.Endpoint.PositiveInfinity)
+          (Solver.Endpoint.PositiveInfinity `Solver.Endpoint.add` Solver.Endpoint.PositiveInfinity)
+
+    , ElmTest.test "NegativeInfinity + NegativeInfinity" <|
+        ElmTest.assertEqual
+          (Just Solver.Endpoint.NegativeInfinity)
+          (Solver.Endpoint.NegativeInfinity `Solver.Endpoint.add` Solver.Endpoint.NegativeInfinity)
+
+    , ElmTest.test "PositiveInfinity + NegativeInfinity" <|
+        ElmTest.assertEqual
+          Nothing
+          (Solver.Endpoint.PositiveInfinity `Solver.Endpoint.add` Solver.Endpoint.NegativeInfinity)
+    ]
+
+
+negateSuite : ElmTest.Test
+negateSuite =
+  ElmTest.suite "negate"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "behaves like integer negation for non-infinite points"
+        `Check.that`
+          (Solver.Endpoint.negate << Solver.Endpoint.Point)
+        `Check.is`
+          (Solver.Endpoint.Point << negate)
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "is its own inverse"
+        `Check.that`
+          (Solver.Endpoint.negate << Solver.Endpoint.negate)
+        `Check.is`
+          identity
+        `Check.for`
+          endpointProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "only has 0 as a fixed point"
+        `Check.that`
+          (\ep -> Solver.Endpoint.negate ep == ep)
+        `Check.is`
+          (\ep -> ep == Solver.Endpoint.Point 0)
+        `Check.for`
+          endpointProducer
     ]
 
 
