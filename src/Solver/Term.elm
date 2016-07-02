@@ -3,6 +3,7 @@ module Solver.Term exposing
   , constant
   , variable
   , add
+  , sum
 
   , evaluate
   , constrain
@@ -44,6 +45,13 @@ variable =
 add : Term var -> Term var -> Term var
 add =
   Add
+
+
+{-| The sum of an arbitrary number of terms.
+-}
+sum : List (Term var) -> Term var
+sum =
+  List.foldl add (constant 0)
 
 
 {-| Evaluate the range of vaues a term can have, given a set of known

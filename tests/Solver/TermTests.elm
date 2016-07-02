@@ -20,6 +20,7 @@ all =
     [ constantSuite
     , variableSuite
     , addSuite
+    , sumSuite
     ]
 
 
@@ -219,6 +220,46 @@ addSuite =
           (\(variable1, variable2) -> EveryDict.toList <| EveryDict.fromList [(variable1, ()), (variable2, ())])
         `Check.for`
           Check.Producer.tuple (Check.Producer.string, Check.Producer.string)
+    ]
+
+
+sumSuite : ElmTest.Test
+sumSuite =
+  ElmTest.suite "sum"
+    [ ElmTest.test "for zero terms, evaluates to zero" <|
+        ElmTest.assertEqual
+          (Solver.Range.singleton 0)
+          (Solver.Term.evaluate EveryDict.empty <| Solver.Term.sum [])
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "for one term, evaluates to that term"
+        `Check.that`
+          (\value -> Solver.Term.evaluate EveryDict.empty <| Solver.Term.sum [Solver.Term.constant value])
+        `Check.is`
+          Solver.Range.singleton
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "for two terms, is consistent with add"
+        `Check.that`
+          (\(value1, value2) -> Solver.Term.evaluate EveryDict.empty <| Solver.Term.sum (List.map Solver.Term.constant [value1, value2]))
+        `Check.is`
+          (\(value1, value2) -> Solver.Term.evaluate EveryDict.empty <| Solver.Term.add (Solver.Term.constant value1) (Solver.Term.constant value2))
+        `Check.for`
+          Check.Producer.tuple (Check.Producer.int, Check.Producer.int)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "sums lists of arbitrary length correctly"
+        `Check.that`
+          (\values -> Solver.Term.evaluate EveryDict.empty <| Solver.Term.sum (List.map Solver.Term.constant values))
+        `Check.is`
+          (Solver.Range.singleton << List.sum)
+        `Check.for`
+          Check.Producer.list Check.Producer.int
     ]
 
 
