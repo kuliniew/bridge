@@ -89,6 +89,54 @@ evaluateSuite =
           EveryDict.empty
           (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.variable "x")
           (Just <| EveryDict.singleton "x" (Solver.Range.fromLowerBound 2))
+
+      , testCase
+          "1 >= 2"
+          EveryDict.empty
+          (Solver.Term.constant 1 `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 2)
+          Nothing
+
+      , testCase
+          "2 >= 1"
+          EveryDict.empty
+          (Solver.Term.constant 2 `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 1)
+          (Just EveryDict.empty)
+
+      , testCase
+          "x >= 1"
+          EveryDict.empty
+          (Solver.Term.variable "x" `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 1)
+          (Just <| EveryDict.singleton "x" (Solver.Range.fromLowerBound 1))
+
+      , testCase
+          "1 >= x"
+          EveryDict.empty
+          (Solver.Term.constant 1 `Solver.Constraint.greaterThanOrEqual` Solver.Term.variable "x")
+          (Just <| EveryDict.singleton "x" (Solver.Range.fromUpperBound 1))
+
+      , testCase
+          "1 > 2"
+          EveryDict.empty
+          (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.constant 2)
+          Nothing
+
+      , testCase
+          "1 > 1"
+          EveryDict.empty
+          (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.constant 1)
+          Nothing
+
+      , testCase
+          "x > 1"
+          EveryDict.empty
+          (Solver.Term.variable "x" `Solver.Constraint.greaterThan` Solver.Term.constant 1)
+          (Just <| EveryDict.singleton "x" (Solver.Range.fromLowerBound 2))
+
+      , testCase
+          "1 > x"
+          EveryDict.empty
+          (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.variable "x")
+          (Just <| EveryDict.singleton "x" (Solver.Range.fromUpperBound 0))
       ]
 
 
@@ -158,5 +206,45 @@ boundVariablesSuite =
       , testCase
           "x < y"
           (Solver.Term.variable "x" `Solver.Constraint.lessThan` Solver.Term.variable "y")
+          ["x", "y"]
+
+      , testCase
+          "1 >= 2"
+          (Solver.Term.constant 1 `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 2)
+          []
+
+      , testCase
+          "x >= 1"
+          (Solver.Term.variable "x" `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 1)
+          ["x"]
+
+      , testCase
+          "1 >= x"
+          (Solver.Term.constant 1 `Solver.Constraint.greaterThanOrEqual` Solver.Term.variable "x")
+          ["x"]
+
+      , testCase
+          "x >= y"
+          (Solver.Term.variable "x" `Solver.Constraint.greaterThanOrEqual` Solver.Term.variable "y")
+          ["x", "y"]
+
+      , testCase
+          "1 > 2"
+          (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.constant 2)
+          []
+
+      , testCase
+          "x > 1"
+          (Solver.Term.variable "x" `Solver.Constraint.greaterThan` Solver.Term.constant 1)
+          ["x"]
+
+      , testCase
+          "1 > x"
+          (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.variable "x")
+          ["x"]
+
+      , testCase
+          "x > y"
+          (Solver.Term.variable "x" `Solver.Constraint.greaterThan` Solver.Term.variable "y")
           ["x", "y"]
       ]

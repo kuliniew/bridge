@@ -3,6 +3,8 @@ module Solver.Constraint exposing
   , equal
   , lessThanOrEqual
   , lessThan
+  , greaterThanOrEqual
+  , greaterThan
 
   , evaluate
   , boundVariables
@@ -46,6 +48,20 @@ lessThanOrEqual =
 lessThan : Term var -> Term var -> Constraint var
 lessThan left right =
   lessThanOrEqual (left `Solver.Term.add` Solver.Term.constant 1) right
+
+
+{-| Constrain one term to be greater than or equal to another.
+-}
+greaterThanOrEqual : Term var -> Term var -> Constraint var
+greaterThanOrEqual =
+  flip lessThanOrEqual
+
+
+{-| Constrain one term to be strictly greater than another.
+-}
+greaterThan : Term var -> Term var -> Constraint var
+greaterThan =
+  flip lessThan
 
 
 {-| Evaluate a constraint over a set of known variable ranges, returning
