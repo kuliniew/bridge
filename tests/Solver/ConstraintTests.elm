@@ -20,6 +20,8 @@ all =
     , greaterThanSuite
     , andSuite
     , allSuite
+    , orSuite
+    , anySuite
     ]
 
 
@@ -405,6 +407,158 @@ allSuite =
     , boundVariablesTestCase
         "[1 <= x, x <= 10, 1 <= y, y <= 5]"
         (Solver.Constraint.all
+          [ Solver.Term.constant 1 `Solver.Constraint.lessThanOrEqual` Solver.Term.variable "x"
+          , Solver.Term.variable "x" `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 10
+          , Solver.Term.constant 1 `Solver.Constraint.lessThanOrEqual` Solver.Term.variable "y"
+          , Solver.Term.variable "y" `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 5
+          ])
+        ["x", "y"]
+    ]
+
+
+orSuite : ElmTest.Test
+orSuite =
+  ElmTest.suite "or"
+    [ evaluateTestCase
+        "1 < 2 || 2 < 3"
+        EveryDict.empty
+        (Solver.Constraint.or
+          (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.constant 2)
+          (Solver.Term.constant 2 `Solver.Constraint.lessThan` Solver.Term.constant 3))
+        (Just EveryDict.empty)
+
+    , evaluateTestCase
+        "1 > 2 || 2 < 3"
+        EveryDict.empty
+        (Solver.Constraint.or
+          (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.constant 2)
+          (Solver.Term.constant 2 `Solver.Constraint.lessThan` Solver.Term.constant 3))
+        (Just EveryDict.empty)
+
+    , evaluateTestCase
+        "1 < 2 || 2 > 3"
+        EveryDict.empty
+        (Solver.Constraint.or
+          (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.constant 2)
+          (Solver.Term.constant 2 `Solver.Constraint.greaterThan` Solver.Term.constant 3))
+        (Just EveryDict.empty)
+
+    , evaluateTestCase
+        "1 > 2 || 2 > 3"
+        EveryDict.empty
+        (Solver.Constraint.and
+          (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.constant 2)
+          (Solver.Term.constant 2 `Solver.Constraint.greaterThan` Solver.Term.constant 3))
+        Nothing
+
+    , evaluateTestCase
+        "x <= 1 || x >= 10"
+        EveryDict.empty
+        (Solver.Constraint.or
+          (Solver.Term.variable "x" `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 1)
+          (Solver.Term.variable "x" `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 10))
+        (Just <| EveryDict.singleton "x" (Solver.Range.union (Solver.Range.fromUpperBound 1) (Solver.Range.fromLowerBound 10)))
+
+    , evaluateTestCase
+        "x >= 1 || y >= 1"
+        EveryDict.empty
+        (Solver.Constraint.or
+          (Solver.Term.variable "x" `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 1)
+          (Solver.Term.variable "y" `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 1))
+        (Just <| EveryDict.fromList
+          [ ("x", Solver.Range.full)
+          , ("y", Solver.Range.full)
+          ])
+
+    , evaluateTestCase
+        "1 = 2 || x = 1"
+        EveryDict.empty
+        (Solver.Constraint.or
+          (Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 2)
+          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1))
+        (Just <| EveryDict.singleton "x" (Solver.Range.singleton 1))
+
+    , evaluateTestCase
+        "x = 1 || 1 = 2"
+        EveryDict.empty
+        (Solver.Constraint.or
+          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1)
+          (Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 2))
+        (Just <| EveryDict.singleton "x" (Solver.Range.singleton 1))
+
+    , boundVariablesTestCase
+        "w < x || y < z"
+        (Solver.Constraint.or
+          (Solver.Term.variable "w" `Solver.Constraint.lessThan` Solver.Term.variable "x")
+          (Solver.Term.variable "y" `Solver.Constraint.lessThan` Solver.Term.variable "z"))
+        ["w", "x", "y", "z"]
+    ]
+
+
+anySuite : ElmTest.Test
+anySuite =
+  ElmTest.suite "any"
+    [ evaluateTestCase
+        "[]"
+        EveryDict.empty
+        (Solver.Constraint.any [])
+        Nothing
+
+    , evaluateTestCase
+        "[1 = 1]"
+        EveryDict.empty
+        (Solver.Constraint.any
+          [ Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 1
+          ])
+        (Just EveryDict.empty)
+
+    , evaluateTestCase
+        "[1 = 2, 2 = 2]"
+        EveryDict.empty
+        (Solver.Constraint.any
+          [ Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 2
+          , Solver.Term.constant 2 `Solver.Constraint.equal` Solver.Term.constant 2
+          ])
+        (Just EveryDict.empty)
+
+    , evaluateTestCase
+        "[1 = 2, 2 = 3, 3 = 3]"
+        EveryDict.empty
+        (Solver.Constraint.any
+          [ Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 2
+          , Solver.Term.constant 2 `Solver.Constraint.equal` Solver.Term.constant 3
+          , Solver.Term.constant 3 `Solver.Constraint.equal` Solver.Term.constant 3
+          ])
+        (Just EveryDict.empty)
+
+    , evaluateTestCase
+        "[1 = 2, 2 = 3, 3 = 4]"
+        EveryDict.empty
+        (Solver.Constraint.any
+          [ Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 2
+          , Solver.Term.constant 2 `Solver.Constraint.equal` Solver.Term.constant 3
+          , Solver.Term.constant 3 `Solver.Constraint.equal` Solver.Term.constant 4
+          ])
+        Nothing
+
+    , evaluateTestCase
+        "[1 = 2, x = 3, x = 4]"
+        EveryDict.empty
+        (Solver.Constraint.any
+          [ Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 2
+          , Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 3
+          , Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 4
+          ])
+        (Just <| EveryDict.singleton "x" (Solver.Range.fromIntervals [boundedInterval 3 4]))
+
+    , boundVariablesTestCase
+        "[]"
+        (Solver.Constraint.any [])
+        []
+
+    , boundVariablesTestCase
+        "[1 <= x, x <= 10, 1 <= y, y <= 5]"
+        (Solver.Constraint.any
           [ Solver.Term.constant 1 `Solver.Constraint.lessThanOrEqual` Solver.Term.variable "x"
           , Solver.Term.variable "x" `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 10
           , Solver.Term.constant 1 `Solver.Constraint.lessThanOrEqual` Solver.Term.variable "y"

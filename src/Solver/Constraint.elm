@@ -7,6 +7,8 @@ module Solver.Constraint exposing
   , greaterThan
   , and
   , all
+  , or
+  , any
 
   , evaluate
   , boundVariables
@@ -30,7 +32,9 @@ type Constraint var
   = Equal (Term var) (Term var)
   | LessThanOrEqual (Term var) (Term var)
   | And (Constraint var) (Constraint var)
+  | Or (Constraint var) (Constraint var)
   | AlwaysTrue
+  | AlwaysFalse
 
 
 {-| Constrain two terms to be exactly equal.
@@ -82,12 +86,32 @@ all =
   List.foldl and AlwaysTrue
 
 
+{-| Require either constraint (or both) to be met.
+-}
+or : Constraint var -> Constraint var -> Constraint var
+or =
+  Or
+
+
+{-| Require at least one constraint to be met.
+-}
+any : List (Constraint var) -> Constraint var
+any =
+  List.foldl or AlwaysFalse
+
+
 {-| Evaluate a constraint over a set of known variable ranges, returning
 a narrower set of variable ranges that satisfies the constraint.
 -}
 evaluate : EveryDict var Range -> Constraint var -> Maybe (EveryDict var Range)
 evaluate variables constraint =
   let
+    alternatives variables1 variables2 =
+      EveryDict.keys variables1 ++ EveryDict.keys variables2
+        |> List.map (\key -> (key, Solver.Range.union
+                                      (Maybe.withDefault Solver.Range.full <| EveryDict.get key variables1)
+                                      (Maybe.withDefault Solver.Range.full <| EveryDict.get key variables2)))
+        |> EveryDict.fromList
     basicResult =
       case constraint of
         Equal left right ->
@@ -114,8 +138,20 @@ evaluate variables constraint =
             else Just <| Solver.Term.constrain left allowedLeft <| Solver.Term.constrain right allowedRight <| variables
         And left right ->
           evaluate variables left `Maybe.andThen` flip evaluate right
+        Or left right ->
+          case (evaluate variables left, evaluate variables right) of
+            (Just leftResult, Just rightResult) ->
+              Just <| alternatives leftResult rightResult
+            (Just leftResult, Nothing) ->
+              Just leftResult
+            (Nothing, Just rightResult) ->
+              Just rightResult
+            (Nothing, Nothing) ->
+              Nothing
         AlwaysTrue ->
           Just variables
+        AlwaysFalse ->
+          Nothing
   in
     case basicResult of
       Just newVariables ->
@@ -137,5 +173,9 @@ boundVariables constraint =
       EveryDict.union (Solver.Term.boundVariables left) (Solver.Term.boundVariables right)
     And left right ->
       EveryDict.union (boundVariables left) (boundVariables right)
+    Or left right ->
+      EveryDict.union (boundVariables left) (boundVariables right)
     AlwaysTrue ->
+      EveryDict.empty
+    AlwaysFalse ->
       EveryDict.empty
