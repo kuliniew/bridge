@@ -1,7 +1,7 @@
 module Solver.ConstraintTests exposing (all)
 
-import Solver.Constraint
-import Solver.Range
+import Solver.Constraint exposing (Constraint)
+import Solver.Range exposing (Range)
 import Solver.Term
 
 import ElmTest
@@ -11,240 +11,260 @@ import EveryDict exposing (EveryDict)
 all : ElmTest.Test
 all =
   ElmTest.suite "Solver.Constraint"
-    [ evaluateSuite
-    , boundVariablesSuite
+    [ equalSuite
+    , lessThanOrEqualSuite
+    , lessThanSuite
+    , greaterThanOrEqualSuite
+    , greaterThanSuite
     ]
 
 
-evaluateSuite : ElmTest.Test
-evaluateSuite =
-  ElmTest.suite "evaluate" <|
-    let
-      testCase name initial constraint expected =
-        ElmTest.test name <|
-          ElmTest.assertEqual expected (Solver.Constraint.evaluate initial constraint)
-    in
-      [ testCase
-          "1 = 1"
-          EveryDict.empty
-          (Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 1)
-          (Just EveryDict.empty)
+equalSuite : ElmTest.Test
+equalSuite =
+  ElmTest.suite "equal"
+    [ evaluateTestCase
+        "1 = 1"
+        EveryDict.empty
+        (Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 1)
+        (Just EveryDict.empty)
 
-      , testCase
-          "1 = 2"
-          EveryDict.empty
-          (Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 2)
-          Nothing
+    , evaluateTestCase
+        "1 = 2"
+        EveryDict.empty
+        (Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 2)
+        Nothing
 
-      , testCase
-          "x = 1"
-          EveryDict.empty
-          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1)
-          (Just <| EveryDict.singleton "x" (Solver.Range.singleton 1))
+    , evaluateTestCase
+        "x = 1"
+        EveryDict.empty
+        (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1)
+        (Just <| EveryDict.singleton "x" (Solver.Range.singleton 1))
 
-      , testCase
-          "1 <= 2"
-          EveryDict.empty
-          (Solver.Term.constant 1 `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 2)
-          (Just EveryDict.empty)
+    , boundVariablesTestCase
+        "1 = 1"
+        (Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 1)
+        []
 
-      , testCase
-          "2 <= 1"
-          EveryDict.empty
-          (Solver.Term.constant 2 `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 1)
-          Nothing
+    , boundVariablesTestCase
+        "x = 1"
+        (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1)
+        ["x"]
 
-      , testCase
-          "x <= 1"
-          EveryDict.empty
-          (Solver.Term.variable "x" `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 1)
-          (Just <| EveryDict.singleton "x" (Solver.Range.fromUpperBound 1))
+    , boundVariablesTestCase
+        "x = x"
+        (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.variable "x")
+        ["x"]
 
-      , testCase
-          "1 <= x"
-          EveryDict.empty
-          (Solver.Term.constant 1 `Solver.Constraint.lessThanOrEqual` Solver.Term.variable "x")
-          (Just <| EveryDict.singleton "x" (Solver.Range.fromLowerBound 1))
-
-      , testCase
-          "1 < 2"
-          EveryDict.empty
-          (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.constant 2)
-          (Just EveryDict.empty)
-
-      , testCase
-          "1 < 1"
-          EveryDict.empty
-          (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.constant 1)
-          Nothing
-
-      , testCase
-          "x < 1"
-          EveryDict.empty
-          (Solver.Term.variable "x" `Solver.Constraint.lessThan` Solver.Term.constant 1)
-          (Just <| EveryDict.singleton "x" (Solver.Range.fromUpperBound 0))
-
-      , testCase
-          "1 < x"
-          EveryDict.empty
-          (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.variable "x")
-          (Just <| EveryDict.singleton "x" (Solver.Range.fromLowerBound 2))
-
-      , testCase
-          "1 >= 2"
-          EveryDict.empty
-          (Solver.Term.constant 1 `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 2)
-          Nothing
-
-      , testCase
-          "2 >= 1"
-          EveryDict.empty
-          (Solver.Term.constant 2 `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 1)
-          (Just EveryDict.empty)
-
-      , testCase
-          "x >= 1"
-          EveryDict.empty
-          (Solver.Term.variable "x" `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 1)
-          (Just <| EveryDict.singleton "x" (Solver.Range.fromLowerBound 1))
-
-      , testCase
-          "1 >= x"
-          EveryDict.empty
-          (Solver.Term.constant 1 `Solver.Constraint.greaterThanOrEqual` Solver.Term.variable "x")
-          (Just <| EveryDict.singleton "x" (Solver.Range.fromUpperBound 1))
-
-      , testCase
-          "1 > 2"
-          EveryDict.empty
-          (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.constant 2)
-          Nothing
-
-      , testCase
-          "1 > 1"
-          EveryDict.empty
-          (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.constant 1)
-          Nothing
-
-      , testCase
-          "x > 1"
-          EveryDict.empty
-          (Solver.Term.variable "x" `Solver.Constraint.greaterThan` Solver.Term.constant 1)
-          (Just <| EveryDict.singleton "x" (Solver.Range.fromLowerBound 2))
-
-      , testCase
-          "1 > x"
-          EveryDict.empty
-          (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.variable "x")
-          (Just <| EveryDict.singleton "x" (Solver.Range.fromUpperBound 0))
-      ]
+    , boundVariablesTestCase
+        "x = y"
+        (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.variable "y")
+        ["x", "y"]
+    ]
 
 
-boundVariablesSuite : ElmTest.Test
-boundVariablesSuite =
-  ElmTest.suite "boundVariables" <|
-    let
-      testCase name constraint expected =
-        ElmTest.test name <|
-          ElmTest.assertEqual expected (EveryDict.keys <| Solver.Constraint.boundVariables constraint)
-    in
-      [ testCase
-          "1 = 1"
-          (Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 1)
-          []
+lessThanOrEqualSuite : ElmTest.Test
+lessThanOrEqualSuite =
+  ElmTest.suite "lessThanOrEqual"
+    [ evaluateTestCase
+        "1 <= 2"
+        EveryDict.empty
+        (Solver.Term.constant 1 `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 2)
+        (Just EveryDict.empty)
 
-      , testCase
-          "x = 1"
-          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1)
-          ["x"]
+    , evaluateTestCase
+        "2 <= 1"
+        EveryDict.empty
+        (Solver.Term.constant 2 `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 1)
+        Nothing
 
-      , testCase
-          "x = x"
-          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.variable "x")
-          ["x"]
+    , evaluateTestCase
+        "x <= 1"
+        EveryDict.empty
+        (Solver.Term.variable "x" `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 1)
+        (Just <| EveryDict.singleton "x" (Solver.Range.fromUpperBound 1))
 
-      , testCase
-          "x = y"
-          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.variable "y")
-          ["x", "y"]
+    , evaluateTestCase
+        "1 <= x"
+        EveryDict.empty
+        (Solver.Term.constant 1 `Solver.Constraint.lessThanOrEqual` Solver.Term.variable "x")
+        (Just <| EveryDict.singleton "x" (Solver.Range.fromLowerBound 1))
 
-      , testCase
-          "1 <= 2"
-          (Solver.Term.constant 1 `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 2)
-          []
+    , boundVariablesTestCase
+        "1 <= 2"
+        (Solver.Term.constant 1 `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 2)
+        []
 
-      , testCase
-          "x <= 1"
-          (Solver.Term.variable "x" `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 1)
-          ["x"]
+    , boundVariablesTestCase
+        "x <= 1"
+        (Solver.Term.variable "x" `Solver.Constraint.lessThanOrEqual` Solver.Term.constant 1)
+        ["x"]
 
-      , testCase
-          "1 <= x"
-          (Solver.Term.constant 1 `Solver.Constraint.lessThanOrEqual` Solver.Term.variable "x")
-          ["x"]
+    , boundVariablesTestCase
+        "1 <= x"
+        (Solver.Term.constant 1 `Solver.Constraint.lessThanOrEqual` Solver.Term.variable "x")
+        ["x"]
 
-      , testCase
-          "x <= y"
-          (Solver.Term.variable "x" `Solver.Constraint.lessThanOrEqual` Solver.Term.variable "y")
-          ["x", "y"]
+    , boundVariablesTestCase
+        "x <= y"
+        (Solver.Term.variable "x" `Solver.Constraint.lessThanOrEqual` Solver.Term.variable "y")
+        ["x", "y"]
+    ]
 
-      , testCase
-          "1 < 2"
-          (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.constant 2)
-          []
 
-      , testCase
-          "x < 1"
-          (Solver.Term.variable "x" `Solver.Constraint.lessThan` Solver.Term.constant 1)
-          ["x"]
+lessThanSuite : ElmTest.Test
+lessThanSuite =
+  ElmTest.suite "lessThan"
+    [ evaluateTestCase
+        "1 < 2"
+        EveryDict.empty
+        (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.constant 2)
+        (Just EveryDict.empty)
 
-      , testCase
-          "1 < x"
-          (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.variable "x")
-          ["x"]
+    , evaluateTestCase
+        "1 < 1"
+        EveryDict.empty
+        (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.constant 1)
+        Nothing
 
-      , testCase
-          "x < y"
-          (Solver.Term.variable "x" `Solver.Constraint.lessThan` Solver.Term.variable "y")
-          ["x", "y"]
+    , evaluateTestCase
+        "x < 1"
+        EveryDict.empty
+        (Solver.Term.variable "x" `Solver.Constraint.lessThan` Solver.Term.constant 1)
+        (Just <| EveryDict.singleton "x" (Solver.Range.fromUpperBound 0))
 
-      , testCase
-          "1 >= 2"
-          (Solver.Term.constant 1 `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 2)
-          []
+    , evaluateTestCase
+        "1 < x"
+        EveryDict.empty
+        (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.variable "x")
+        (Just <| EveryDict.singleton "x" (Solver.Range.fromLowerBound 2))
 
-      , testCase
-          "x >= 1"
-          (Solver.Term.variable "x" `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 1)
-          ["x"]
+    , boundVariablesTestCase
+        "1 < 2"
+        (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.constant 2)
+        []
 
-      , testCase
-          "1 >= x"
-          (Solver.Term.constant 1 `Solver.Constraint.greaterThanOrEqual` Solver.Term.variable "x")
-          ["x"]
+    , boundVariablesTestCase
+        "x < 1"
+        (Solver.Term.variable "x" `Solver.Constraint.lessThan` Solver.Term.constant 1)
+        ["x"]
 
-      , testCase
-          "x >= y"
-          (Solver.Term.variable "x" `Solver.Constraint.greaterThanOrEqual` Solver.Term.variable "y")
-          ["x", "y"]
+    , boundVariablesTestCase
+        "1 < x"
+        (Solver.Term.constant 1 `Solver.Constraint.lessThan` Solver.Term.variable "x")
+        ["x"]
 
-      , testCase
-          "1 > 2"
-          (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.constant 2)
-          []
+    , boundVariablesTestCase
+        "x < y"
+        (Solver.Term.variable "x" `Solver.Constraint.lessThan` Solver.Term.variable "y")
+        ["x", "y"]
+    ]
 
-      , testCase
-          "x > 1"
-          (Solver.Term.variable "x" `Solver.Constraint.greaterThan` Solver.Term.constant 1)
-          ["x"]
 
-      , testCase
-          "1 > x"
-          (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.variable "x")
-          ["x"]
+greaterThanOrEqualSuite : ElmTest.Test
+greaterThanOrEqualSuite =
+  ElmTest.suite "greaterThanOrEqual"
+    [ evaluateTestCase
+        "1 >= 2"
+        EveryDict.empty
+        (Solver.Term.constant 1 `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 2)
+        Nothing
 
-      , testCase
-          "x > y"
-          (Solver.Term.variable "x" `Solver.Constraint.greaterThan` Solver.Term.variable "y")
-          ["x", "y"]
-      ]
+    , evaluateTestCase
+        "2 >= 1"
+        EveryDict.empty
+        (Solver.Term.constant 2 `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 1)
+        (Just EveryDict.empty)
+
+    , evaluateTestCase
+        "x >= 1"
+        EveryDict.empty
+        (Solver.Term.variable "x" `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 1)
+        (Just <| EveryDict.singleton "x" (Solver.Range.fromLowerBound 1))
+
+    , evaluateTestCase
+        "1 >= x"
+        EveryDict.empty
+        (Solver.Term.constant 1 `Solver.Constraint.greaterThanOrEqual` Solver.Term.variable "x")
+        (Just <| EveryDict.singleton "x" (Solver.Range.fromUpperBound 1))
+
+    , boundVariablesTestCase
+        "1 >= 2"
+        (Solver.Term.constant 1 `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 2)
+        []
+
+    , boundVariablesTestCase
+        "x >= 1"
+        (Solver.Term.variable "x" `Solver.Constraint.greaterThanOrEqual` Solver.Term.constant 1)
+        ["x"]
+
+    , boundVariablesTestCase
+        "1 >= x"
+        (Solver.Term.constant 1 `Solver.Constraint.greaterThanOrEqual` Solver.Term.variable "x")
+        ["x"]
+
+    , boundVariablesTestCase
+        "x >= y"
+        (Solver.Term.variable "x" `Solver.Constraint.greaterThanOrEqual` Solver.Term.variable "y")
+        ["x", "y"]
+    ]
+
+
+greaterThanSuite : ElmTest.Test
+greaterThanSuite =
+  ElmTest.suite "greaterThan" <|
+    [ evaluateTestCase
+        "1 > 2"
+        EveryDict.empty
+        (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.constant 2)
+        Nothing
+
+    , evaluateTestCase
+        "1 > 1"
+        EveryDict.empty
+        (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.constant 1)
+        Nothing
+
+    , evaluateTestCase
+        "x > 1"
+        EveryDict.empty
+        (Solver.Term.variable "x" `Solver.Constraint.greaterThan` Solver.Term.constant 1)
+        (Just <| EveryDict.singleton "x" (Solver.Range.fromLowerBound 2))
+
+    , evaluateTestCase
+        "1 > x"
+        EveryDict.empty
+        (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.variable "x")
+        (Just <| EveryDict.singleton "x" (Solver.Range.fromUpperBound 0))
+
+    , boundVariablesTestCase
+        "1 > 2"
+        (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.constant 2)
+        []
+
+    , boundVariablesTestCase
+        "x > 1"
+        (Solver.Term.variable "x" `Solver.Constraint.greaterThan` Solver.Term.constant 1)
+        ["x"]
+
+    , boundVariablesTestCase
+        "1 > x"
+        (Solver.Term.constant 1 `Solver.Constraint.greaterThan` Solver.Term.variable "x")
+        ["x"]
+
+    , boundVariablesTestCase
+        "x > y"
+        (Solver.Term.variable "x" `Solver.Constraint.greaterThan` Solver.Term.variable "y")
+        ["x", "y"]
+    ]
+
+
+evaluateTestCase : String -> EveryDict var Range -> Constraint var -> Maybe (EveryDict var Range) -> ElmTest.Test
+evaluateTestCase name initial constraint expected =
+  ElmTest.test name <|
+    ElmTest.assertEqual expected (Solver.Constraint.evaluate initial constraint)
+
+
+boundVariablesTestCase : String -> Constraint var -> List var -> ElmTest.Test
+boundVariablesTestCase name constraint expected =
+  ElmTest.test name <|
+    ElmTest.assertEqual expected (EveryDict.keys <| Solver.Constraint.boundVariables constraint)
