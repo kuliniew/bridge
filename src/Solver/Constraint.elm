@@ -121,7 +121,7 @@ evaluate variables constraint =
           in
             if Solver.Range.isEmpty allowed
             then Nothing
-            else Just <| Solver.Term.constrain left allowed <| Solver.Term.constrain right allowed <| variables
+            else Solver.Term.constrain left allowed variables `Maybe.andThen` Solver.Term.constrain right allowed
         LessThanOrEqual left right ->
           let
             currentLeft =
@@ -135,7 +135,7 @@ evaluate variables constraint =
           in
             if Solver.Range.isEmpty allowedLeft || Solver.Range.isEmpty allowedRight
             then Nothing
-            else Just <| Solver.Term.constrain left allowedLeft <| Solver.Term.constrain right allowedRight <| variables
+            else Solver.Term.constrain left allowedLeft variables `Maybe.andThen` Solver.Term.constrain right allowedRight
         And left right ->
           evaluate variables left `Maybe.andThen` flip evaluate right
         Or left right ->

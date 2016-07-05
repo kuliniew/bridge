@@ -3,8 +3,8 @@ module Solver.TermTests exposing (all)
 import Solver.Endpoint
 import Solver.Interval exposing (Interval)
 import Solver.Range exposing (Range)
-import Solver.RangeTests exposing (rangeProducer)
-import Solver.Term
+import Solver.RangeTests exposing (nonEmptyRangeProducer, rangeProducer)
+import Solver.Term exposing (Term)
 import TestUtils
 
 import Check
@@ -12,6 +12,8 @@ import Check.Producer
 import ElmTest
 import EveryDict exposing (EveryDict)
 import List.Extra
+import Random.Extra
+import Shrink
 
 
 all : ElmTest.Test
@@ -43,9 +45,33 @@ constantSuite =
         `Check.that`
           (\(variables, value) -> Solver.Term.constrain (Solver.Term.constant value) (Solver.Range.singleton value) variables)
         `Check.is`
-          fst
+          (Just << fst)
         `Check.for`
           Check.Producer.tuple (variablesProducer, Check.Producer.int)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "can be constrained to ranges including that value"
+        `Check.that`
+          (\(variables, value, range) -> Solver.Term.constrain (Solver.Term.constant value) range variables)
+        `Check.is`
+          (\(variables, _, _) -> Just variables)
+        `Check.for`
+          Check.Producer.filter
+            (\(_, value, range) -> Solver.Range.member value range)
+            (Check.Producer.tuple3 (variablesProducer, Check.Producer.int, rangeProducer))
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "cannot be constrained to ranges not including that value"
+        `Check.that`
+          (\(variables, value, range) -> Solver.Term.constrain (Solver.Term.constant value) range variables)
+        `Check.is`
+          always Nothing
+        `Check.for`
+          Check.Producer.filter
+            (\(_, value, range) -> not <| Solver.Range.member value range)
+            (Check.Producer.tuple3 (variablesProducer, Check.Producer.int, rangeProducer))
 
     , TestUtils.generativeTest <|
         Check.claim
@@ -88,23 +114,33 @@ variableSuite =
         `Check.that`
           (\(variable, range) -> Solver.Term.constrain (Solver.Term.variable variable) range (EveryDict.singleton variable range))
         `Check.is`
-          (\(variable, range) -> EveryDict.singleton variable range)
+          (\(variable, range) -> Just <| EveryDict.singleton variable range)
         `Check.for`
-          (Check.Producer.tuple (Check.Producer.string, rangeProducer))
+          (Check.Producer.tuple (Check.Producer.string, nonEmptyRangeProducer))
 
     , TestUtils.generativeTest <|
         Check.claim
           "can be constrained to a subset of its original value"
         `Check.that`
-          (\(variable, range, subset) -> Solver.Term.constrain (Solver.Term.variable variable) subset (EveryDict.singleton variable range))
+          (\(variable, range, otherRange) -> Solver.Term.constrain (Solver.Term.variable variable) otherRange (EveryDict.singleton variable range))
         `Check.is`
-          (\(variable, _, subset) -> EveryDict.singleton variable subset)
+          (\(variable, range, otherRange) -> Just <| EveryDict.singleton variable (Solver.Range.intersect range otherRange))
         `Check.for`
           Check.Producer.filter
-            (\(_, _, subset) -> not <| Solver.Range.isEmpty subset)
-            (Check.Producer.map
-              (\(variable, range, mask) -> (variable, range, Solver.Range.intersect range mask))
-              (Check.Producer.tuple3 (Check.Producer.string, rangeProducer, rangeProducer)))
+            (\(_, range, otherRange) -> not <| Solver.Range.isEmpty <| Solver.Range.intersect range otherRange)
+            (Check.Producer.tuple3 (Check.Producer.string, rangeProducer, rangeProducer))
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "cannot be constrained to a range that does not overlap its current value"
+        `Check.that`
+          (\(variable, range, otherRange) -> Solver.Term.constrain (Solver.Term.variable variable) otherRange (EveryDict.singleton variable range))
+        `Check.is`
+          always Nothing
+        `Check.for`
+          Check.Producer.filter
+            (\(_, range, otherRange) -> Solver.Range.isEmpty <| Solver.Range.intersect range otherRange)
+            (Check.Producer.tuple3 (Check.Producer.string, rangeProducer, rangeProducer))
 
     , TestUtils.generativeTest <|
         Check.claim
@@ -142,7 +178,7 @@ addSuite =
               EveryDict.empty
           )
         `Check.is`
-          always EveryDict.empty
+          always (Just <| EveryDict.empty)
         `Check.for`
           Check.Producer.tuple (Check.Producer.int, Check.Producer.int)
 
@@ -157,7 +193,7 @@ addSuite =
               EveryDict.empty
           )
         `Check.is`
-          (\(variable, addend, sum) -> EveryDict.singleton variable (Solver.Range.singleton (sum - addend)))
+          (\(variable, addend, sum) -> Just <| EveryDict.singleton variable (Solver.Range.singleton (sum - addend)))
         `Check.for`
           Check.Producer.tuple3 (Check.Producer.string, Check.Producer.int, Check.Producer.int)
 
@@ -172,7 +208,7 @@ addSuite =
               EveryDict.empty
           )
         `Check.is`
-          (\(variable, addend, sum) -> EveryDict.singleton variable (Solver.Range.singleton (sum - addend)))
+          (\(variable, addend, sum) -> Just <| EveryDict.singleton variable (Solver.Range.singleton (sum - addend)))
         `Check.for`
           Check.Producer.tuple3 (Check.Producer.string, Check.Producer.int, Check.Producer.int)
 
@@ -186,7 +222,7 @@ addSuite =
           constraint =
             Solver.Term.variable "x" `Solver.Term.add` Solver.Term.variable "y"
           expected =
-            EveryDict.fromList
+            Just <| EveryDict.fromList
               [ ("x", Solver.Range.singleton 1)
               , ("y", Solver.Range.singleton 4)
               ]
@@ -203,7 +239,7 @@ addSuite =
           constraint =
             Solver.Term.variable "x" `Solver.Term.add` Solver.Term.variable "y"
           expected =
-            EveryDict.fromList
+            Just <| EveryDict.fromList
               [ ("x", Solver.Range.fromIntervals [boundedInterval 1 2])
               , ("y", Solver.Range.fromIntervals [boundedInterval 4 5])
               ]
@@ -220,6 +256,12 @@ addSuite =
           (\(variable1, variable2) -> EveryDict.toList <| EveryDict.fromList [(variable1, ()), (variable2, ())])
         `Check.for`
           Check.Producer.tuple (Check.Producer.string, Check.Producer.string)
+
+    , commutativeTests Solver.Term.add
+
+    , associativeTests Solver.Term.add
+
+    , leftIdentityTests Solver.Term.add (Solver.Term.constant 0)
     ]
 
 
@@ -263,15 +305,134 @@ sumSuite =
     ]
 
 
+commutativeTests : (Term String -> Term String -> Term String) -> ElmTest.Test
+commutativeTests operation =
+  ElmTest.suite "commutative"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "evaluate"
+        `Check.that`
+          (\(term1, term2, variables) -> Solver.Term.evaluate variables (term1 `operation` term2))
+        `Check.is`
+          (\(term1, term2, variables) -> Solver.Term.evaluate variables (term2 `operation` term1))
+        `Check.for`
+          Check.Producer.tuple3 (termProducer, termProducer, variablesProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "constrain"
+        `Check.that`
+          (\(term1, term2, range, variables) -> constrainToList (term1 `operation` term2) range variables)
+        `Check.is`
+          (\(term1, term2, range, variables) -> constrainToList (term2 `operation` term1) range variables)
+        `Check.for`
+          Check.Producer.tuple4 (termProducer, termProducer, rangeProducer, variablesProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "boundVariables"
+        `Check.that`
+          (\(term1, term2) -> boundVariablesToList (term1 `operation` term2))
+        `Check.is`
+          (\(term1, term2) -> boundVariablesToList (term2 `operation` term1))
+        `Check.for`
+          Check.Producer.tuple (termProducer, termProducer)
+    ]
+
+
+associativeTests : (Term String -> Term String -> Term String) -> ElmTest.Test
+associativeTests operation =
+  ElmTest.suite "associative"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "evaluate"
+        `Check.that`
+          (\(term1, term2, term3, variables) -> Solver.Term.evaluate variables (term1 `operation` (term2 `operation` term3)))
+        `Check.is`
+          (\(term1, term2, term3, variables) -> Solver.Term.evaluate variables ((term1 `operation` term2) `operation` term3))
+        `Check.for`
+          Check.Producer.tuple4 (termProducer, termProducer, termProducer, variablesProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "constrain"
+        `Check.that`
+          (\(term1, term2, term3, range, variables) -> constrainToList (term1 `operation` (term2 `operation` term3)) range variables)
+        `Check.is`
+          (\(term1, term2, term3, range, variables) -> constrainToList ((term1 `operation` term2) `operation` term3) range variables)
+        `Check.for`
+          Check.Producer.tuple5 (termProducer, termProducer, termProducer, rangeProducer, variablesProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "boundVariables"
+        `Check.that`
+          (\(term1, term2, term3) -> boundVariablesToList (term1 `operation` (term2 `operation` term3)))
+        `Check.is`
+          (\(term1, term2, term3) -> boundVariablesToList ((term1 `operation` term2) `operation` term3))
+        `Check.for`
+          Check.Producer.tuple3 (termProducer, termProducer, termProducer)
+    ]
+
+
+leftIdentityTests : (Term String -> Term String -> Term String) -> Term String -> ElmTest.Test
+leftIdentityTests operation leftIdentity =
+  ElmTest.suite "left identity"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "evaluate"
+        `Check.that`
+          (\(term, variables) -> Solver.Term.evaluate variables (leftIdentity `operation` term))
+        `Check.is`
+          (\(term, variables) -> Solver.Term.evaluate variables (leftIdentity `operation` term))
+        `Check.for`
+          Check.Producer.tuple (termProducer, variablesProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "constrain"
+        `Check.that`
+          (\(term, range, variables) -> constrainToList (leftIdentity `operation` term) range variables)
+        `Check.is`
+          (\(term, range, variables) -> constrainToList (leftIdentity `operation` term) range variables)
+        `Check.for`
+          Check.Producer.tuple3 (termProducer, rangeProducer, variablesProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "boundVariables"
+        `Check.that`
+          (\term -> boundVariablesToList (leftIdentity `operation` term))
+        `Check.is`
+          (\term -> boundVariablesToList (leftIdentity `operation` term))
+        `Check.for`
+          termProducer
+    ]
+
+
+variableProducer : Check.Producer.Producer String
+variableProducer =
+  { generator =
+      Random.Extra.choices <| List.map Random.Extra.constant ["w", "x", "y", "z"]
+  , shrinker =
+      Shrink.noShrink
+  }
+
+
 variablesProducer : Check.Producer.Producer (EveryDict String Range)
 variablesProducer =
   let
     assignmentProducer =
-      Check.Producer.tuple (Check.Producer.string, Solver.RangeTests.rangeProducer)
+      Check.Producer.tuple (variableProducer, nonEmptyRangeProducer)
     assignmentsProducer =
       Check.Producer.list assignmentProducer
   in
     Check.Producer.convert EveryDict.fromList EveryDict.toList assignmentsProducer
+
+
+termProducer : Check.Producer.Producer (Term String)
+termProducer =
+  Solver.Term.producer variableProducer
 
 
 boundedInterval : Int -> Int -> Interval
@@ -281,3 +442,13 @@ boundedInterval lo hi =
       interval
     Nothing ->
       Debug.crash <| "boundedInterval failed for: " ++ toString lo ++ " " ++ toString hi
+
+
+constrainToList : Term var -> Range -> EveryDict var Range -> Maybe (List (var, Range))
+constrainToList term range variables =
+  Maybe.map EveryDict.toList <| Solver.Term.constrain term range variables
+
+
+boundVariablesToList : Term var -> List var
+boundVariablesToList term =
+  EveryDict.keys <| Solver.Term.boundVariables term

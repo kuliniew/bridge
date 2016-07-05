@@ -1,6 +1,7 @@
 module Solver.RangeTests exposing
   ( all
   , rangeProducer
+  , nonEmptyRangeProducer
   )
 
 import OperationTests
@@ -348,3 +349,8 @@ latticeSuite =
 rangeProducer : Check.Producer.Producer Range
 rangeProducer =
   Check.Producer.convert Solver.Range.fromIntervals Solver.Range.toIntervals (Check.Producer.list intervalProducer)
+
+
+nonEmptyRangeProducer : Check.Producer.Producer Range
+nonEmptyRangeProducer =
+  Check.Producer.filter (not << Solver.Range.isEmpty) rangeProducer
