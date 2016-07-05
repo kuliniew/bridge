@@ -12,6 +12,7 @@ import Check.Producer
 import ElmTest
 import EveryDict exposing (EveryDict)
 import List.Extra
+import Random
 import Random.Extra
 import Shrink
 
@@ -410,10 +411,15 @@ leftIdentityTests operation leftIdentity =
     ]
 
 
+variableNames : List String
+variableNames =
+  ["w", "x", "y", "z"]
+
+
 variableProducer : Check.Producer.Producer String
 variableProducer =
   { generator =
-      Random.Extra.choices <| List.map Random.Extra.constant ["w", "x", "y", "z"]
+      Random.Extra.choices <| List.map Random.Extra.constant variableNames
   , shrinker =
       Shrink.noShrink
   }
@@ -421,13 +427,14 @@ variableProducer =
 
 variablesProducer : Check.Producer.Producer (EveryDict String Range)
 variablesProducer =
-  let
-    assignmentProducer =
-      Check.Producer.tuple (variableProducer, nonEmptyRangeProducer)
-    assignmentsProducer =
-      Check.Producer.list assignmentProducer
-  in
-    Check.Producer.convert EveryDict.fromList EveryDict.toList assignmentsProducer
+  { generator =
+      List.repeat (List.length variableNames) nonEmptyRangeProducer.generator
+        |> Random.Extra.together
+        |> Random.map (List.Extra.zip variableNames)
+        |> Random.map EveryDict.fromList
+  , shrinker =
+      Shrink.noShrink
+  }
 
 
 termProducer : Check.Producer.Producer (Term String)
