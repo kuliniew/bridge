@@ -131,6 +131,13 @@ producer variableProducer =
   }
 
 
+-- All of these functions are at the toplevel because they are
+-- mutually recursive generators/shrinkers.  If they were set in
+-- a `let` binding, then in Elm 0.17 the compiler creates
+-- JavaScript code that fails at runtime because of the circular
+-- reference: something will be used before it's been initialized.
+
+
 constantGenerator : Random.Generator (Term var)
 constantGenerator =
   let
@@ -146,7 +153,7 @@ variableGenerator varGenerator =
 
 addGenerator : Random.Generator var -> Random.Generator (Term var)
 addGenerator varGenerator =
-  Random.map2 Add (terminalGenerator varGenerator) (terminalGenerator varGenerator)
+  Random.map2 Add (termGenerator varGenerator) (termGenerator varGenerator)
 
 
 terminalGenerator : Random.Generator var -> Random.Generator (Term var)
@@ -161,10 +168,12 @@ nonTerminalGenerator varGenerator =
 
 termGenerator : Random.Generator var -> Random.Generator (Term var)
 termGenerator varGenerator =
-  Random.Extra.frequency
-    [ (0.7, terminalGenerator varGenerator)
-    , (0.3, nonTerminalGenerator varGenerator)
-    ]
+  -- The conditional here is essential, to prevent infinite recursion
+  -- when evaluating the generator itself.
+  Random.Extra.oneIn 3 `Random.andThen` \deeper ->
+    if deeper
+    then nonTerminalGenerator varGenerator
+    else terminalGenerator varGenerator
 
 
 constantShrinker : Int -> Lazy.List.LazyList (Term var)
