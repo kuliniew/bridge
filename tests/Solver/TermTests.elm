@@ -1,4 +1,10 @@
-module Solver.TermTests exposing (all)
+module Solver.TermTests exposing
+  ( all
+
+  , termProducer
+  , variableProducer
+  , variablesProducer
+  )
 
 import Solver.Endpoint
 import Solver.Interval exposing (Interval)

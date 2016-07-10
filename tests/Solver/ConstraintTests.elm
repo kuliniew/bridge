@@ -5,7 +5,11 @@ import Solver.Endpoint
 import Solver.Interval exposing (Interval)
 import Solver.Range exposing (Range)
 import Solver.Term
+import Solver.TermTests exposing (termProducer, variableProducer, variablesProducer)
+import TestUtils
 
+import Check
+import Check.Producer
 import ElmTest
 import EveryDict exposing (EveryDict)
 
@@ -18,17 +22,21 @@ all =
     , lessThanSuite
     , greaterThanOrEqualSuite
     , greaterThanSuite
+    , relationsSuite
     , andSuite
     , allSuite
     , orSuite
     , anySuite
+    , logicSuite
     ]
 
 
 equalSuite : ElmTest.Test
 equalSuite =
   ElmTest.suite "equal"
-    [ evaluateTestCase
+    [ commutativeTests Solver.Constraint.equal termProducer
+
+    , evaluateTestCase
         "1 = 1"
         EveryDict.empty
         (Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 1)
@@ -264,10 +272,32 @@ greaterThanSuite =
     ]
 
 
+relationsSuite : ElmTest.Test
+relationsSuite =
+  let
+    flippedTests name1 operation1 name2 operation2 =
+      equivalentTests
+        ("x " ++ name1 ++ " y  <-->  y " ++ name2 ++ " x")
+        (uncurry operation1)
+        (uncurry <| flip operation2)
+        (Check.Producer.tuple (termProducer, termProducer))
+  in
+    ElmTest.suite "relations"
+      [ flippedTests "<=" Solver.Constraint.lessThanOrEqual ">=" Solver.Constraint.greaterThanOrEqual
+      , flippedTests "<" Solver.Constraint.lessThan ">" Solver.Constraint.greaterThan
+      ]
+
+
 andSuite : ElmTest.Test
 andSuite =
   ElmTest.suite "and"
-    [ evaluateTestCase
+    [ commutativeTests Solver.Constraint.and constraintProducer
+
+    , associativeTests Solver.Constraint.and
+
+    , idempotentTests Solver.Constraint.and
+
+    , evaluateTestCase
         "1 < 2 && 2 < 3"
         EveryDict.empty
         (Solver.Constraint.and
@@ -419,7 +449,13 @@ allSuite =
 orSuite : ElmTest.Test
 orSuite =
   ElmTest.suite "or"
-    [ evaluateTestCase
+    [ commutativeTests Solver.Constraint.or constraintProducer
+
+    , associativeTests Solver.Constraint.or
+
+    , idempotentTests Solver.Constraint.and
+
+    , evaluateTestCase
         "1 < 2 || 2 < 3"
         EveryDict.empty
         (Solver.Constraint.or
@@ -568,18 +604,96 @@ anySuite =
     ]
 
 
+logicSuite : ElmTest.Test
+logicSuite =
+  let
+    distributiveTests name1 operation1 name2 operation2 =
+      equivalentTests
+        ("x " ++ name1 ++ " (y " ++ name2 ++ " z)  <-->  (x " ++ name1 ++ " y) " ++ name2 ++ "(x " ++ name1 ++ " z)")
+        (\(x, y, z) -> x `operation1` (y `operation2` z))
+        (\(x, y, z) -> (x `operation1` y) `operation2` (x `operation1` z))
+        (Check.Producer.tuple3 (constraintProducer, constraintProducer, constraintProducer))
+  in
+    ElmTest.suite "logic"
+      [ distributiveTests "&&" Solver.Constraint.and "||" Solver.Constraint.or
+      , distributiveTests "||" Solver.Constraint.or "&&" Solver.Constraint.and
+      ]
+
+
+commutativeTests : (a -> a -> Constraint String) -> Check.Producer.Producer a -> ElmTest.Test
+commutativeTests operation argProducer =
+  equivalentTests
+    "commutative"
+    (uncurry operation)
+    (uncurry <| flip operation)
+    (Check.Producer.tuple (argProducer, argProducer))
+
+
+associativeTests : (Constraint String -> Constraint String -> Constraint String) -> ElmTest.Test
+associativeTests operation =
+  equivalentTests
+    "associative"
+    (\(x, y, z) -> x `operation` (y `operation` z))
+    (\(x, y, z) -> (x `operation` y) `operation` z)
+    (Check.Producer.tuple3 (constraintProducer, constraintProducer, constraintProducer))
+
+
+idempotentTests : (Constraint String -> Constraint String -> Constraint String) -> ElmTest.Test
+idempotentTests operation =
+  equivalentTests
+    "idempotent"
+    (\x -> x `operation` x)
+    identity
+    constraintProducer
+
+
+equivalentTests : String -> (a -> Constraint String) -> (a -> Constraint String) -> Check.Producer.Producer a -> ElmTest.Test
+equivalentTests name builder1 builder2 argsProducer =
+  ElmTest.suite name
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "evaluate"
+        `Check.that`
+          (\(args, variables) -> evaluateAsList variables <| builder1 args)
+        `Check.is`
+          (\(args, variables) -> evaluateAsList variables <| builder2 args)
+        `Check.for`
+          Check.Producer.tuple (argsProducer, variablesProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "boundVariables"
+        `Check.that`
+          (boundVariablesAsList << builder1)
+        `Check.is`
+          (boundVariablesAsList << builder2)
+        `Check.for`
+          argsProducer
+    ]
+
+
 evaluateTestCase : String -> EveryDict var Range -> Constraint var -> Maybe (EveryDict var Range) -> ElmTest.Test
 evaluateTestCase name initial constraint expected =
   ElmTest.test name <|
     ElmTest.assertEqual
       (Maybe.map EveryDict.toList expected)
-      (Maybe.map EveryDict.toList <| Solver.Constraint.evaluate initial constraint)
+      (evaluateAsList initial constraint)
+
+
+evaluateAsList : EveryDict var Range -> Constraint var -> Maybe (List (var, Range))
+evaluateAsList variables constraint =
+  Maybe.map EveryDict.toList <| Solver.Constraint.evaluate variables constraint
 
 
 boundVariablesTestCase : String -> Constraint var -> List var -> ElmTest.Test
 boundVariablesTestCase name constraint expected =
   ElmTest.test name <|
-    ElmTest.assertEqual expected (EveryDict.keys <| Solver.Constraint.boundVariables constraint)
+    ElmTest.assertEqual expected (boundVariablesAsList constraint)
+
+
+boundVariablesAsList : Constraint var -> List var
+boundVariablesAsList =
+  EveryDict.keys << Solver.Constraint.boundVariables
 
 
 boundedInterval : Int -> Int -> Interval
@@ -589,3 +703,8 @@ boundedInterval lo hi =
       interval
     Nothing ->
       Debug.crash <| "boundedInterval failed for: " ++ toString lo ++ " " ++ toString hi
+
+
+constraintProducer : Check.Producer.Producer (Constraint String)
+constraintProducer =
+  Solver.Constraint.producer variableProducer

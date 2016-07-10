@@ -12,6 +12,8 @@ module Solver.Constraint exposing
 
   , evaluate
   , boundVariables
+
+  , producer
   )
 
 {-| Integer constraints over variables.
@@ -20,7 +22,12 @@ module Solver.Constraint exposing
 import Solver.Range exposing (Range)
 import Solver.Term exposing (Term)
 
+import Check.Producer
 import EveryDict exposing (EveryDict)
+import Lazy.List
+import Random
+import Random.Extra
+import Shrink
 
 
 {-| A constraint to be satisfied.
@@ -106,6 +113,13 @@ a narrower set of variable ranges that satisfies the constraint.
 evaluate : EveryDict var Range -> Constraint var -> Maybe (EveryDict var Range)
 evaluate variables constraint =
   let
+    sameVariablesOnBothSides left right =
+      -- The solver can't currently handle things like "x = x + 1" gracefully since
+      -- it really requires algebraic manipulation that isn't implemented yet.  So,
+      -- give up if that case comes up, to avoid taking a loooooooong time to try to
+      -- deal with it incrementally.
+      not <| EveryDict.isEmpty <|
+        EveryDict.intersect (Solver.Term.boundVariables left) (Solver.Term.boundVariables right)
     alternatives variables1 variables2 =
       EveryDict.keys variables1 ++ EveryDict.keys variables2
         |> List.map (\key -> (key, Solver.Range.union
@@ -119,7 +133,7 @@ evaluate variables constraint =
             allowed =
               Solver.Range.intersect (Solver.Term.evaluate variables left) (Solver.Term.evaluate variables right)
           in
-            if Solver.Range.isEmpty allowed
+            if Solver.Range.isEmpty allowed || sameVariablesOnBothSides left right
             then Nothing
             else Solver.Term.constrain left allowed variables `Maybe.andThen` Solver.Term.constrain right allowed
         LessThanOrEqual left right ->
@@ -133,7 +147,7 @@ evaluate variables constraint =
             allowedRight =
               Solver.Range.intersect currentRight (Solver.Range.removeUpperBound currentLeft)
           in
-            if Solver.Range.isEmpty allowedLeft || Solver.Range.isEmpty allowedRight
+            if Solver.Range.isEmpty allowedLeft || Solver.Range.isEmpty allowedRight || sameVariablesOnBothSides left right
             then Nothing
             else Solver.Term.constrain left allowedLeft variables `Maybe.andThen` Solver.Term.constrain right allowedRight
         And left right ->
@@ -179,3 +193,79 @@ boundVariables constraint =
       EveryDict.empty
     AlwaysFalse ->
       EveryDict.empty
+
+
+{-| Produce a random constraint for testing.
+-}
+producer : Check.Producer.Producer var -> Check.Producer.Producer (Constraint var)
+producer variableProducer =
+  let
+    termProducer =
+      Solver.Term.producer variableProducer
+  in
+    { generator = constraintGenerator termProducer.generator
+    , shrinker = constraintShrinker termProducer.shrinker
+    }
+
+
+-- All of these functions are at the toplevel because they are
+-- mutually recursive generators/shrinkers.  If they were set in
+-- a `let` binding, then in Elm 0.17 the compiler creates
+-- JavaScript code that fails at runtime because of the circular
+-- reference: something will be used before it's been initialized.
+
+
+terminalGenerator : Random.Generator (Term var) -> Random.Generator (Constraint var)
+terminalGenerator termGenerator =
+  Random.Extra.choices
+    [ Random.Extra.constant AlwaysTrue
+    , Random.Extra.constant AlwaysFalse
+    , Random.map2 Equal termGenerator termGenerator
+    , Random.map2 LessThanOrEqual termGenerator termGenerator
+    ]
+
+
+nonTerminalGenerator : Random.Generator (Term var) -> Random.Generator (Constraint var)
+nonTerminalGenerator termGenerator =
+  let
+    recursive =
+      constraintGenerator termGenerator
+  in
+    Random.Extra.choices
+      [ Random.map2 And recursive recursive
+      , Random.map2 Or recursive recursive
+      ]
+
+
+constraintGenerator : Random.Generator (Term var) -> Random.Generator (Constraint var)
+constraintGenerator termGenerator =
+  -- The conditional here is essential, to prevent infinite recursion
+  -- when evaluating the generator itself.
+  Random.Extra.oneIn 4 `Random.andThen` \deeper ->
+    if deeper
+    then nonTerminalGenerator termGenerator
+    else terminalGenerator termGenerator
+
+
+constraintShrinker : Shrink.Shrinker (Term var) -> Shrink.Shrinker (Constraint var)
+constraintShrinker termShrinker constraint =
+  let
+    shrinkTerms ctor left right =
+      ctor `Shrink.map` termShrinker left `Shrink.andMap` termShrinker right
+    shrinkConstraints ctor left right =
+      Lazy.List.cons left <| Lazy.List.cons right <|
+        ctor `Shrink.map` constraintShrinker termShrinker left `Shrink.andMap` constraintShrinker termShrinker right
+  in
+    case constraint of
+      Equal left right ->
+        shrinkTerms Equal left right
+      LessThanOrEqual left right ->
+        shrinkTerms LessThanOrEqual left right
+      And left right ->
+        shrinkConstraints And left right
+      Or left right ->
+        shrinkConstraints Or left right
+      AlwaysTrue ->
+        Lazy.List.empty
+      AlwaysFalse ->
+        Lazy.List.empty
