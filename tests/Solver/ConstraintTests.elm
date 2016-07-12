@@ -27,6 +27,7 @@ all =
     , allSuite
     , orSuite
     , anySuite
+    , notSuite
     , logicSuite
     ]
 
@@ -281,10 +282,21 @@ relationsSuite =
         (uncurry operation1)
         (uncurry <| flip operation2)
         (Check.Producer.tuple (termProducer, termProducer))
+    negatedTests name1 operation1 name2 operation2 =
+      equivalentTests
+        ("x " ++ name1 ++ " y  <-->  !(x " ++ name2 ++ " y)")
+        (uncurry operation1)
+        (\(x, y) -> Solver.Constraint.not (x `operation2` y))
+        (Check.Producer.tuple (termProducer, termProducer))
   in
     ElmTest.suite "relations"
       [ flippedTests "<=" Solver.Constraint.lessThanOrEqual ">=" Solver.Constraint.greaterThanOrEqual
       , flippedTests "<" Solver.Constraint.lessThan ">" Solver.Constraint.greaterThan
+
+      , negatedTests "<=" Solver.Constraint.lessThanOrEqual ">" Solver.Constraint.greaterThan
+      , negatedTests "<" Solver.Constraint.lessThan ">" Solver.Constraint.greaterThanOrEqual
+      , negatedTests ">=" Solver.Constraint.greaterThanOrEqual "<" Solver.Constraint.lessThan
+      , negatedTests ">" Solver.Constraint.greaterThan "<=" Solver.Constraint.lessThanOrEqual
       ]
 
 
@@ -604,19 +616,94 @@ anySuite =
     ]
 
 
+notSuite : ElmTest.Test
+notSuite =
+  ElmTest.suite "not"
+    [ evaluateTestCase
+        "!(x == 5)"
+        EveryDict.empty
+        (Solver.Constraint.not
+          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 5))
+        (Just <| EveryDict.singleton "x" (Solver.Range.union (Solver.Range.fromUpperBound 4) (Solver.Range.fromLowerBound 6)))
+
+    , boundVariablesTestCase
+        "!(x == 5)"
+        (Solver.Constraint.not
+          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 5))
+        ["x"]
+
+    -- FIXME PENDING
+    -- Double-negating equality breaks without algebraic manipulation of terms
+    {-
+    , equivalentTests
+        "!!x  <-->  x"
+        (Solver.Constraint.not << Solver.Constraint.not)
+        identity
+        constraintProducer
+    -}
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "binds the same variables as its subconstraint"
+        `Check.that`
+          (boundVariablesAsList << Solver.Constraint.not)
+        `Check.is`
+          boundVariablesAsList
+        `Check.for`
+          constraintProducer
+    ]
+
+
 logicSuite : ElmTest.Test
 logicSuite =
   let
     distributiveTests name1 operation1 name2 operation2 =
       equivalentTests
-        ("x " ++ name1 ++ " (y " ++ name2 ++ " z)  <-->  (x " ++ name1 ++ " y) " ++ name2 ++ "(x " ++ name1 ++ " z)")
+        ("x " ++ name1 ++ " (y " ++ name2 ++ " z)  <-->  (x " ++ name1 ++ " y) " ++ name2 ++ " (x " ++ name1 ++ " z)")
         (\(x, y, z) -> x `operation1` (y `operation2` z))
         (\(x, y, z) -> (x `operation1` y) `operation2` (x `operation1` z))
         (Check.Producer.tuple3 (constraintProducer, constraintProducer, constraintProducer))
+    deMorganTests name1 operation1 name2 operation2 =
+      equivalentTests
+        ("!(x " ++ name1 ++ " y)  <-->  (!x) " ++ name2 ++ " (!y)")
+        (\(x, y) -> Solver.Constraint.not (x `operation1` y))
+        (\(x, y) -> (Solver.Constraint.not x) `operation2` (Solver.Constraint.not y))
+        (Check.Producer.tuple (constraintProducer, constraintProducer))
   in
     ElmTest.suite "logic"
       [ distributiveTests "&&" Solver.Constraint.and "||" Solver.Constraint.or
       , distributiveTests "||" Solver.Constraint.or "&&" Solver.Constraint.and
+
+      , deMorganTests "&&" Solver.Constraint.and "||" Solver.Constraint.or
+      , deMorganTests "||" Solver.Constraint.or "&&" Solver.Constraint.and
+
+      -- FIXME PENDING
+      -- Possibly broken due to lack of algebraic manipulation of terms
+      {-
+      , TestUtils.generativeTest <|
+          Check.claim
+            "tautology"
+          `Check.that`
+            (\(constraint, variables) -> evaluateAsList variables <| constraint `Solver.Constraint.or` (Solver.Constraint.not constraint))
+          `Check.is`
+            (\(_, variables) -> Just <| EveryDict.toList variables)
+          `Check.for`
+            (Check.Producer.tuple (constraintProducer, variablesProducer))
+      -}
+
+      -- FIXME PENDING
+      -- Possibly broken due to lack of algebraic manipulation of terms
+      {-
+      , TestUtils.generativeTest <|
+          Check.claim
+            "fallacy"
+          `Check.that`
+            (\(constraint, variables) -> evaluateAsList variables <| constraint `Solver.Constraint.and` (Solver.Constraint.not constraint))
+          `Check.is`
+            always Nothing
+          `Check.for`
+            (Check.Producer.tuple (constraintProducer, variablesProducer))
+      -}
       ]
 
 

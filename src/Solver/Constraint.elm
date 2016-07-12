@@ -9,6 +9,7 @@ module Solver.Constraint exposing
   , all
   , or
   , any
+  , not
 
   , evaluate
   , boundVariables
@@ -107,6 +108,25 @@ any =
   List.foldl or AlwaysFalse
 
 
+{-| Require that a constraint not be met.
+-}
+not : Constraint var -> Constraint var
+not constraint =
+  case constraint of
+    Equal left right ->
+      (left `lessThan` right) `or` (left `greaterThan` right)
+    LessThanOrEqual left right ->
+      left `greaterThan` right
+    And left right ->
+      not left `or` not right
+    Or left right ->
+      not left `and` not right
+    AlwaysTrue ->
+      AlwaysFalse
+    AlwaysFalse ->
+      AlwaysTrue
+
+
 {-| Evaluate a constraint over a set of known variable ranges, returning
 a narrower set of variable ranges that satisfies the constraint.
 -}
@@ -118,7 +138,7 @@ evaluate variables constraint =
       -- it really requires algebraic manipulation that isn't implemented yet.  So,
       -- give up if that case comes up, to avoid taking a loooooooong time to try to
       -- deal with it incrementally.
-      not <| EveryDict.isEmpty <|
+      Basics.not <| EveryDict.isEmpty <|
         EveryDict.intersect (Solver.Term.boundVariables left) (Solver.Term.boundVariables right)
     alternatives variables1 variables2 =
       EveryDict.keys variables1 ++ EveryDict.keys variables2
