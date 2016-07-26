@@ -11,6 +11,8 @@ module Solver.Endpoint exposing
   , adjacent
   , add
   , negate
+  , multiply
+  , divide
   )
 
 {-| Operations over endpoints of potentially-unbounded integer intervals.
@@ -143,3 +145,33 @@ negate endpoint =
       NegativeInfinity
     NegativeInfinity ->
       PositiveInfinity
+
+
+{-| Multiply a point by a constant.
+-}
+multiply : Int -> Endpoint -> Endpoint
+multiply coeff endpoint =
+  case (coeff, endpoint) of
+    (0, _) ->
+      Point 0
+    (_, PositiveInfinity) ->
+      if coeff > 0 then PositiveInfinity else NegativeInfinity
+    (_, NegativeInfinity) ->
+      if coeff > 0 then NegativeInfinity else PositiveInfinity
+    (_, Point value) ->
+      Point (coeff * value)
+
+
+{-| Divide a point by a constant.
+-}
+divide : Endpoint -> Int -> Maybe Endpoint
+divide endpoint divisor =
+  case (endpoint, divisor) of
+    (_, 0) ->
+      Nothing
+    (PositiveInfinity, _) ->
+      Just <| if divisor > 0 then PositiveInfinity else NegativeInfinity
+    (NegativeInfinity, _) ->
+      Just <| if divisor > 0 then NegativeInfinity else PositiveInfinity
+    (Point value, _) ->
+      Just <| Point (value // divisor)

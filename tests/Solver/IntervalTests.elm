@@ -7,6 +7,7 @@ import OperationTests
 import Solver.Endpoint
 import Solver.EndpointTests exposing (endpointProducer)
 import Solver.Interval exposing (Interval)
+import Solver.TestUtils exposing (smallishIntProducer)
 import TestUtils
 
 import Check
@@ -35,6 +36,8 @@ all =
     , addSuite
     , negateSuite
     , subtractSuite
+    , multiplySuite
+    , divideSuite
     , intersectSuite
     , hullSuite
     , unionSuite
@@ -374,6 +377,150 @@ subtractSuite =
             (\(interval1, value1, interval2, value2) -> Solver.Interval.member value1 interval1 && Solver.Interval.member value2 interval2)
             (Check.Producer.tuple4 (intervalProducer, Check.Producer.int, intervalProducer, Check.Producer.int))
     ]
+
+
+multiplySuite : ElmTest.Test
+multiplySuite =
+  ElmTest.suite "multiply"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "by empty interval"
+        `Check.that`
+          flip Solver.Interval.multiply Solver.Interval.empty
+        `Check.is`
+          always Solver.Interval.empty
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "by singleton interval 0"
+        `Check.that`
+          flip Solver.Interval.multiply (Solver.Interval.singleton 0)
+        `Check.is`
+          always (Solver.Interval.singleton 0)
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "by constant 0"
+        `Check.that`
+          Solver.Interval.multiply 0
+        `Check.is`
+          always (Solver.Interval.singleton 0)
+        `Check.for`
+          Check.Producer.filter (not << Solver.Interval.isEmpty) intervalProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "by singleton interval 1"
+        `Check.that`
+          flip Solver.Interval.multiply (Solver.Interval.singleton 1)
+        `Check.is`
+          Solver.Interval.singleton
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "by constant 1"
+        `Check.that`
+          Solver.Interval.multiply 1
+        `Check.is`
+          identity
+        `Check.for`
+          intervalProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "commutative with singletons"
+        `Check.that`
+          (\(x, y) -> x `Solver.Interval.multiply` Solver.Interval.singleton y)
+        `Check.is`
+          (\(x, y) -> y `Solver.Interval.multiply` Solver.Interval.singleton x)
+        `Check.for`
+          Check.Producer.tuple (Check.Producer.int, Check.Producer.int)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "associative with singletons"
+        `Check.that`
+          (\(x, y, z) -> x `Solver.Interval.multiply` (y `Solver.Interval.multiply` Solver.Interval.singleton z))
+        `Check.is`
+          (\(x, y, z) -> (x * y) `Solver.Interval.multiply` Solver.Interval.singleton z)
+        `Check.for`
+          Check.Producer.tuple3 (smallishIntProducer, smallishIntProducer, smallishIntProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains the products of values from the input intervals"
+        `Check.true`
+          (\(value1, interval2, value2) -> Solver.Interval.member (value1 * value2) (value1 `Solver.Interval.multiply` interval2))
+        `Check.for`
+          Check.Producer.filter
+            (\(_, interval2, value2) -> Solver.Interval.member value2 interval2)
+            (Check.Producer.tuple3 (Check.Producer.int, intervalProducer, Check.Producer.int))
+    ]
+
+
+divideSuite : ElmTest.Test
+divideSuite =
+  let
+    nonZeroProducer =
+      Check.Producer.filter (\val -> val /= 0) Check.Producer.int
+  in
+    ElmTest.suite "divide"
+      [ TestUtils.generativeTest <|
+          Check.claim
+            "into 0"
+          `Check.that`
+            Solver.Interval.divide (Solver.Interval.singleton 0)
+          `Check.is`
+            always (Solver.Interval.singleton 0)
+          `Check.for`
+            nonZeroProducer
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "by 0"
+          `Check.that`
+            flip Solver.Interval.divide 0
+          `Check.is`
+            always Solver.Interval.empty
+          `Check.for`
+            intervalProducer
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "by 1"
+          `Check.that`
+            flip Solver.Interval.divide 1
+          `Check.is`
+            identity
+          `Check.for`
+            intervalProducer
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "contains the quotients of values from the input intervals"
+          `Check.true`
+            (\(interval1, value1, value2) -> Solver.Interval.member (value1 // value2) (interval1 `Solver.Interval.divide` value2))
+          `Check.for`
+            Check.Producer.filter
+              (\(interval1, value1, _) -> Solver.Interval.member value1 interval1)
+              (Check.Producer.tuple3 (intervalProducer, Check.Producer.int, nonZeroProducer))
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "inverse of multiply"
+          `Check.that`
+            (\(interval, value) -> (value `Solver.Interval.multiply` interval) `Solver.Interval.divide` value)
+          `Check.is`
+            fst
+          `Check.for`
+            Check.Producer.tuple (intervalProducer, nonZeroProducer)
+      ]
 
 
 intersectSuite : ElmTest.Test

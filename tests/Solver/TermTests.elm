@@ -6,11 +6,13 @@ module Solver.TermTests exposing
   , variablesProducer
   )
 
+import OperationTests
 import Solver.Endpoint
 import Solver.Interval exposing (Interval)
 import Solver.Range exposing (Range)
 import Solver.RangeTests exposing (nonEmptyRangeProducer, rangeProducer)
 import Solver.Term exposing (Term)
+import Solver.TestUtils exposing (smallishIntProducer)
 import TestUtils
 
 import Check
@@ -26,10 +28,22 @@ import Shrink
 all : ElmTest.Test
 all =
   ElmTest.suite "Solver.Term"
-    [ constantSuite
+    [ eqSuite
+    , constantSuite
     , variableSuite
     , addSuite
     , sumSuite
+    , negateSuite
+    ]
+
+
+eqSuite : ElmTest.Test
+eqSuite =
+  ElmTest.suite "eq"
+    [ OperationTests.equality Solver.Term.eq termProducer
+
+    , ElmTest.test "0 != 1" <|
+        ElmTest.assert <| not <| Solver.Term.constant 0 `Solver.Term.eq` Solver.Term.constant 1
     ]
 
 
@@ -164,7 +178,12 @@ variableSuite =
 addSuite : ElmTest.Test
 addSuite =
   ElmTest.suite "add"
-    [ TestUtils.generativeTest <|
+    [ commutative Solver.Term.add
+    , associative Solver.Term.add
+    , leftIdentity Solver.Term.add (Solver.Term.constant 0)
+    , inverse Solver.Term.add Solver.Term.negate (Solver.Term.constant 0)
+
+    , TestUtils.generativeTest <|
         Check.claim
           "always evaluates to the sum of its subterms"
         `Check.that`
@@ -202,7 +221,7 @@ addSuite =
         `Check.is`
           (\(variable, addend, sum) -> Just <| EveryDict.singleton variable (Solver.Range.singleton (sum - addend)))
         `Check.for`
-          Check.Producer.tuple3 (Check.Producer.string, Check.Producer.int, Check.Producer.int)
+          Check.Producer.tuple3 (Check.Producer.string, smallishIntProducer, smallishIntProducer)
 
     , TestUtils.generativeTest <|
         Check.claim
@@ -217,7 +236,7 @@ addSuite =
         `Check.is`
           (\(variable, addend, sum) -> Just <| EveryDict.singleton variable (Solver.Range.singleton (sum - addend)))
         `Check.for`
-          Check.Producer.tuple3 (Check.Producer.string, Check.Producer.int, Check.Producer.int)
+          Check.Producer.tuple3 (Check.Producer.string, smallishIntProducer, smallishIntProducer)
 
     , ElmTest.test "x:[1 .. 3] + y:[4 .. 6] == [5 .. 5]" <|
         let
@@ -263,12 +282,6 @@ addSuite =
           (\(variable1, variable2) -> EveryDict.toList <| EveryDict.fromList [(variable1, ()), (variable2, ())])
         `Check.for`
           Check.Producer.tuple (Check.Producer.string, Check.Producer.string)
-
-    , commutativeTests Solver.Term.add
-
-    , associativeTests Solver.Term.add
-
-    , leftIdentityTests Solver.Term.add (Solver.Term.constant 0)
     ]
 
 
@@ -312,109 +325,80 @@ sumSuite =
     ]
 
 
-commutativeTests : (Term String -> Term String -> Term String) -> ElmTest.Test
-commutativeTests operation =
-  ElmTest.suite "commutative"
-    [ TestUtils.generativeTest <|
-        Check.claim
-          "evaluate"
-        `Check.that`
-          (\(term1, term2, variables) -> Solver.Term.evaluate variables (term1 `operation` term2))
-        `Check.is`
-          (\(term1, term2, variables) -> Solver.Term.evaluate variables (term2 `operation` term1))
-        `Check.for`
-          Check.Producer.tuple3 (termProducer, termProducer, variablesProducer)
+negateSuite : ElmTest.Test
+negateSuite =
+  ElmTest.suite "negate"
+    [ ElmTest.test "0" <|
+        ElmTest.assert <| Solver.Term.negate (Solver.Term.constant 0) `Solver.Term.eq` Solver.Term.constant 0
 
     , TestUtils.generativeTest <|
         Check.claim
-          "constrain"
-        `Check.that`
-          (\(term1, term2, range, variables) -> constrainToList (term1 `operation` term2) range variables)
-        `Check.is`
-          (\(term1, term2, range, variables) -> constrainToList (term2 `operation` term1) range variables)
+          "constant"
+        `Check.true`
+          (\val -> Solver.Term.negate (Solver.Term.constant val) `Solver.Term.eq` Solver.Term.constant (negate val))
         `Check.for`
-          Check.Producer.tuple4 (termProducer, termProducer, rangeProducer, variablesProducer)
+          Check.Producer.int
 
     , TestUtils.generativeTest <|
         Check.claim
-          "boundVariables"
-        `Check.that`
-          (\(term1, term2) -> boundVariablesToList (term1 `operation` term2))
-        `Check.is`
-          (\(term1, term2) -> boundVariablesToList (term2 `operation` term1))
+          "distributes over addition"
+        `Check.true`
+          (\(x, y) -> Solver.Term.negate (x `Solver.Term.add` y) `Solver.Term.eq` ((Solver.Term.negate x) `Solver.Term.add` (Solver.Term.negate y)))
         `Check.for`
           Check.Producer.tuple (termProducer, termProducer)
-    ]
-
-
-associativeTests : (Term String -> Term String -> Term String) -> ElmTest.Test
-associativeTests operation =
-  ElmTest.suite "associative"
-    [ TestUtils.generativeTest <|
-        Check.claim
-          "evaluate"
-        `Check.that`
-          (\(term1, term2, term3, variables) -> Solver.Term.evaluate variables (term1 `operation` (term2 `operation` term3)))
-        `Check.is`
-          (\(term1, term2, term3, variables) -> Solver.Term.evaluate variables ((term1 `operation` term2) `operation` term3))
-        `Check.for`
-          Check.Producer.tuple4 (termProducer, termProducer, termProducer, variablesProducer)
 
     , TestUtils.generativeTest <|
         Check.claim
-          "constrain"
-        `Check.that`
-          (\(term1, term2, term3, range, variables) -> constrainToList (term1 `operation` (term2 `operation` term3)) range variables)
-        `Check.is`
-          (\(term1, term2, term3, range, variables) -> constrainToList ((term1 `operation` term2) `operation` term3) range variables)
-        `Check.for`
-          Check.Producer.tuple5 (termProducer, termProducer, termProducer, rangeProducer, variablesProducer)
-
-    , TestUtils.generativeTest <|
-        Check.claim
-          "boundVariables"
-        `Check.that`
-          (\(term1, term2, term3) -> boundVariablesToList (term1 `operation` (term2 `operation` term3)))
-        `Check.is`
-          (\(term1, term2, term3) -> boundVariablesToList ((term1 `operation` term2) `operation` term3))
-        `Check.for`
-          Check.Producer.tuple3 (termProducer, termProducer, termProducer)
-    ]
-
-
-leftIdentityTests : (Term String -> Term String -> Term String) -> Term String -> ElmTest.Test
-leftIdentityTests operation leftIdentity =
-  ElmTest.suite "left identity"
-    [ TestUtils.generativeTest <|
-        Check.claim
-          "evaluate"
-        `Check.that`
-          (\(term, variables) -> Solver.Term.evaluate variables (leftIdentity `operation` term))
-        `Check.is`
-          (\(term, variables) -> Solver.Term.evaluate variables (leftIdentity `operation` term))
-        `Check.for`
-          Check.Producer.tuple (termProducer, variablesProducer)
-
-    , TestUtils.generativeTest <|
-        Check.claim
-          "constrain"
-        `Check.that`
-          (\(term, range, variables) -> constrainToList (leftIdentity `operation` term) range variables)
-        `Check.is`
-          (\(term, range, variables) -> constrainToList (leftIdentity `operation` term) range variables)
-        `Check.for`
-          Check.Producer.tuple3 (termProducer, rangeProducer, variablesProducer)
-
-    , TestUtils.generativeTest <|
-        Check.claim
-          "boundVariables"
-        `Check.that`
-          (\term -> boundVariablesToList (leftIdentity `operation` term))
-        `Check.is`
-          (\term -> boundVariablesToList (leftIdentity `operation` term))
+          "is its own inverse"
+        `Check.true`
+          (\x -> Solver.Term.negate (Solver.Term.negate x) `Solver.Term.eq` x)
         `Check.for`
           termProducer
     ]
+
+
+commutative : (Term String -> Term String -> Term String) -> ElmTest.Test
+commutative operation =
+  TestUtils.generativeTest <|
+    Check.claim
+      "commutative"
+    `Check.true`
+      (\(x, y) -> (x `operation` y) `Solver.Term.eq` (y `operation` x))
+    `Check.for`
+      Check.Producer.tuple (termProducer, termProducer)
+
+
+associative : (Term String -> Term String -> Term String) -> ElmTest.Test
+associative operation =
+  TestUtils.generativeTest <|
+    Check.claim
+      "associative"
+    `Check.true`
+      (\(x, y, z) -> ((x `operation` y) `operation` z) `Solver.Term.eq` (x `operation` (y `operation` z)))
+    `Check.for`
+      Check.Producer.tuple3 (termProducer, termProducer, termProducer)
+
+
+leftIdentity : (Term String -> Term String -> Term String) -> Term String -> ElmTest.Test
+leftIdentity operation elem =
+  TestUtils.generativeTest <|
+    Check.claim
+      "left identity"
+    `Check.true`
+      (\x -> (elem `operation` x) `Solver.Term.eq` x)
+    `Check.for`
+      termProducer
+
+
+inverse : (Term String -> Term String -> Term String) -> (Term String -> Term String) -> Term String -> ElmTest.Test
+inverse operation invert elem =
+  TestUtils.generativeTest <|
+    Check.claim
+      "inverse"
+    `Check.true`
+      (\x -> (x `operation` (invert x)) `Solver.Term.eq` elem)
+    `Check.for`
+      termProducer
 
 
 variableNames : List String

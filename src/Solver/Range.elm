@@ -16,7 +16,10 @@ module Solver.Range exposing
   , removeUpperBound
 
   , add
+  , sum
   , subtract
+  , multiply
+  , divide
   , intersect
   , union
   )
@@ -150,11 +153,32 @@ add =
   pairwise Solver.Interval.add
 
 
+{-| Compute the sum of a list of ranges.
+-}
+sum : List Range -> Range
+sum =
+  List.foldl add (singleton 0)
+
+
 {-| Compute the difference between two ranges.
 -}
 subtract : Range -> Range -> Range
 subtract =
   pairwise Solver.Interval.subtract
+
+
+{-| Compute the product of a range and a constant.
+-}
+multiply : Int -> Range -> Range
+multiply coeff (Range intervals) =
+  fromIntervals <| List.map (Solver.Interval.multiply coeff) intervals
+
+
+{-| Divide a range by a constant.
+-}
+divide : Range -> Int -> Range
+divide (Range intervals) divisor =
+  fromIntervals <| List.map (flip Solver.Interval.divide divisor) intervals
 
 
 {-| Compute the values that appear in both ranges.

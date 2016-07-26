@@ -30,6 +30,8 @@ all =
     , latticeSuite
     , addSuite
     , negateSuite
+    , multiplySuite
+    , divideSuite
     ]
 
 
@@ -417,6 +419,190 @@ negateSuite =
         `Check.for`
           endpointProducer
     ]
+
+
+multiplySuite : ElmTest.Test
+multiplySuite =
+  ElmTest.suite "multiply"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "by point 0"
+        `Check.that`
+          flip Solver.Endpoint.multiply (Solver.Endpoint.Point 0)
+        `Check.is`
+          always (Solver.Endpoint.Point 0)
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "by constant 0"
+        `Check.that`
+          Solver.Endpoint.multiply 0
+        `Check.is`
+          always (Solver.Endpoint.Point 0)
+        `Check.for`
+          endpointProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "by point 1"
+        `Check.that`
+          flip Solver.Endpoint.multiply (Solver.Endpoint.Point 1)
+        `Check.is`
+          Solver.Endpoint.Point
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "by constant 1"
+        `Check.that`
+          Solver.Endpoint.multiply 1
+        `Check.is`
+          identity
+        `Check.for`
+          endpointProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "by non-infinite point"
+        `Check.that`
+          (\(val1, val2) -> Solver.Endpoint.multiply val1 (Solver.Endpoint.Point val2))
+        `Check.is`
+          (\(val1, val2) -> Solver.Endpoint.Point (val1 * val2))
+        `Check.for`
+          Check.Producer.tuple (Check.Producer.int, Check.Producer.int)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "PositiveInfinity * positive"
+        `Check.that`
+          flip Solver.Endpoint.multiply Solver.Endpoint.PositiveInfinity
+        `Check.is`
+          always Solver.Endpoint.PositiveInfinity
+        `Check.for`
+          Check.Producer.filter (\val -> val > 0) Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "PositiveInfinity * negative"
+        `Check.that`
+          flip Solver.Endpoint.multiply Solver.Endpoint.PositiveInfinity
+        `Check.is`
+          always Solver.Endpoint.NegativeInfinity
+        `Check.for`
+          Check.Producer.filter (\val -> val < 0) Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "NegativeInfinity * positive"
+        `Check.that`
+          flip Solver.Endpoint.multiply Solver.Endpoint.NegativeInfinity
+        `Check.is`
+          always Solver.Endpoint.NegativeInfinity
+        `Check.for`
+          Check.Producer.filter (\val -> val > 0) Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "NegativeInfinity * negative"
+        `Check.that`
+          flip Solver.Endpoint.multiply Solver.Endpoint.NegativeInfinity
+        `Check.is`
+          always Solver.Endpoint.PositiveInfinity
+        `Check.for`
+          Check.Producer.filter (\val -> val < 0) Check.Producer.int
+    ]
+
+
+divideSuite : ElmTest.Test
+divideSuite =
+  let
+    nonZeroProducer =
+      Check.Producer.filter (\val -> val /= 0) Check.Producer.int
+  in
+    ElmTest.suite "divide"
+      [ TestUtils.generativeTest <|
+          Check.claim
+            "into 0"
+          `Check.that`
+            Solver.Endpoint.divide (Solver.Endpoint.Point 0)
+          `Check.is`
+            always (Just <| Solver.Endpoint.Point 0)
+          `Check.for`
+            nonZeroProducer
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "by 0"
+          `Check.that`
+            flip Solver.Endpoint.divide 0
+          `Check.is`
+            always Nothing
+          `Check.for`
+            endpointProducer
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "by 1"
+          `Check.that`
+            flip Solver.Endpoint.divide 1
+          `Check.is`
+            Just
+          `Check.for`
+            endpointProducer
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "into non-infinite point"
+          `Check.that`
+            (\(val1, val2) -> Solver.Endpoint.divide (Solver.Endpoint.Point val1) val2)
+          `Check.is`
+            (\(val1, val2) -> Just <| Solver.Endpoint.Point (val1 // val2))
+          `Check.for`
+            Check.Producer.tuple (Check.Producer.int, nonZeroProducer)
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "PositiveInfinity // positive"
+          `Check.that`
+            Solver.Endpoint.divide Solver.Endpoint.PositiveInfinity
+          `Check.is`
+            always (Just <| Solver.Endpoint.PositiveInfinity)
+          `Check.for`
+            Check.Producer.filter (\val -> val > 0) Check.Producer.int
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "PositiveInfinity // negative"
+          `Check.that`
+            Solver.Endpoint.divide Solver.Endpoint.PositiveInfinity
+          `Check.is`
+            always (Just <| Solver.Endpoint.NegativeInfinity)
+          `Check.for`
+            Check.Producer.filter (\val -> val < 0) Check.Producer.int
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "NegativeInfinity // positive"
+          `Check.that`
+            Solver.Endpoint.divide Solver.Endpoint.NegativeInfinity
+          `Check.is`
+            always (Just <| Solver.Endpoint.NegativeInfinity)
+          `Check.for`
+            Check.Producer.filter (\val -> val > 0) Check.Producer.int
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "NegativeInfinity // negative"
+          `Check.that`
+            Solver.Endpoint.divide Solver.Endpoint.NegativeInfinity
+          `Check.is`
+            always (Just <| Solver.Endpoint.PositiveInfinity)
+          `Check.for`
+            Check.Producer.filter (\val -> val < 0) Check.Producer.int
+        ]
 
 
 endpointProducer : Check.Producer.Producer Solver.Endpoint.Endpoint

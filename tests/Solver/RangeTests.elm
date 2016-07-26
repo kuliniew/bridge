@@ -8,6 +8,7 @@ import OperationTests
 import Solver.Interval
 import Solver.IntervalTests exposing (intervalProducer)
 import Solver.Range exposing (Range)
+import Solver.TestUtils exposing (smallishIntProducer)
 import TestUtils
 
 import Check
@@ -30,7 +31,10 @@ all =
     , removeLowerBoundSuite
     , removeUpperBoundSuite
     , addSuite
+    , sumSuite
     , subtractSuite
+    , multiplySuite
+    , divideSuite
     , intersectSuite
     , unionSuite
     , latticeSuite
@@ -288,6 +292,34 @@ addSuite =
     ]
 
 
+sumSuite : ElmTest.Test
+sumSuite =
+  ElmTest.suite "sum"
+    [ ElmTest.test "empty list" <|
+        ElmTest.assertEqual (Solver.Range.singleton 0) (Solver.Range.sum [])
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "singleton list"
+        `Check.that`
+          (\range -> Solver.Range.sum [range])
+        `Check.is`
+          identity
+        `Check.for`
+          rangeProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "two-element list"
+        `Check.that`
+          (\(range1, range2) -> Solver.Range.sum [range1, range2])
+        `Check.is`
+          uncurry Solver.Range.add
+        `Check.for`
+          Check.Producer.tuple (rangeProducer, rangeProducer)
+    ]
+
+
 subtractSuite : ElmTest.Test
 subtractSuite =
   ElmTest.suite "subtract"
@@ -307,6 +339,150 @@ subtractSuite =
             (\(range1, value1, range2, value2) -> Solver.Range.member value1 range1 && Solver.Range.member value2 range2)
             (Check.Producer.tuple4 (rangeProducer, Check.Producer.int, rangeProducer, Check.Producer.int))
     ]
+
+
+multiplySuite : ElmTest.Test
+multiplySuite =
+  ElmTest.suite "multiply"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "by empty range"
+        `Check.that`
+          flip Solver.Range.multiply Solver.Range.empty
+        `Check.is`
+          always Solver.Range.empty
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "by singleton range 0"
+        `Check.that`
+          flip Solver.Range.multiply (Solver.Range.singleton 0)
+        `Check.is`
+          always (Solver.Range.singleton 0)
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "by constant 0"
+        `Check.that`
+          Solver.Range.multiply 0
+        `Check.is`
+          always (Solver.Range.singleton 0)
+        `Check.for`
+          Check.Producer.filter (not << Solver.Range.isEmpty) rangeProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "by singleton range 1"
+        `Check.that`
+          flip Solver.Range.multiply (Solver.Range.singleton 1)
+        `Check.is`
+          Solver.Range.singleton
+        `Check.for`
+          Check.Producer.int
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "by constant 1"
+        `Check.that`
+          Solver.Range.multiply 1
+        `Check.is`
+          identity
+        `Check.for`
+          rangeProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "commutative with singletons"
+        `Check.that`
+          (\(x, y) -> x `Solver.Range.multiply` Solver.Range.singleton y)
+        `Check.is`
+          (\(x, y) -> y `Solver.Range.multiply` Solver.Range.singleton x)
+        `Check.for`
+          Check.Producer.tuple (Check.Producer.int, Check.Producer.int)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "associative with singletons"
+        `Check.that`
+          (\(x, y, z) -> x `Solver.Range.multiply` (y `Solver.Range.multiply` Solver.Range.singleton z))
+        `Check.is`
+          (\(x, y, z) -> (x * y) `Solver.Range.multiply` Solver.Range.singleton z)
+        `Check.for`
+          Check.Producer.tuple3 (smallishIntProducer, smallishIntProducer, smallishIntProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "contains the products of values from the input ranges"
+        `Check.true`
+          (\(value1, range2, value2) -> Solver.Range.member (value1 * value2) (value1 `Solver.Range.multiply` range2))
+        `Check.for`
+          Check.Producer.filter
+            (\(_, range2, value2) -> Solver.Range.member value2 range2)
+            (Check.Producer.tuple3 (Check.Producer.int, rangeProducer, Check.Producer.int))
+    ]
+
+
+divideSuite : ElmTest.Test
+divideSuite =
+  let
+    nonZeroProducer =
+      Check.Producer.filter (\val -> val /= 0) Check.Producer.int
+  in
+    ElmTest.suite "divide"
+      [ TestUtils.generativeTest <|
+          Check.claim
+            "into 0"
+          `Check.that`
+            Solver.Range.divide (Solver.Range.singleton 0)
+          `Check.is`
+            always (Solver.Range.singleton 0)
+          `Check.for`
+            nonZeroProducer
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "by 0"
+          `Check.that`
+            flip Solver.Range.divide 0
+          `Check.is`
+            always Solver.Range.empty
+          `Check.for`
+            rangeProducer
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "by 1"
+          `Check.that`
+            flip Solver.Range.divide 1
+          `Check.is`
+            identity
+          `Check.for`
+            rangeProducer
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "contains the quotients of values from the input ranges"
+          `Check.true`
+            (\(range1, value1, value2) -> Solver.Range.member (value1 // value2) (range1 `Solver.Range.divide` value2))
+          `Check.for`
+            Check.Producer.filter
+              (\(range1, value1, _) -> Solver.Range.member value1 range1)
+              (Check.Producer.tuple3 (rangeProducer, Check.Producer.int, nonZeroProducer))
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "inverse of multiply"
+          `Check.that`
+            (\(range, value) -> (value `Solver.Range.multiply` range) `Solver.Range.divide` value)
+          `Check.is`
+            fst
+          `Check.for`
+            Check.Producer.tuple (rangeProducer, nonZeroProducer)
+      ]
 
 
 intersectSuite : ElmTest.Test

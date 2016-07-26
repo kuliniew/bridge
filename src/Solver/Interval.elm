@@ -18,6 +18,8 @@ module Solver.Interval exposing
   , add
   , negate
   , subtract
+  , multiply
+  , divide
   , intersect
   , hull
   , union
@@ -192,6 +194,39 @@ negate interval =
 subtract : Interval -> Interval -> Interval
 subtract interval1 interval2 =
   add interval1 (negate interval2)
+
+
+{-| Multiply an interval by a constant.
+-}
+multiply : Int -> Interval -> Interval
+multiply coeff interval =
+  case interval of
+    NonEmpty lo hi ->
+      if coeff > 0
+      then NonEmpty (Solver.Endpoint.multiply coeff lo) (Solver.Endpoint.multiply coeff hi)
+      else
+        if coeff < 0
+        then NonEmpty (Solver.Endpoint.multiply coeff hi) (Solver.Endpoint.multiply coeff lo)
+        else NonEmpty (Solver.Endpoint.Point 0) (Solver.Endpoint.Point 0)
+    Empty ->
+      Empty
+
+
+{-| Divide an interval by a constant.
+-}
+divide : Interval -> Int -> Interval
+divide interval divisor =
+  case interval of
+    NonEmpty lo hi ->
+      case (Solver.Endpoint.divide lo divisor, Solver.Endpoint.divide hi divisor) of
+        (Just loQuotient, Just hiQuotient) ->
+          if divisor > 0
+          then NonEmpty loQuotient hiQuotient
+          else NonEmpty hiQuotient loQuotient
+        _ ->
+          Empty
+    Empty ->
+      Empty
 
 
 {-| Compute the values that appear in both intervals.

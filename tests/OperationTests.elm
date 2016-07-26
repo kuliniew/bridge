@@ -3,6 +3,7 @@ module OperationTests exposing
   , totalOrder
   , boundedLattice
   , commutativeMonoid
+  , equality
 
   , commutative
   , unaryIdempotent
@@ -88,6 +89,45 @@ commutativeMonoid operation identityElement producer =
     , associative operation producer
     , leftIdentity operation identityElement producer
     ]
+
+
+{-| Test that an operation acts as an equality operator.
+-}
+equality : (a -> a -> Bool) -> Check.Producer.Producer a -> ElmTest.Test
+equality operation producer =
+  ElmTest.suite "equality"
+    [ reflexive operation producer
+    , symmetric operation producer
+    , transitive operation producer
+    ]
+
+
+{-| Test that a relation is reflexive.
+-}
+reflexive : (a -> a -> Bool) -> Check.Producer.Producer a -> ElmTest.Test
+reflexive operation producer =
+  TestUtils.generativeTest <|
+    Check.claim
+      "reflexive"
+    `Check.true`
+      (\x -> x `operation` x)
+    `Check.for`
+      producer
+
+
+{-| Test that a relation is symmetric.
+-}
+symmetric : (a -> a -> Bool) -> Check.Producer.Producer a -> ElmTest.Test
+symmetric operation producer =
+  TestUtils.generativeTest <|
+    Check.claim
+      "symmetric"
+    `Check.that`
+      uncurry operation
+    `Check.is`
+      uncurry (flip operation)
+    `Check.for`
+      Check.Producer.tuple (producer, producer)
 
 
 {-| Test that a relation is antisymmetric.
