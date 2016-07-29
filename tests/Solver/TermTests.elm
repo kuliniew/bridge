@@ -34,6 +34,7 @@ all =
     , addSuite
     , sumSuite
     , negateSuite
+    , subtractSuite
     ]
 
 
@@ -357,6 +358,37 @@ negateSuite =
     ]
 
 
+subtractSuite : ElmTest.Test
+subtractSuite =
+  ElmTest.suite "subtract"
+    [ rightIdentity Solver.Term.subtract (Solver.Term.constant 0)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "undoes addition"
+        `Check.true`
+          (\(x, y) -> ((x `Solver.Term.add` y) `Solver.Term.subtract` y) `Solver.Term.eq` x)
+        `Check.for`
+          Check.Producer.tuple (termProducer, termProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "undone by addition"
+        `Check.true`
+          (\(x, y) -> ((x `Solver.Term.subtract` y) `Solver.Term.add` y) `Solver.Term.eq` x)
+        `Check.for`
+          Check.Producer.tuple (termProducer, termProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "equivalent to negation and addition"
+        `Check.true`
+          (\(x, y) -> (x `Solver.Term.subtract` y) `Solver.Term.eq` (x `Solver.Term.add` Solver.Term.negate y))
+        `Check.for`
+          Check.Producer.tuple (termProducer, termProducer)
+    ]
+
+
 commutative : (Term String -> Term String -> Term String) -> ElmTest.Test
 commutative operation =
   TestUtils.generativeTest <|
@@ -386,6 +418,17 @@ leftIdentity operation elem =
       "left identity"
     `Check.true`
       (\x -> (elem `operation` x) `Solver.Term.eq` x)
+    `Check.for`
+      termProducer
+
+
+rightIdentity : (Term String -> Term String -> Term String) -> Term String -> ElmTest.Test
+rightIdentity operation elem =
+  TestUtils.generativeTest <|
+    Check.claim
+      "right identity"
+    `Check.true`
+      (\x -> (x `operation` elem) `Solver.Term.eq` x)
     `Check.for`
       termProducer
 

@@ -37,8 +37,8 @@ Whenever a constraint implements a relation R, the interpretation is
 "a R b".  For example, LessThan a b would be "a is less than b".
 -}
 type Constraint var
-  = Equal (Term var) (Term var)
-  | LessThanOrEqual (Term var) (Term var)
+  = Zero (Term var)
+  | Positive (Term var)
   | And (Constraint var) (Constraint var)
   | Or (Constraint var) (Constraint var)
   | AlwaysTrue
@@ -48,22 +48,22 @@ type Constraint var
 {-| Constrain two terms to be exactly equal.
 -}
 equal : Term var -> Term var -> Constraint var
-equal =
-  Equal
+equal left right =
+  Zero (left `Solver.Term.subtract` right)
 
 
 {-| Constrain one term to be less than or equal to another.
 -}
 lessThanOrEqual : Term var -> Term var -> Constraint var
-lessThanOrEqual =
-  LessThanOrEqual
+lessThanOrEqual left right =
+  lessThan left (right `Solver.Term.add` Solver.Term.constant 1)
 
 
 {-| Constrain one term to be strictly less than another.
 -}
 lessThan : Term var -> Term var -> Constraint var
 lessThan left right =
-  lessThanOrEqual (left `Solver.Term.add` Solver.Term.constant 1) right
+  Positive (right `Solver.Term.subtract` left)
 
 
 {-| Constrain one term to be greater than or equal to another.
@@ -113,10 +113,10 @@ any =
 not : Constraint var -> Constraint var
 not constraint =
   case constraint of
-    Equal left right ->
-      (left `lessThan` right) `or` (left `greaterThan` right)
-    LessThanOrEqual left right ->
-      left `greaterThan` right
+    Zero term ->
+      (term `lessThan` Solver.Term.constant 0) `or` (term `greaterThan` Solver.Term.constant 0)
+    Positive term ->
+      (term `lessThanOrEqual` Solver.Term.constant 0)
     And left right ->
       not left `or` not right
     Or left right ->
@@ -133,13 +133,6 @@ a narrower set of variable ranges that satisfies the constraint.
 evaluate : EveryDict var Range -> Constraint var -> Maybe (EveryDict var Range)
 evaluate variables constraint =
   let
-    sameVariablesOnBothSides left right =
-      -- The solver can't currently handle things like "x = x + 1" gracefully since
-      -- it really requires algebraic manipulation that isn't implemented yet.  So,
-      -- give up if that case comes up, to avoid taking a loooooooong time to try to
-      -- deal with it incrementally.
-      Basics.not <| EveryDict.isEmpty <|
-        EveryDict.intersect (Solver.Term.boundVariables left) (Solver.Term.boundVariables right)
     alternatives variables1 variables2 =
       EveryDict.keys variables1 ++ EveryDict.keys variables2
         |> List.map (\key -> (key, Solver.Range.union
@@ -148,28 +141,10 @@ evaluate variables constraint =
         |> EveryDict.fromList
     basicResult =
       case constraint of
-        Equal left right ->
-          let
-            allowed =
-              Solver.Range.intersect (Solver.Term.evaluate variables left) (Solver.Term.evaluate variables right)
-          in
-            if Solver.Range.isEmpty allowed || sameVariablesOnBothSides left right
-            then Nothing
-            else Solver.Term.constrain left allowed variables `Maybe.andThen` Solver.Term.constrain right allowed
-        LessThanOrEqual left right ->
-          let
-            currentLeft =
-              Solver.Term.evaluate variables left
-            currentRight =
-              Solver.Term.evaluate variables right
-            allowedLeft =
-              Solver.Range.intersect currentLeft (Solver.Range.removeLowerBound currentRight)
-            allowedRight =
-              Solver.Range.intersect currentRight (Solver.Range.removeUpperBound currentLeft)
-          in
-            if Solver.Range.isEmpty allowedLeft || Solver.Range.isEmpty allowedRight || sameVariablesOnBothSides left right
-            then Nothing
-            else Solver.Term.constrain left allowedLeft variables `Maybe.andThen` Solver.Term.constrain right allowedRight
+        Zero term ->
+          Solver.Term.constrain term (Solver.Range.singleton 0) variables
+        Positive term ->
+          Solver.Term.constrain term (Solver.Range.fromLowerBound 1) variables
         And left right ->
           evaluate variables left `Maybe.andThen` flip evaluate right
         Or left right ->
@@ -201,10 +176,10 @@ evaluate variables constraint =
 boundVariables : Constraint var -> EveryDict var ()
 boundVariables constraint =
   case constraint of
-    Equal left right ->
-      EveryDict.union (Solver.Term.boundVariables left) (Solver.Term.boundVariables right)
-    LessThanOrEqual left right ->
-      EveryDict.union (Solver.Term.boundVariables left) (Solver.Term.boundVariables right)
+    Zero term ->
+      Solver.Term.boundVariables term
+    Positive term ->
+      Solver.Term.boundVariables term
     And left right ->
       EveryDict.union (boundVariables left) (boundVariables right)
     Or left right ->
@@ -240,8 +215,8 @@ terminalGenerator termGenerator =
   Random.Extra.choices
     [ Random.Extra.constant AlwaysTrue
     , Random.Extra.constant AlwaysFalse
-    , Random.map2 Equal termGenerator termGenerator
-    , Random.map2 LessThanOrEqual termGenerator termGenerator
+    , Random.map Zero termGenerator
+    , Random.map Positive termGenerator
     ]
 
 
@@ -270,17 +245,15 @@ constraintGenerator termGenerator =
 constraintShrinker : Shrink.Shrinker (Term var) -> Shrink.Shrinker (Constraint var)
 constraintShrinker termShrinker constraint =
   let
-    shrinkTerms ctor left right =
-      ctor `Shrink.map` termShrinker left `Shrink.andMap` termShrinker right
     shrinkConstraints ctor left right =
       Lazy.List.cons left <| Lazy.List.cons right <|
         ctor `Shrink.map` constraintShrinker termShrinker left `Shrink.andMap` constraintShrinker termShrinker right
   in
     case constraint of
-      Equal left right ->
-        shrinkTerms Equal left right
-      LessThanOrEqual left right ->
-        shrinkTerms LessThanOrEqual left right
+      Zero term ->
+        Zero `Shrink.map` termShrinker term
+      Positive term ->
+        Positive `Shrink.map` termShrinker term
       And left right ->
         shrinkConstraints And left right
       Or left right ->

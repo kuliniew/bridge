@@ -55,6 +55,24 @@ equalSuite =
         (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1)
         (Just <| EveryDict.singleton "x" (Solver.Range.singleton 1))
 
+    , evaluateTestCase
+        "x = x"
+        EveryDict.empty
+        (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.variable "x")
+        (Just EveryDict.empty)
+
+    , evaluateTestCase
+        "x = x + 1"
+        EveryDict.empty
+        (Solver.Term.variable "x" `Solver.Constraint.equal` (Solver.Term.variable "x" `Solver.Term.add` Solver.Term.constant 1))
+        Nothing
+
+    , evaluateTestCase
+        "x = x + x"
+        EveryDict.empty
+        (Solver.Term.variable "x" `Solver.Constraint.equal` (Solver.Term.variable "x" `Solver.Term.add` Solver.Term.variable "x"))
+        (Just <| EveryDict.singleton "x" (Solver.Range.singleton 0))
+
     , boundVariablesTestCase
         "1 = 1"
         (Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 1)
@@ -68,7 +86,7 @@ equalSuite =
     , boundVariablesTestCase
         "x = x"
         (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.variable "x")
-        ["x"]
+        []   -- because x cancels out
 
     , boundVariablesTestCase
         "x = y"
@@ -632,15 +650,11 @@ notSuite =
           (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 5))
         ["x"]
 
-    -- FIXME PENDING
-    -- Double-negating equality breaks without algebraic manipulation of terms
-    {-
     , equivalentTests
         "!!x  <-->  x"
         (Solver.Constraint.not << Solver.Constraint.not)
         identity
         constraintProducer
-    -}
 
     , TestUtils.generativeTest <|
         Check.claim
@@ -677,9 +691,6 @@ logicSuite =
       , deMorganTests "&&" Solver.Constraint.and "||" Solver.Constraint.or
       , deMorganTests "||" Solver.Constraint.or "&&" Solver.Constraint.and
 
-      -- FIXME PENDING
-      -- Possibly broken due to lack of algebraic manipulation of terms
-      {-
       , TestUtils.generativeTest <|
           Check.claim
             "tautology"
@@ -689,10 +700,16 @@ logicSuite =
             (\(_, variables) -> Just <| EveryDict.toList variables)
           `Check.for`
             (Check.Producer.tuple (constraintProducer, variablesProducer))
-      -}
 
-      -- FIXME PENDING
-      -- Possibly broken due to lack of algebraic manipulation of terms
+      {-
+        This test doesn't really work unless a conjunction were to evaluate each subconstraint simultaneously.
+        For example, in "x + y > 0 && x + y < 0", where x and y are initially unbounded, neither subconstraint
+        is able by itself to tighten the bounds of x or y, even though there is no individual choice of x or y
+        that can satisfy both subconstraints simultaneously.
+
+        There are hacks possible to handle this particular case, but in general the way the solver works can't
+        really handle situations like this well.
+      -}
       {-
       , TestUtils.generativeTest <|
           Check.claim
@@ -761,7 +778,7 @@ equivalentTests name builder1 builder2 argsProducer =
 
 evaluateTestCase : String -> EveryDict var Range -> Constraint var -> Maybe (EveryDict var Range) -> ElmTest.Test
 evaluateTestCase name initial constraint expected =
-  ElmTest.test name <|
+  ElmTest.test ("evaluate: " ++ name) <|
     ElmTest.assertEqual
       (Maybe.map EveryDict.toList expected)
       (evaluateAsList initial constraint)
@@ -774,7 +791,7 @@ evaluateAsList variables constraint =
 
 boundVariablesTestCase : String -> Constraint var -> List var -> ElmTest.Test
 boundVariablesTestCase name constraint expected =
-  ElmTest.test name <|
+  ElmTest.test ("boundVariables: " ++ name) <|
     ElmTest.assertEqual expected (boundVariablesAsList constraint)
 
 

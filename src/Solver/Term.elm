@@ -5,6 +5,7 @@ module Solver.Term exposing
   , add
   , sum
   , negate
+  , subtract
 
   , eq
 
@@ -83,6 +84,13 @@ sum =
 negate : Term var -> Term var
 negate (Term term) =
   Term <| EveryDict.map (always Basics.negate) term
+
+
+{-| Subtract one term from another.
+-}
+subtract : Term var -> Term var -> Term var
+subtract left right =
+  left `add` negate right
 
 
 {-| Check if two terms are equivalent.
