@@ -28,6 +28,8 @@ all =
     , orSuite
     , anySuite
     , notSuite
+    , ifThenSuite
+    , ifThenElseSuite
     , logicSuite
     ]
 
@@ -668,6 +670,64 @@ notSuite =
     ]
 
 
+ifThenSuite : ElmTest.Test
+ifThenSuite =
+  ElmTest.suite "ifThen"
+    [ equivalentTests
+        "true -> x  <-->  x"
+        (Solver.Constraint.ifThen alwaysTrue)
+        identity
+        constraintProducer
+
+    , equivalentTests
+        "x -> false  <-->  !x"
+        (flip Solver.Constraint.ifThen alwaysFalse)
+        Solver.Constraint.not
+        constraintProducer
+
+    , equivalentTests
+        "x -> y  <-->  !y -> !x"
+        (uncurry Solver.Constraint.ifThen)
+        (\(x, y) -> Solver.Constraint.ifThen (Solver.Constraint.not y) (Solver.Constraint.not x))
+        (Check.Producer.tuple (constraintProducer, constraintProducer))
+    ]
+
+
+ifThenElseSuite : ElmTest.Test
+ifThenElseSuite =
+  ElmTest.suite "ifThenElse"
+    [ evaluateTestCase
+        "only then clause"
+        EveryDict.empty
+        (Solver.Constraint.ifThenElse
+          alwaysTrue
+          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1)
+          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 2))
+        (Just <| EveryDict.singleton "x" (Solver.Range.singleton 1))
+
+    , evaluateTestCase
+        "only else clause"
+        EveryDict.empty
+        (Solver.Constraint.ifThenElse
+          alwaysFalse
+          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1)
+          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 2))
+        (Just <| EveryDict.singleton "x" (Solver.Range.singleton 2))
+
+    , evaluateTestCase
+        "indefinite"
+        EveryDict.empty
+        (Solver.Constraint.ifThenElse
+          (Solver.Term.variable "y" `Solver.Constraint.equal` Solver.Term.constant 1)
+          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1)
+          (Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 2))
+        (Just <| EveryDict.fromList
+          [ ("x", Solver.Range.fromIntervals [boundedInterval 1 2])
+          , ("y", Solver.Range.full)
+          ])
+    ]
+
+
 logicSuite : ElmTest.Test
 logicSuite =
   let
@@ -812,3 +872,13 @@ boundedInterval lo hi =
 constraintProducer : Check.Producer.Producer (Constraint String)
 constraintProducer =
   Solver.Constraint.producer variableProducer
+
+
+alwaysTrue : Constraint var
+alwaysTrue =
+  Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 1
+
+
+alwaysFalse : Constraint var
+alwaysFalse =
+  Solver.Term.constant 1 `Solver.Constraint.equal` Solver.Term.constant 2

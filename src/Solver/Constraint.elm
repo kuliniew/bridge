@@ -10,6 +10,8 @@ module Solver.Constraint exposing
   , or
   , any
   , not
+  , ifThen
+  , ifThenElse
 
   , evaluate
   , boundVariables
@@ -125,6 +127,27 @@ not constraint =
       AlwaysFalse
     AlwaysFalse ->
       AlwaysTrue
+
+
+{-| If one constraint is true, require a second constraint to
+also be true.
+-}
+ifThen : Constraint var -> Constraint var -> Constraint var
+ifThen cond whenTrue =
+  not cond `or` whenTrue
+
+
+{-| If one constraint is true, require a second constraint to
+also be true.  Otherwise, require a third constraint to be true
+instead.
+-}
+ifThenElse : Constraint var -> Constraint var -> Constraint var -> Constraint var
+ifThenElse cond whenTrue whenFalse =
+  all
+    [ ifThen cond whenTrue
+    , ifThen (not cond) whenFalse
+    , whenTrue `or` whenFalse
+    ]
 
 
 {-| Evaluate a constraint over a set of known variable ranges, returning
