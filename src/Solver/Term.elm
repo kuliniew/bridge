@@ -6,6 +6,7 @@ module Solver.Term exposing
   , sum
   , negate
   , subtract
+  , multiply
 
   , eq
 
@@ -91,6 +92,21 @@ negate (Term term) =
 subtract : Term var -> Term var -> Term var
 subtract left right =
   left `add` negate right
+
+
+{-| Multiply a term by a constant.
+
+Arbitrary term cannot be multiplied together for the sake of simplicity
+of implementation, and because that ability isn't needed for the intended
+use case.
+-}
+multiply : Int -> Term var -> Term var
+multiply coeff (Term term) =
+  case coeff of
+    0 ->
+      constant 0
+    _ ->
+      Term <| EveryDict.map (\_ val -> coeff * val) term
 
 
 {-| Check if two terms are equivalent.

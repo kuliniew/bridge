@@ -35,6 +35,7 @@ all =
     , sumSuite
     , negateSuite
     , subtractSuite
+    , multiplySuite
     ]
 
 
@@ -386,6 +387,77 @@ subtractSuite =
           (\(x, y) -> (x `Solver.Term.subtract` y) `Solver.Term.eq` (x `Solver.Term.add` Solver.Term.negate y))
         `Check.for`
           Check.Producer.tuple (termProducer, termProducer)
+    ]
+
+
+multiplySuite : ElmTest.Test
+multiplySuite =
+  ElmTest.suite "multiply"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "commutative"
+        `Check.true`
+          (\(x, y) ->
+            Solver.Term.eq
+              (x `Solver.Term.multiply` Solver.Term.constant y)
+              (y `Solver.Term.multiply` Solver.Term.constant x))
+        `Check.for`
+          Check.Producer.tuple (smallishIntProducer, smallishIntProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "associative"
+        `Check.true`
+          (\(x, y, z) ->
+            Solver.Term.eq
+              ((x * y) `Solver.Term.multiply` Solver.Term.constant z)
+              (x `Solver.Term.multiply` (y `Solver.Term.multiply` Solver.Term.constant z)))
+        `Check.for`
+          Check.Producer.tuple3 (smallishIntProducer, smallishIntProducer, smallishIntProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "left identity"
+        `Check.true`
+          (\x ->
+            Solver.Term.eq
+              (1 `Solver.Term.multiply` x)
+              x)
+        `Check.for`
+          termProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "left annihilator"
+        `Check.true`
+          (\x ->
+            Solver.Term.eq
+              (0 `Solver.Term.multiply` x)
+              (Solver.Term.constant 0))
+        `Check.for`
+          termProducer
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "constants"
+        `Check.true`
+          (\(x, y) ->
+            Solver.Term.eq
+              (x `Solver.Term.multiply` Solver.Term.constant y)
+              (Solver.Term.constant (x * y)))
+        `Check.for`
+          Check.Producer.tuple (smallishIntProducer, smallishIntProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "repeated addition"
+        `Check.true`
+          (\(count, term) ->
+            Solver.Term.eq
+              (count `Solver.Term.multiply` term)
+              (Solver.Term.sum <| List.repeat count term))
+        `Check.for`
+          Check.Producer.tuple (Check.Producer.rangeInt 0 10, termProducer)
     ]
 
 
