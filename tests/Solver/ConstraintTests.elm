@@ -31,6 +31,7 @@ all =
     , ifThenSuite
     , ifThenElseSuite
     , logicSuite
+    , decomposeSuite
     ]
 
 
@@ -782,6 +783,32 @@ logicSuite =
             (Check.Producer.tuple (constraintProducer, variablesProducer))
       -}
       ]
+
+
+decomposeSuite : ElmTest.Test
+decomposeSuite =
+  ElmTest.suite "decompose"
+    [ TestUtils.generativeTest <|
+        Check.claim
+          "equivalent to original constraint"
+        `Check.that`
+          (\(variables, constraint) ->
+            Solver.Constraint.decompose constraint
+              |> List.foldl (\con mvar -> mvar `Maybe.andThen` flip Solver.Constraint.evaluate con) (Just variables)
+              |> Maybe.map EveryDict.toList)
+        `Check.is`
+          uncurry evaluateAsList
+        `Check.for`
+          Check.Producer.tuple (variablesProducer, constraintProducer)
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "decomposes conjunctions"
+        `Check.true`
+          (\(x, y) -> List.length (Solver.Constraint.decompose (x `Solver.Constraint.and` y)) >= 2)
+        `Check.for`
+          Check.Producer.tuple (constraintProducer, constraintProducer)
+    ]
 
 
 commutativeTests : (a -> a -> Constraint String) -> Check.Producer.Producer a -> ElmTest.Test

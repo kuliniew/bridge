@@ -13,6 +13,7 @@ module Solver.Constraint exposing
   , ifThen
   , ifThenElse
 
+  , decompose
   , evaluate
   , boundVariables
 
@@ -148,6 +149,19 @@ ifThenElse cond whenTrue whenFalse =
     , ifThen (not cond) whenFalse
     , whenTrue `or` whenFalse
     ]
+
+
+{-| Decompose a constraint into a list of smaller, equivalent constraints.
+The solver can be more efficient with a larger number of smaller constraints,
+since it can consider fewer variables at a time.
+-}
+decompose : Constraint var -> List (Constraint var)
+decompose constraint =
+  case constraint of
+    And left right ->
+      decompose left ++ decompose right
+    _ ->
+      [constraint]
 
 
 {-| Evaluate a constraint over a set of known variable ranges, returning
