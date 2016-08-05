@@ -10,9 +10,11 @@ hand.
 -}
 
 import Card
-import Constraint
 import Evaluation
 import Seat
+import Solver
+
+import List.Extra
 
 
 {-| A metric used to evaluate a player's hand.
@@ -20,8 +22,10 @@ import Seat
 type Metric
   = HighCardPoints
   | LengthPoints
+  | LengthPointsWithinSuit Card.Suit
   | UncommittedPoints
   | ShortnessPointsWithTrump Card.Suit
+  | ShortnessPointsWithinSuit Card.Suit
   | PointsWithTrump Card.Suit
   | Length Card.Suit
   | CountRank Card.Rank
@@ -29,16 +33,53 @@ type Metric
   | QuickLosers Card.Suit
 
 
+{-| List of all possible metrics.
+-}
+allMetrics : List Metric
+allMetrics =
+  let
+    simpleMetrics =
+      [ HighCardPoints
+      , LengthPoints
+      , UncommittedPoints
+      , PlayingTricks
+      ]
+    suitMetricCtors =
+      [ LengthPointsWithinSuit
+      , ShortnessPointsWithTrump
+      , ShortnessPointsWithinSuit
+      , PointsWithTrump
+      , Length
+      , QuickLosers
+      ]
+    suitMetrics =
+      cartesianMap (<|) suitMetricCtors Card.suits
+    rankMetricCtors =
+      [ CountRank
+      ]
+    rankMetrics =
+      cartesianMap (<|) rankMetricCtors Card.ranks
+  in
+    simpleMetrics ++ suitMetrics ++ rankMetrics
+
+
 {-| The variable used in the player's knowledge representation.
 -}
 type Variable =
-  Var Seat.Relative Metric
+  Variable Seat.Relative Metric
+
+
+{-| List of all possible variables.
+-}
+allVariables : List Variable
+allVariables =
+  cartesianMap Variable Seat.relatives allMetrics
 
 
 {-| Representation of a player's total knowledge.
 -}
 type alias Knowledge =
-  Constraint.State Variable
+  Solver.Problem Variable
 
 
 {-| The unconstrained variables composing the knowledge state.
@@ -46,37 +87,10 @@ type alias Knowledge =
 baseKnowledge : Knowledge
 baseKnowledge =
   let
-    maxHighCardPoints =
-      37   {- 4 aces, 4 kings, 4 queens, 1 jack -}
-    maxLengthPoints =
-      9    {- 13 cards in one suit -}
-    maxShortnessPoints =
-      9    {- 3 void suits -}
-    basicMetrics =
-      [ (HighCardPoints, Constraint.range 0 maxHighCardPoints)
-      , (LengthPoints, Constraint.range 0 maxLengthPoints)
-      , (UncommittedPoints, Constraint.range 0 (maxHighCardPoints + maxLengthPoints))
-      , (PlayingTricks, Constraint.range 0 13)
-      ]
-    suitMetrics =
-      [ (ShortnessPointsWithTrump, Constraint.range 0 maxShortnessPoints)
-      , (PointsWithTrump, Constraint.range 0 (maxHighCardPoints + maxShortnessPoints))
-      , (Length, Constraint.range 0 13)
-      , (QuickLosers, Constraint.range 0 13)
-      ]
-    rankMetrics =
-      [ (CountRank, Constraint.range 0 4)
-      ]
-    metrics =
-      List.concat
-        [ basicMetrics
-        , crossMap (\(ctor, range) suit -> (ctor suit, range)) suitMetrics Card.suits
-        , crossMap (\(ctor, range) rank -> (ctor rank, range)) rankMetrics Card.ranks
-        ]
-    variables =
-      crossMap (\seat (metric, range) -> (Var seat metric, range)) Seat.relatives metrics
+    constraints =
+      lowerBoundConstraints ++ structuralConstraints
   in
-    Constraint.initialize variables
+    List.foldl Solver.addConstraint Solver.empty constraints
 
 
 {-| Map over the cross product of two lists.
@@ -92,26 +106,36 @@ create : List Card.Card -> Knowledge
 create hand =
   let
     suitConstraint suit =
-      Constraint.Equal
-        (Constraint.Variable <| Var Seat.Self (Length suit))
-        (Constraint.Constant <| Evaluation.length suit hand)
+      Solver.equal
+        (Solver.variable <| Variable Seat.Self (Length suit))
+        (Solver.constant <| Evaluation.length suit hand)
     rankConstraint rank =
-      Constraint.Equal
-        (Constraint.Variable <| Var Seat.Self (CountRank rank))
-        (Constraint.Constant <| Evaluation.countRank rank hand)
+      Solver.equal
+        (Solver.variable <| Variable Seat.Self (CountRank rank))
+        (Solver.constant <| Evaluation.countRank rank hand)
     constraints =
       List.concat
         [ List.map suitConstraint Card.suits
         , List.map rankConstraint Card.ranks
-        , structuralConstraints
         ]
   in
-    List.foldl Constraint.constrain baseKnowledge constraints
+    List.foldl Solver.addConstraint baseKnowledge constraints
+
+
+{-| Constraints that put a lower bound of 0 on each variable.
+-}
+lowerBoundConstraints : List (Solver.Constraint Variable)
+lowerBoundConstraints =
+  let
+    lowerBoundOfZero var =
+      Solver.variable var `Solver.greaterThanOrEqual` Solver.constant 0
+  in
+    List.map lowerBoundOfZero allVariables
 
 
 {-| The constraints inherent in the structure of the game.
 -}
-structuralConstraints : List (Constraint.Constraint Variable)
+structuralConstraints : List (Solver.Constraint Variable)
 structuralConstraints =
   totalHighCardPointsInDeck
     :: List.map totalSuitLengthInDeck Card.suits
@@ -119,60 +143,63 @@ structuralConstraints =
     ++ List.map totalSuitLengthInHand Seat.relatives
     ++ List.map totalRankCountInHand Seat.relatives
     ++ List.map highCardPointsDefinition Seat.relatives
+    ++ crossMap lengthPointsWithinSuit Card.suits Seat.relatives
     ++ List.map lengthPointsDefinition Seat.relatives
+    ++ List.map maximumLengthPointsInHand Seat.relatives
     ++ List.map uncommittedPointsDefinition Seat.relatives
+    ++ crossMap shortnessPointsWithinSuit Card.suits Seat.relatives
     ++ crossMap shortnessPointsDefinition Card.suits Seat.relatives
     ++ crossMap pointsWithTrumpDefinition Card.suits Seat.relatives
 
 
 {-| There are exactly 40 HCP in the deck.
 -}
-totalHighCardPointsInDeck : Constraint.Constraint Variable
+totalHighCardPointsInDeck : Solver.Constraint Variable
 totalHighCardPointsInDeck =
-  Constraint.Equal
-    (Constraint.Add <| List.map (\seat -> Constraint.Variable <| Var seat HighCardPoints) Seat.relatives)
-    (Constraint.Constant 40)
+  Solver.equal
+    (Solver.sum <| List.map (\seat -> Solver.variable <| Variable seat HighCardPoints) Seat.relatives)
+    (Solver.constant 40)
 
 
 {-| There are exactly 13 cards in each suit in the deck.
 -}
-totalSuitLengthInDeck : Card.Suit -> Constraint.Constraint Variable
+totalSuitLengthInDeck : Card.Suit -> Solver.Constraint Variable
 totalSuitLengthInDeck suit =
-  Constraint.Equal
-    (Constraint.Add <| List.map (\seat -> Constraint.Variable <| Var seat (Length suit)) Seat.relatives)
-    (Constraint.Constant 13)
+  Solver.equal
+    (Solver.sum <| List.map (\seat -> Solver.variable <| Variable seat (Length suit)) Seat.relatives)
+    (Solver.constant 13)
 
 
 {-| There are exactly 4 cards of each rank in the deck.
 -}
-totalRankCountInDeck : Card.Rank -> Constraint.Constraint Variable
+totalRankCountInDeck : Card.Rank -> Solver.Constraint Variable
 totalRankCountInDeck rank =
-  Constraint.Equal
-    (Constraint.Add <| List.map (\seat -> Constraint.Variable <| Var seat (CountRank rank)) Seat.relatives)
-    (Constraint.Constant 4)
+  Solver.equal
+    (Solver.sum <| List.map (\seat -> Solver.variable <| Variable seat (CountRank rank)) Seat.relatives)
+    (Solver.constant 4)
 
 
 {-| The total length of all suits in a single hand is exactly 13.
 -}
-totalSuitLengthInHand : Seat.Relative -> Constraint.Constraint Variable
+totalSuitLengthInHand : Seat.Relative -> Solver.Constraint Variable
 totalSuitLengthInHand seat =
-  Constraint.Equal
-    (Constraint.Add <| List.map (\suit -> Constraint.Variable <| Var seat (Length suit)) Card.suits)
-    (Constraint.Constant 13)
+  Solver.equal
+    (Solver.sum <| List.map (\suit -> Solver.variable <| Variable seat (Length suit)) Card.suits)
+    (Solver.constant 13)
 
 
 {-| The total count of all ranks in a single hand is exactly 13.
 -}
-totalRankCountInHand : Seat.Relative -> Constraint.Constraint Variable
+totalRankCountInHand : Seat.Relative -> Solver.Constraint Variable
 totalRankCountInHand seat =
-  Constraint.Equal
-    (Constraint.Add <| List.map (\rank -> Constraint.Variable <| Var seat (CountRank rank)) Card.ranks)
-    (Constraint.Constant 13)
+  Solver.equal
+    (Solver.sum <| List.map (\rank -> Solver.variable <| Variable seat (CountRank rank)) Card.ranks)
+    (Solver.constant 13)
 
 
 {-| The definition of high card points in a hand.
 -}
-highCardPointsDefinition : Seat.Relative -> Constraint.Constraint Variable
+highCardPointsDefinition : Seat.Relative -> Solver.Constraint Variable
 highCardPointsDefinition seat =
   let
     factors =
@@ -182,82 +209,102 @@ highCardPointsDefinition seat =
       , (1, Card.Jack)
       ]
     component (factor, rank) =
-      Constraint.Multiply [Constraint.Constant factor, Constraint.Variable <| Var seat (CountRank rank)]
+      Solver.multiply factor (Solver.variable <| Variable seat (CountRank rank))
   in
-    Constraint.Equal
-      (Constraint.Add <| List.map component factors)
-      (Constraint.Variable <| Var seat HighCardPoints)
+    Solver.equal
+      (Solver.sum <| List.map component factors)
+      (Solver.variable <| Variable seat HighCardPoints)
+
+
+{-| Calculation of length points within a single suit in a hand.
+-}
+lengthPointsWithinSuit : Card.Suit -> Seat.Relative -> Solver.Constraint Variable
+lengthPointsWithinSuit suit seat =
+  Solver.ifThenElse
+    (Solver.greaterThan
+      (Solver.variable <| Variable seat (Length suit))
+      (Solver.constant 4))
+    (Solver.equal
+      (Solver.variable <| Variable seat (LengthPointsWithinSuit suit))
+      (Solver.subtract
+        (Solver.variable <| Variable seat (Length suit))
+        (Solver.constant 4)))
+    (Solver.equal
+      (Solver.variable <| Variable seat (LengthPointsWithinSuit suit))
+      (Solver.constant 0))
 
 
 {-| The definition of length points in a hand.
 -}
-lengthPointsDefinition : Seat.Relative -> Constraint.Constraint Variable
+lengthPointsDefinition : Seat.Relative -> Solver.Constraint Variable
 lengthPointsDefinition seat =
-  let
-    component suit =
-      Constraint.Max
-        [ Constraint.Add
-            [ Constraint.Variable <| Var seat (Length suit)
-            , Constraint.Constant (-4)
-            ]
-        , Constraint.Constant 0
-        ]
-  in
-    Constraint.Equal
-      (Constraint.Add <| List.map component Card.suits)
-      (Constraint.Variable <| Var seat LengthPoints)
+  Solver.equal
+    (Solver.variable <| Variable seat LengthPoints)
+    (Solver.sum <| List.map (Solver.variable << Variable seat << LengthPointsWithinSuit) Card.suits)
 
 
-{- | The definition of uncommitted points (the points measure used before
+{-| The maximum number of length points possible in a hand.
+-}
+maximumLengthPointsInHand : Seat.Relative -> Solver.Constraint Variable
+maximumLengthPointsInHand seat =
+  Solver.lessThanOrEqual
+    (Solver.variable <| Variable seat LengthPoints)
+    (Solver.constant 9)
+
+
+{-| The definition of uncommitted points (the points measure used before
 a fit, if one exists, has been identified).
 -}
-uncommittedPointsDefinition : Seat.Relative -> Constraint.Constraint Variable
+uncommittedPointsDefinition : Seat.Relative -> Solver.Constraint Variable
 uncommittedPointsDefinition seat =
-  let
-    components =
-      [ Constraint.Variable <| Var seat HighCardPoints
-      , Constraint.Variable <| Var seat LengthPoints
-      ]
-  in
-    Constraint.Equal
-      (Constraint.Add components)
-      (Constraint.Variable <| Var seat UncommittedPoints)
+  Solver.equal
+    (Solver.add
+      (Solver.variable <| Variable seat HighCardPoints)
+      (Solver.variable <| Variable seat LengthPoints))
+    (Solver.variable <| Variable seat UncommittedPoints)
+
+
+{-| Calculation of the shortness points within a single suit in a hand,
+assuming that a fit has been found in a different suit.
+-}
+shortnessPointsWithinSuit : Card.Suit -> Seat.Relative -> Solver.Constraint Variable
+shortnessPointsWithinSuit suit seat =
+  Solver.ifThenElse
+    (Solver.lessThan
+      (Solver.variable <| Variable seat (Length suit))
+      (Solver.constant 3))
+    (Solver.equal
+      (Solver.variable <| Variable seat (ShortnessPointsWithinSuit suit))
+      (Solver.subtract
+        (Solver.constant 3)
+        (Solver.variable <| Variable seat (Length suit))))
+    (Solver.equal
+      (Solver.variable <| Variable seat (ShortnessPointsWithinSuit suit))
+      (Solver.constant 0))
 
 
 {-| The definition of shortness points for a given fit.
 -}
-shortnessPointsDefinition : Card.Suit -> Seat.Relative -> Constraint.Constraint Variable
+shortnessPointsDefinition : Card.Suit -> Seat.Relative -> Solver.Constraint Variable
 shortnessPointsDefinition trumpSuit seat =
   let
     countedSuits =
       List.filter ((/=) trumpSuit) Card.suits
-    component suit =
-      Constraint.Max
-        [ Constraint.Add
-            [ Constraint.Constant 3
-            , Constraint.Negate (Constraint.Variable <| Var seat (Length suit))
-            ]
-        , Constraint.Constant 0
-        ]
   in
-    Constraint.Equal
-      (Constraint.Add <| List.map component countedSuits)
-      (Constraint.Variable <| Var seat (ShortnessPointsWithTrump trumpSuit))
+    Solver.equal
+      (Solver.sum <| List.map (Solver.variable << Variable seat << ShortnessPointsWithinSuit) countedSuits)
+      (Solver.variable <| Variable seat (ShortnessPointsWithTrump trumpSuit))
 
 
 {-| The definition of points when a fit is known.
 -}
-pointsWithTrumpDefinition : Card.Suit -> Seat.Relative -> Constraint.Constraint Variable
+pointsWithTrumpDefinition : Card.Suit -> Seat.Relative -> Solver.Constraint Variable
 pointsWithTrumpDefinition trumpSuit seat =
-  let
-    components =
-      [ Constraint.Variable <| Var seat HighCardPoints
-      , Constraint.Variable <| Var seat (ShortnessPointsWithTrump trumpSuit)
-      ]
-  in
-    Constraint.Equal
-      (Constraint.Add components)
-      (Constraint.Variable <| Var seat (PointsWithTrump trumpSuit))
+  Solver.equal
+    (Solver.add
+      (Solver.variable <| Variable seat HighCardPoints)
+      (Solver.variable <| Variable seat (ShortnessPointsWithTrump trumpSuit)))
+    (Solver.variable <| Variable seat (PointsWithTrump trumpSuit))
 
 
 {-| Add the hand held by a seat.
@@ -268,6 +315,15 @@ addHand _ _ knowledge = knowledge
 
 {-| Get a piece of information.
 -}
-get : Seat.Relative -> Metric -> Knowledge -> Constraint.Range
+get : Seat.Relative -> Metric -> Knowledge -> Solver.Range
 get seat metric knowledge =
-  Constraint.possibleValues (Var seat metric) knowledge
+  Solver.possibleValues (Variable seat metric) knowledge
+
+
+{-| Apply a function to each pair in a cartesian product.
+-}
+cartesianMap : (a -> b -> c) -> List a -> List b -> List c
+cartesianMap f xs ys =
+  xs `List.Extra.andThen` \x ->
+    ys `List.Extra.andThen` \y ->
+      [f x y]

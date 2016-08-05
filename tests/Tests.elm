@@ -8,6 +8,7 @@ import Bidding.StaymanTests
 import BiddingTests
 import CardTests
 import EvaluationTests
+import KnowledgeTests
 import SeatTests
 import Solver.ConstraintTests
 import Solver.EndpointTests
@@ -31,6 +32,7 @@ all =
     , BiddingTests.all
     , CardTests.all
     , EvaluationTests.all
+    , KnowledgeTests.all
     , SeatTests.all
     , Solver.ConstraintTests.all
     , Solver.EndpointTests.all
