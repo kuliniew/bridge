@@ -6,6 +6,7 @@ import Seat
 import Solver
 
 import ElmTest
+import Maybe.Extra
 
 
 all : ElmTest.Test
@@ -19,9 +20,9 @@ all =
     , pointsSuite
 
     , lengthSuite
-    -- , distributionSuite    -- FIXME: IMPLEMENT THIS
-    -- , balancedSuite        -- FIXME: IMPLEMENT THIS
-    -- , semiBalancedSuite    -- FIXME: IMPLEMENT THIS
+    , distributionSuite
+    , balancedSuite
+    , semiBalancedSuite
 
     , countRankSuite
 
@@ -391,6 +392,115 @@ lengthSuite =
       ]
 
 
+distributionSuite : ElmTest.Test
+distributionSuite =
+  ElmTest.suite "distribution"
+    [ testSatisfied "measures the length of each suit regardless of order" (Knowledge.distribution 4 4 3 2)
+        { spades = [ Card.Ace, Card.King, Card.Queen ]
+        , hearts = [ Card.Ace, Card.King, Card.Queen, Card.Jack ]
+        , diamonds = [ Card.Ace, Card.King ]
+        , clubs = [ Card.Ace, Card.King, Card.Queen, Card.Jack ]
+        }
+    ]
+
+
+-- TODO: balancedSuite and semiBalancedSuite need to take hands as inputs
+
+
+balancedSuite : ElmTest.Test
+balancedSuite =
+  ElmTest.suite "balanced"
+    [ testSatisfied "4-4-3-2 is balanced" Knowledge.balanced
+        { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , hearts = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , diamonds = [ Card.Ace, Card.Two, Card.Three ]
+        , clubs = [ Card.Ace, Card.Two ]
+        }
+
+    , testSatisfied "4-3-3-3 is balanced" Knowledge.balanced
+        { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , hearts = [ Card.Ace, Card.Two, Card.Three ]
+        , diamonds = [ Card.Ace, Card.Two, Card.Three ]
+        , clubs = [ Card.Ace, Card.Two, Card.Three ]
+        }
+
+    , testSatisfied "5-3-3-2 is balanced" Knowledge.balanced
+        { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four, Card.Five ]
+        , hearts = [ Card.Ace, Card.Two, Card.Three ]
+        , diamonds = [ Card.Ace, Card.Two, Card.Three ]
+        , clubs = [ Card.Ace, Card.Two ]
+        }
+
+    , testNotSatisfied "5-4-2-2 is not balanced" Knowledge.balanced
+        { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four, Card.Five ]
+        , hearts = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , diamonds = [ Card.Ace, Card.Two ]
+        , clubs = [ Card.Ace, Card.Two ]
+        }
+
+    , testNotSatisfied "6-3-2-2 is not balanced" Knowledge.balanced
+        { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four, Card.Five, Card.Six ]
+        , hearts = [ Card.Ace, Card.Two, Card.Three ]
+        , diamonds = [ Card.Ace, Card.Two ]
+        , clubs = [ Card.Ace, Card.Two ]
+        }
+
+    , testNotSatisfied "4-4-4-1 is not balanced" Knowledge.balanced
+        { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , hearts = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , diamonds = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , clubs = [ Card.Ace ]
+        }
+    ]
+
+
+semiBalancedSuite : ElmTest.Test
+semiBalancedSuite =
+  ElmTest.suite "semiBalanced"
+    [ testSatisfied "5-4-2-2 is semi-balanced" Knowledge.semiBalanced
+        { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four, Card.Five ]
+        , hearts = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , diamonds = [ Card.Ace, Card.Two ]
+        , clubs = [ Card.Ace, Card.Two ]
+        }
+
+    , testSatisfied "6-3-2-2 is semi-balanced" Knowledge.semiBalanced
+        { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four, Card.Five, Card.Six ]
+        , hearts = [ Card.Ace, Card.Two, Card.Three ]
+        , diamonds = [ Card.Ace, Card.Two ]
+        , clubs = [ Card.Ace, Card.Two ]
+        }
+
+    , testNotSatisfied "4-4-3-2 is not semi-balanced" Knowledge.semiBalanced
+        { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , hearts = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , diamonds = [ Card.Ace, Card.Two, Card.Three ]
+        , clubs = [ Card.Ace, Card.Two ]
+        }
+
+    , testNotSatisfied "4-3-3-3 is not semi-balanced" Knowledge.semiBalanced
+        { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , hearts = [ Card.Ace, Card.Two, Card.Three ]
+        , diamonds = [ Card.Ace, Card.Two, Card.Three ]
+        , clubs = [ Card.Ace, Card.Two, Card.Three ]
+        }
+
+    , testNotSatisfied "5-3-3-2 is not semi-balanced" Knowledge.semiBalanced
+        { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four, Card.Five ]
+        , hearts = [ Card.Ace, Card.Two, Card.Three ]
+        , diamonds = [ Card.Ace, Card.Two, Card.Three ]
+        , clubs = [ Card.Ace, Card.Two ]
+        }
+
+    , testNotSatisfied "4-4-4-1 is not semi-balanced" Knowledge.semiBalanced
+        { spades = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , hearts = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , diamonds = [ Card.Ace, Card.Two, Card.Three, Card.Four ]
+        , clubs = [ Card.Ace ]
+        }
+    ]
+
+
 countRankSuite : ElmTest.Test
 countRankSuite =
   let
@@ -412,6 +522,18 @@ testExactMetric : String -> Knowledge.Metric -> Int -> Card.SampleHand a -> ElmT
 testExactMetric name metric expected hand =
   ElmTest.test name <|
     ElmTest.assertEqual (Solver.singleton expected) (Knowledge.get Seat.Self metric <| handKnowledge hand)
+
+
+testSatisfied : String -> Solver.Constraint Knowledge.Metric -> Card.SampleHand a -> ElmTest.Test
+testSatisfied name constraint hand =
+  ElmTest.test name <|
+    ElmTest.assert <| Maybe.Extra.isJust <| Knowledge.addConstraint Seat.Self constraint <| handKnowledge hand
+
+
+testNotSatisfied : String -> Solver.Constraint Knowledge.Metric -> Card.SampleHand a -> ElmTest.Test
+testNotSatisfied name constraint hand =
+  ElmTest.test name <|
+    ElmTest.assert <| Maybe.Extra.isNothing <| Knowledge.addConstraint Seat.Self constraint <| handKnowledge hand
 
 
 handKnowledge : Card.SampleHand a -> Knowledge.Knowledge

@@ -15,8 +15,10 @@ module Solver exposing
   , greaterThanOrEqual
   , ifThen
   , ifThenElse
+  , isSolvable
   , lessThan
   , lessThanOrEqual
+  , mapVariables
   , multiply
   , not
   , or
@@ -112,6 +114,11 @@ ifThenElse =
   Solver.Constraint.ifThenElse
 
 
+isSolvable : Problem var -> Bool
+isSolvable =
+  Solver.Problem.isSolvable
+
+
 lessThan : Term var -> Term var -> Constraint var
 lessThan =
   Solver.Constraint.lessThan
@@ -120,6 +127,11 @@ lessThan =
 lessThanOrEqual : Term var -> Term var -> Constraint var
 lessThanOrEqual =
   Solver.Constraint.lessThanOrEqual
+
+
+mapVariables : (old -> new) -> Constraint old -> Constraint new
+mapVariables =
+  Solver.Constraint.mapVariables
 
 
 multiply : Int -> Term var -> Term var

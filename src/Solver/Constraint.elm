@@ -17,6 +17,9 @@ module Solver.Constraint exposing
   , evaluate
   , boundVariables
 
+  , mapVariables
+  , eq
+
   , producer
   )
 
@@ -225,6 +228,46 @@ boundVariables constraint =
       EveryDict.empty
     AlwaysFalse ->
       EveryDict.empty
+
+
+{-| Apply a transformation to the variables in a constraint.
+-}
+mapVariables : (old -> new) -> Constraint old -> Constraint new
+mapVariables f constraint =
+  case constraint of
+    Zero child ->
+      Zero (Solver.Term.mapVariables f child)
+    Positive child ->
+      Positive (Solver.Term.mapVariables f child)
+    And child1 child2 ->
+      And (mapVariables f child1) (mapVariables f child2)
+    Or child1 child2 ->
+      Or (mapVariables f child1) (mapVariables f child2)
+    AlwaysTrue ->
+      AlwaysTrue
+    AlwaysFalse ->
+      AlwaysFalse
+
+
+{-| Test if two constraints are exactly identical.
+-}
+eq : Constraint var -> Constraint var -> Bool
+eq left right =
+  case (left, right) of
+    (Zero leftChild, Zero rightChild) ->
+      Solver.Term.eq leftChild rightChild
+    (Positive leftChild, Positive rightChild) ->
+      Solver.Term.eq leftChild rightChild
+    (And leftChild1 leftChild2, And rightChild1 rightChild2) ->
+      eq leftChild1 rightChild1 && eq leftChild2 rightChild2
+    (Or leftChild1 leftChild2, Or rightChild1 rightChild2) ->
+      eq leftChild1 rightChild1 && eq leftChild2 rightChild2
+    (AlwaysTrue, AlwaysTrue) ->
+      True
+    (AlwaysFalse, AlwaysFalse) ->
+      True
+    _ ->
+      False
 
 
 {-| Produce a random constraint for testing.

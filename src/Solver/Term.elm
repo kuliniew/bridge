@@ -9,6 +9,7 @@ module Solver.Term exposing
   , multiply
 
   , eq
+  , mapVariables
 
   , evaluate
   , constrain
@@ -27,6 +28,7 @@ import EveryDict exposing (EveryDict)
 import Random
 import Random.Extra
 import Shrink
+import Tuple2
 
 
 {-| A term in a constraint.
@@ -114,6 +116,16 @@ multiply coeff (Term term) =
 eq : Term var -> Term var -> Bool
 eq (Term left) (Term right) =
   EveryDict.eq left right
+
+
+{-| Apply a transformation to the variables in a term.
+-}
+mapVariables : (old -> new) -> Term old -> Term new
+mapVariables f (Term term) =
+  EveryDict.toList term
+    |> List.map (Tuple2.mapFst (Maybe.map f))
+    |> EveryDict.fromList
+    |> Term
 
 
 {-| Evaluate the range of values a term can have, given a set of known

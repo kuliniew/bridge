@@ -1,5 +1,6 @@
 module Solver.ConstraintTests exposing (all)
 
+import OperationTests
 import Solver.Constraint exposing (Constraint)
 import Solver.Endpoint
 import Solver.Interval exposing (Interval)
@@ -12,6 +13,7 @@ import Check
 import Check.Producer
 import ElmTest
 import EveryDict exposing (EveryDict)
+import String
 
 
 all : ElmTest.Test
@@ -32,6 +34,8 @@ all =
     , ifThenElseSuite
     , logicSuite
     , decomposeSuite
+    , mapVariablesSuite
+    , eqSuite
     ]
 
 
@@ -808,6 +812,49 @@ decomposeSuite =
           (\(x, y) -> List.length (Solver.Constraint.decompose (x `Solver.Constraint.and` y)) >= 2)
         `Check.for`
           Check.Producer.tuple (constraintProducer, constraintProducer)
+    ]
+
+
+mapVariablesSuite : ElmTest.Test
+mapVariablesSuite =
+  ElmTest.suite "mapVariables"
+    [ ElmTest.test "basic transformation" <|
+        let
+          oldConstraint =
+            Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.variable "y"
+          newConstraint =
+            Solver.Term.variable "X" `Solver.Constraint.equal` Solver.Term.variable "Y"
+        in
+          ElmTest.assert <| Solver.Constraint.eq (Solver.Constraint.mapVariables String.toUpper oldConstraint) newConstraint
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "reversible"
+        `Check.true`
+          (\original ->
+            let
+              transformed =
+                Solver.Constraint.mapVariables String.toLower <| Solver.Constraint.mapVariables String.toUpper original
+            in
+              transformed `Solver.Constraint.eq` original)
+        `Check.for`
+          constraintProducer
+    ]
+
+
+eqSuite : ElmTest.Test
+eqSuite =
+  ElmTest.suite "eq"
+    [ OperationTests.equality Solver.Constraint.eq constraintProducer
+
+    , ElmTest.test "(x = 0) != (x = 1)" <|
+        let
+          zero =
+            Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 0
+          one =
+            Solver.Term.variable "x" `Solver.Constraint.equal` Solver.Term.constant 1
+        in
+          ElmTest.assert <| not <| zero `Solver.Constraint.eq` one
     ]
 
 

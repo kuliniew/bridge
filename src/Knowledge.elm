@@ -2,7 +2,12 @@ module Knowledge exposing
   ( Metric (..)
   , Knowledge
   , create
+  , addConstraint
   , get
+
+  , distribution
+  , balanced
+  , semiBalanced
   )
 
 {-| Representation of a player's knowledge of what is in each player's
@@ -313,6 +318,21 @@ addHand : Seat.Relative -> List Card.Card -> Knowledge -> Knowledge
 addHand _ _ knowledge = knowledge
 
 
+{-| Add a new constraint, failing if it cannot be satisfied.
+-}
+addConstraint : Seat.Relative -> Solver.Constraint Metric -> Knowledge -> Maybe Knowledge
+addConstraint seat metricConstraint knowledge =
+  let
+    constraint =
+      Solver.mapVariables (Variable seat) metricConstraint
+    newKnowledge =
+      Solver.addConstraint constraint knowledge
+  in
+    if Solver.isSolvable newKnowledge
+    then Just newKnowledge
+    else Nothing
+
+
 {-| Get a piece of information.
 -}
 get : Seat.Relative -> Metric -> Knowledge -> Solver.Range
@@ -327,3 +347,40 @@ cartesianMap f xs ys =
   xs `List.Extra.andThen` \x ->
     ys `List.Extra.andThen` \y ->
       [f x y]
+
+
+{-| Constraint that a hand has a particular distribution.
+-}
+distribution : Int -> Int -> Int -> Int -> Solver.Constraint Metric
+distribution a b c d =
+  let
+    expectLength suit length =
+      Solver.variable (Length suit) `Solver.equal` Solver.constant length
+  in
+    [a, b, c, d]
+      |> List.Extra.permutations
+      |> List.sort
+      |> List.Extra.unique
+      |> List.map (Solver.all << List.map2 expectLength Card.suits)
+      |> Solver.any
+
+
+{-| Constraint that a hand is balanced.
+-}
+balanced : Solver.Constraint Metric
+balanced =
+  Solver.any
+    [ distribution 4 3 3 3
+    , distribution 4 4 3 2
+    , distribution 5 3 3 2
+    ]
+
+
+{-| Constraint that a hand is semi-balanced.
+-}
+semiBalanced : Solver.Constraint Metric
+semiBalanced =
+  Solver.any
+    [ distribution 5 4 2 2
+    , distribution 6 3 2 2
+    ]

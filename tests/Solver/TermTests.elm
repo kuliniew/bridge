@@ -23,6 +23,7 @@ import List.Extra
 import Random
 import Random.Extra
 import Shrink
+import String
 
 
 all : ElmTest.Test
@@ -36,6 +37,7 @@ all =
     , negateSuite
     , subtractSuite
     , multiplySuite
+    , mapVariablesSuite
     ]
 
 
@@ -458,6 +460,33 @@ multiplySuite =
               (Solver.Term.sum <| List.repeat count term))
         `Check.for`
           Check.Producer.tuple (Check.Producer.rangeInt 0 10, termProducer)
+    ]
+
+
+mapVariablesSuite : ElmTest.Test
+mapVariablesSuite =
+  ElmTest.suite "mapVariables"
+    [ ElmTest.test "basic transformation" <|
+        let
+          oldTerm =
+            Solver.Term.variable "x"
+          newTerm =
+            Solver.Term.variable "X"
+        in
+          ElmTest.assert <| Solver.Term.eq (Solver.Term.mapVariables String.toUpper oldTerm) newTerm
+
+    , TestUtils.generativeTest <|
+        Check.claim
+          "reversible"
+        `Check.true`
+          (\original ->
+            let
+              transformed =
+                Solver.Term.mapVariables String.toLower <| Solver.Term.mapVariables String.toUpper original
+            in
+              transformed `Solver.Term.eq` original)
+        `Check.for`
+          termProducer
     ]
 
 
