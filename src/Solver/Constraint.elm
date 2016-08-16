@@ -206,10 +206,16 @@ evaluate variables constraint =
           Just variables
         AlwaysFalse ->
           Nothing
+    warrantsReevaluation =
+      case constraint of
+        And _ _ ->
+          True
+        _ ->
+          False
   in
     case basicResult of
       Just newVariables ->
-        if EveryDict.eq variables newVariables
+        if EveryDict.eq variables newVariables || Basics.not warrantsReevaluation
         then basicResult
         else evaluate newVariables constraint
       Nothing ->
