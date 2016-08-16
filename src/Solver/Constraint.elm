@@ -44,6 +44,7 @@ Whenever a constraint implements a relation R, the interpretation is
 -}
 type Constraint var
   = Zero (Term var)
+  | NonZero (Term var)
   | Positive (Term var)
   | And (Constraint var) (Constraint var)
   | Or (Constraint var) (Constraint var)
@@ -120,7 +121,9 @@ not : Constraint var -> Constraint var
 not constraint =
   case constraint of
     Zero term ->
-      (term `lessThan` Solver.Term.constant 0) `or` (term `greaterThan` Solver.Term.constant 0)
+      NonZero term
+    NonZero term ->
+      Zero term
     Positive term ->
       (term `lessThanOrEqual` Solver.Term.constant 0)
     And left right ->
@@ -183,6 +186,8 @@ evaluate variables constraint =
       case constraint of
         Zero term ->
           Solver.Term.constrain term (Solver.Range.singleton 0) variables
+        NonZero term ->
+          evaluate variables ((term `lessThan` Solver.Term.constant 0) `or` (term `greaterThan` Solver.Term.constant 0))
         Positive term ->
           Solver.Term.constrain term (Solver.Range.fromLowerBound 1) variables
         And left right ->
@@ -218,6 +223,8 @@ boundVariables constraint =
   case constraint of
     Zero term ->
       Solver.Term.boundVariables term
+    NonZero term ->
+      Solver.Term.boundVariables term
     Positive term ->
       Solver.Term.boundVariables term
     And left right ->
@@ -237,6 +244,8 @@ mapVariables f constraint =
   case constraint of
     Zero child ->
       Zero (Solver.Term.mapVariables f child)
+    NonZero child ->
+      NonZero (Solver.Term.mapVariables f child)
     Positive child ->
       Positive (Solver.Term.mapVariables f child)
     And child1 child2 ->
@@ -255,6 +264,8 @@ eq : Constraint var -> Constraint var -> Bool
 eq left right =
   case (left, right) of
     (Zero leftChild, Zero rightChild) ->
+      Solver.Term.eq leftChild rightChild
+    (NonZero leftChild, NonZero rightChild) ->
       Solver.Term.eq leftChild rightChild
     (Positive leftChild, Positive rightChild) ->
       Solver.Term.eq leftChild rightChild
@@ -296,6 +307,7 @@ terminalGenerator termGenerator =
     [ Random.Extra.constant AlwaysTrue
     , Random.Extra.constant AlwaysFalse
     , Random.map Zero termGenerator
+    , Random.map NonZero termGenerator
     , Random.map Positive termGenerator
     ]
 
@@ -332,6 +344,8 @@ constraintShrinker termShrinker constraint =
     case constraint of
       Zero term ->
         Zero `Shrink.map` termShrinker term
+      NonZero term ->
+        NonZero `Shrink.map` termShrinker term
       Positive term ->
         Positive `Shrink.map` termShrinker term
       And left right ->
