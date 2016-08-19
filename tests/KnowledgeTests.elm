@@ -404,9 +404,6 @@ distributionSuite =
     ]
 
 
--- TODO: balancedSuite and semiBalancedSuite need to take hands as inputs
-
-
 balancedSuite : ElmTest.Test
 balancedSuite =
   ElmTest.suite "balanced"
