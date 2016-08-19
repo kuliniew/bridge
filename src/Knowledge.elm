@@ -118,10 +118,15 @@ create hand =
       Solver.equal
         (Solver.variable <| Variable Seat.Self (CountRank rank))
         (Solver.constant <| Evaluation.countRank rank hand)
+    quickLosersConstraint suit =
+      Solver.equal
+        (Solver.variable <| Variable Seat.Self (QuickLosers suit))
+        (Solver.constant <| Evaluation.quickLosers suit hand)
     constraints =
       List.concat
         [ List.map suitConstraint Card.suits
         , List.map rankConstraint Card.ranks
+        , List.map quickLosersConstraint Card.suits
         ]
   in
     List.foldl Solver.addConstraint baseKnowledge constraints

@@ -1,10 +1,14 @@
 module KnowledgeTests exposing (all)
 
 import Card
+import Card.Producer
 import Knowledge
 import Seat
 import Solver
+import TestUtils
 
+import Check
+import Check.Producer
 import ElmTest
 import Maybe.Extra
 
@@ -28,7 +32,7 @@ all =
 
     -- , playingTricksSuite   -- FIXME: IMPLEMENT THIS
 
-    -- , quickLosersSuite     -- FIXME: IMPLEMENT THIS
+    , quickLosersSuite
     ]
 
 
@@ -512,6 +516,59 @@ countRankSuite =
       [ testExactMetric "have cards of that rank" (Knowledge.CountRank Card.Ace) 2 hand
 
       , testExactMetric "have no cards of that rank" (Knowledge.CountRank Card.King) 0 hand
+      ]
+
+
+quickLosersSuite : ElmTest.Test
+quickLosersSuite =
+  let
+    spadesHand ranks =
+      { spades = ranks
+      , hearts = []
+      , diamonds = []
+      , clubs = List.take (13 - List.length ranks) Card.ranks
+      }
+    test name expected ranks =
+      testExactMetric name (Knowledge.QuickLosers Card.Spades) expected (spadesHand ranks)
+  in
+    ElmTest.suite "quickLosers"
+      [ test "void suit" 0 []
+
+      , test "singleton ace" 0 [ Card.Ace ]
+      , test "doubleton ace-king" 0 [ Card.Ace, Card.King ]
+      , test "doubleton ace-queen" 0 [ Card.Ace, Card.Queen ]
+      , test "doubleton ace-spot" 0 [ Card.Ace, Card.Ten ]
+
+      , test "singleton king" 1 [ Card.King ]
+      , test "doubleton king-queen" 1 [ Card.King, Card.Queen ]
+      , test "doubleton king-spot" 1 [ Card.King, Card.Ten ]
+
+      , test "singleton queen" 1 [ Card.Queen ]
+      , test "doubleton queen-jack" 2 [ Card.Queen, Card.Jack ]
+      , test "three-length queen-jack-spot" 2 [ Card.Queen, Card.Jack, Card.Ten ]
+
+      , test "singleton jack" 1 [ Card.Jack ]
+      , test "doubleton jack-spot" 2 [ Card.Jack, Card.Ten ]
+      , test "three-length jack-spot-spot" 3 [ Card.Jack, Card.Ten, Card.Nine ]
+      , test "four-length jack-spot-spot-spot" 3 [ Card.Jack, Card.Ten, Card.Nine, Card.Eight ]
+
+      , test "singleton spot" 1 [ Card.Ten ]
+      , test "doubleton spot-spot" 2 [ Card.Ten, Card.Nine ]
+      , test "three-length spot-spot-spot" 3 [ Card.Ten, Card.Nine, Card.Eight ]
+      , test "four-length spot-spot-spot-spot" 4 [ Card.Ten, Card.Nine, Card.Eight, Card.Seven ]
+
+      , TestUtils.generativeTest <|
+          Check.claim
+            "is never more than the length of the suit"
+          `Check.true`
+            (\(suit, hand) ->
+              let
+                constraint =
+                  Solver.variable (Knowledge.QuickLosers suit) `Solver.greaterThan` Solver.variable (Knowledge.Length suit)
+              in
+                Maybe.Extra.isNothing <| Knowledge.addConstraint Seat.Self constraint <| Knowledge.create hand)
+          `Check.for`
+            Check.Producer.tuple (Card.Producer.suit, Card.Producer.hand)
       ]
 
 
